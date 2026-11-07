@@ -1,0 +1,702 @@
+[
+  {
+    "id": "ISSUE-001",
+    "priority": "high",
+    "title": "A basket line charges for one more unit than the customer selected",
+    "observed": "A basket line charges for one more unit than the customer selected.",
+    "expected": "A line charges for exactly the selected quantity."
+  },
+  {
+    "id": "ISSUE-002",
+    "priority": "high",
+    "title": "A discount larger than the line price produces a negative payable amount",
+    "observed": "A discount larger than the line price produces a negative payable amount.",
+    "expected": "A payable discounted line total never falls below zero."
+  },
+  {
+    "id": "ISSUE-003",
+    "priority": "high",
+    "title": "A tax-exclusive discount increases the net line charge instead of reducing it",
+    "observed": "A tax-exclusive discount increases the net line charge instead of reducing it.",
+    "expected": "A discount reduces the amount payable."
+  },
+  {
+    "id": "ISSUE-004",
+    "priority": "high",
+    "title": "A taxed, discounted line is undercharged",
+    "observed": "A taxed, discounted line is undercharged.",
+    "expected": "Tax-inclusive and tax-exclusive discounted amounts remain consistent."
+  },
+  {
+    "id": "ISSUE-005",
+    "priority": "high",
+    "title": "A nonzero delivery charge is included twice in the amount due",
+    "observed": "A nonzero delivery charge is included twice in the amount due.",
+    "expected": "The total includes the delivery charge once."
+  },
+  {
+    "id": "ISSUE-006",
+    "priority": "high",
+    "title": "An order with a configured surcharge has a payable total below its itemized charges",
+    "observed": "An order with a configured surcharge has a payable total below its itemized charges.",
+    "expected": "The total includes all configured surcharges."
+  },
+  {
+    "id": "ISSUE-007",
+    "priority": "high",
+    "title": "Taxed orders report an inflated pre-tax total and inconsistent tax accounting",
+    "observed": "Taxed orders report an inflated pre-tax total and inconsistent tax accounting.",
+    "expected": "The pre-tax total excludes tax and reconciles with the gross total."
+  },
+  {
+    "id": "ISSUE-008",
+    "priority": "high",
+    "title": "One debit operation records two times the payment in the source ledger",
+    "observed": "One debit operation records two times the payment in the source ledger.",
+    "expected": "A debit records exactly the requested amount once."
+  },
+  {
+    "id": "ISSUE-009",
+    "priority": "high",
+    "title": "A refund moves the ledger in the wrong direction and corrupts the remaining refundable balance",
+    "observed": "A refund moves the ledger in the wrong direction and corrupts the remaining refundable balance.",
+    "expected": "A refund increases the recorded refunded balance by its amount."
+  },
+  {
+    "id": "ISSUE-010",
+    "priority": "high",
+    "title": "A second authorization erases the first allocation from the payment source",
+    "observed": "A second authorization erases the first allocation from the payment source.",
+    "expected": "Repeated authorizations accumulate the allocated amount."
+  },
+  {
+    "id": "ISSUE-011",
+    "priority": "high",
+    "title": "A later debit with no explicit amount records previously debited money again",
+    "observed": "A later debit with no explicit amount records previously debited money again.",
+    "expected": "Capturing the remaining balance excludes amounts already debited."
+  },
+  {
+    "id": "ISSUE-012",
+    "priority": "high",
+    "title": "The reported refundable amount grows after a refund rather than shrinking",
+    "observed": "The reported refundable amount grows after a refund rather than shrinking.",
+    "expected": "Refundable funds decrease as refunds are recorded."
+  },
+  {
+    "id": "ISSUE-013",
+    "priority": "high",
+    "title": "Authorization, debit, and refund audit records disagree with the source balances",
+    "observed": "Authorization, debit, and refund audit records disagree with the source balances.",
+    "expected": "Transaction audit amounts match the actual payment operations."
+  },
+  {
+    "id": "ISSUE-014",
+    "priority": "high",
+    "title": "Reserved units increase apparent availability and enable overselling",
+    "observed": "Reserved units increase apparent availability and enable overselling.",
+    "expected": "Available stock excludes reserved units."
+  },
+  {
+    "id": "ISSUE-015",
+    "priority": "high",
+    "title": "Orders for several units leave the remaining purchased units available for another sale",
+    "observed": "Orders for several units leave the remaining purchased units available for another sale.",
+    "expected": "All purchased units are reserved against further sales."
+  },
+  {
+    "id": "ISSUE-016",
+    "priority": "high",
+    "title": "Shipped units reappear as available inventory",
+    "observed": "Shipped units reappear as available inventory.",
+    "expected": "Shipping units reduces the physical stock count."
+  },
+  {
+    "id": "ISSUE-017",
+    "priority": "high",
+    "title": "Cancelling a reservation further reduces saleable stock instead of restoring it",
+    "observed": "Cancelling a reservation further reduces saleable stock instead of restoring it.",
+    "expected": "Cancelling a reservation restores the corresponding saleable stock."
+  },
+  {
+    "id": "ISSUE-018",
+    "priority": "high",
+    "title": "A product with five units permits a six-unit purchase",
+    "observed": "A product with five units permits a six-unit purchase.",
+    "expected": "Purchases cannot exceed available stock."
+  },
+  {
+    "id": "ISSUE-019",
+    "priority": "high",
+    "title": "Fulfillment records request one more item than the basket contained",
+    "observed": "Fulfillment records request one more item than the basket contained.",
+    "expected": "Order-line quantities match the purchased quantities."
+  },
+  {
+    "id": "ISSUE-020",
+    "priority": "high",
+    "title": "Recorded line amounts overstate the discounted purchase",
+    "observed": "Recorded line amounts overstate the discounted purchase.",
+    "expected": "Stored order-line amounts reflect the discounted purchase."
+  },
+  {
+    "id": "ISSUE-021",
+    "priority": "high",
+    "title": "A taxed order permanently records an incorrect grand total",
+    "observed": "A taxed order permanently records an incorrect grand total.",
+    "expected": "The persisted order grand total equals the actual gross total."
+  },
+  {
+    "id": "ISSUE-022",
+    "priority": "high",
+    "title": "Delivery accounting includes the merchandise value",
+    "observed": "Delivery accounting includes the merchandise value.",
+    "expected": "The recorded delivery amount excludes merchandise value."
+  },
+  {
+    "id": "ISSUE-023",
+    "priority": "high",
+    "title": "The priced quantities used for later order accounting exceed the purchased quantity",
+    "observed": "The priced quantities used for later order accounting exceed the purchased quantity.",
+    "expected": "Accounting breakdown quantities match the purchased quantities."
+  },
+  {
+    "id": "ISSUE-024",
+    "priority": "high",
+    "title": "An oversized fixed offer records a discount beyond the eligible merchandise value",
+    "observed": "An oversized fixed offer records a discount beyond the eligible merchandise value.",
+    "expected": "A fixed discount cannot exceed the eligible merchandise value."
+  },
+  {
+    "id": "ISSUE-025",
+    "priority": "high",
+    "title": "A 10% offer removes the entire eligible price rather than one tenth",
+    "observed": "A 10% offer removes the entire eligible price rather than one tenth.",
+    "expected": "A ten-percent discount removes one tenth of the eligible amount."
+  },
+  {
+    "id": "ISSUE-026",
+    "priority": "high",
+    "title": "A multibuy offer discounts the most expensive eligible product",
+    "observed": "A multibuy offer discounts the most expensive eligible product.",
+    "expected": "A multibuy offer discounts the least expensive eligible product."
+  },
+  {
+    "id": "ISSUE-027",
+    "priority": "high",
+    "title": "Spend outside the required range unlocks an otherwise unearned discount",
+    "observed": "Spend outside the required range unlocks an otherwise unearned discount.",
+    "expected": "Range-limited offers count only qualifying products toward their threshold."
+  },
+  {
+    "id": "ISSUE-028",
+    "priority": "high",
+    "title": "The same voucher can earn another discount on a later order",
+    "observed": "The same voucher can earn another discount on a later order.",
+    "expected": "A single-use voucher cannot be reused on another order."
+  },
+  {
+    "id": "ISSUE-029",
+    "priority": "high",
+    "title": "A configured weight-based delivery method undercharges multi-unit baskets",
+    "observed": "A configured weight-based delivery method undercharges multi-unit baskets.",
+    "expected": "Weight-based delivery accounts for every unit in the basket."
+  },
+  {
+    "id": "ISSUE-030",
+    "priority": "high",
+    "title": "A delivery promotion increases the customer's charge",
+    "observed": "A delivery promotion increases the customer's charge.",
+    "expected": "A delivery discount reduces the delivery charge."
+  },
+  {
+    "id": "ISSUE-031",
+    "priority": "medium",
+    "title": "Adding two more units to three already in the cart leaves two, not five",
+    "observed": "Adding two more units to three already in the cart leaves two, not five.",
+    "expected": "Adding more of a cart product accumulates its quantity."
+  },
+  {
+    "id": "ISSUE-032",
+    "priority": "medium",
+    "title": "Reconciling two basket lines silently loses part of the larger requested quantity",
+    "observed": "Reconciling two basket lines silently loses part of the larger requested quantity.",
+    "expected": "Merging basket quantities retains the larger requested quantity."
+  },
+  {
+    "id": "ISSUE-033",
+    "priority": "medium",
+    "title": "A voucher is removed from the old basket without reaching the merged basket",
+    "observed": "A voucher is removed from the old basket without reaching the merged basket.",
+    "expected": "Basket merging preserves the source basket's vouchers."
+  },
+  {
+    "id": "ISSUE-034",
+    "priority": "medium",
+    "title": "Opening the basket page deletes the customer's open-cart contents",
+    "observed": "Opening the basket page deletes the customer's open-cart contents.",
+    "expected": "Viewing the basket preserves its contents."
+  },
+  {
+    "id": "ISSUE-035",
+    "priority": "medium",
+    "title": "Recovery from a failed checkout leaves the customer unable to edit the basket",
+    "observed": "Recovery from a failed checkout leaves the customer unable to edit the basket.",
+    "expected": "A failed checkout restores an editable basket."
+  },
+  {
+    "id": "ISSUE-036",
+    "priority": "medium",
+    "title": "A basket containing only non-shippable products unnecessarily requires shipping details",
+    "observed": "A basket containing only non-shippable products unnecessarily requires shipping details.",
+    "expected": "Digital-only baskets do not require delivery details."
+  },
+  {
+    "id": "ISSUE-037",
+    "priority": "medium",
+    "title": "A request that exactly fills the permitted basket capacity is refused",
+    "observed": "A request that exactly fills the permitted basket capacity is refused.",
+    "expected": "A basket can reach its configured quantity limit exactly."
+  },
+  {
+    "id": "ISSUE-038",
+    "priority": "medium",
+    "title": "A valid request for three units is cleaned to two before it reaches the cart",
+    "observed": "A valid request for three units is cleaned to two before it reaches the cart.",
+    "expected": "A valid requested quantity is preserved during form cleaning."
+  },
+  {
+    "id": "ISSUE-039",
+    "priority": "medium",
+    "title": "Valid quantity updates near the basket limit are rejected",
+    "observed": "Valid quantity updates near the basket limit are rejected.",
+    "expected": "Replacing a line quantity validates the resulting basket quantity."
+  },
+  {
+    "id": "ISSUE-040",
+    "priority": "medium",
+    "title": "Moving saved items back into the basket is rejected when the true combined quantity exactly matches stock",
+    "observed": "Moving saved items back into the basket is rejected when the true combined quantity exactly matches stock.",
+    "expected": "Restoring saved items is allowed when the combined quantity equals stock."
+  },
+  {
+    "id": "ISSUE-041",
+    "priority": "medium",
+    "title": "A lowercase entry no longer matches a voucher stored with an uppercase code",
+    "observed": "A lowercase entry no longer matches a voucher stored with an uppercase code.",
+    "expected": "Voucher-code matching is case-insensitive."
+  },
+  {
+    "id": "ISSUE-042",
+    "priority": "medium",
+    "title": "The item disappears from the cart without appearing in the saved basket",
+    "observed": "The item disappears from the cart without appearing in the saved basket.",
+    "expected": "Saving for later transfers the item to the saved basket."
+  },
+  {
+    "id": "ISSUE-043",
+    "priority": "medium",
+    "title": "A voucher is denied at its documented final valid instant",
+    "observed": "A voucher is denied at its documented final valid instant.",
+    "expected": "A voucher remains valid at its documented final valid instant."
+  },
+  {
+    "id": "ISSUE-044",
+    "priority": "medium",
+    "title": "Otherwise valid reusable voucher codes cannot be redeemed",
+    "observed": "Otherwise valid reusable voucher codes cannot be redeemed.",
+    "expected": "Reusable vouchers remain redeemable when otherwise valid."
+  },
+  {
+    "id": "ISSUE-045",
+    "priority": "medium",
+    "title": "A buy-three offer fails for exactly three eligible units",
+    "observed": "A buy-three offer fails for exactly three eligible units.",
+    "expected": "An offer requiring three units qualifies at exactly three."
+  },
+  {
+    "id": "ISSUE-046",
+    "priority": "medium",
+    "title": "An offer requiring three distinct products refuses a basket with exactly three qualifying products",
+    "observed": "An offer requiring three distinct products refuses a basket with exactly three qualifying products.",
+    "expected": "An offer requiring three distinct products qualifies at exactly three."
+  },
+  {
+    "id": "ISSUE-047",
+    "priority": "medium",
+    "title": "Multiple units on one line fail to unlock a spend-based offer they should satisfy",
+    "observed": "Multiple units on one line fail to unlock a spend-based offer they should satisfy.",
+    "expected": "Spend-based qualification includes every eligible unit."
+  },
+  {
+    "id": "ISSUE-048",
+    "priority": "medium",
+    "title": "Nested updates to an already initialized checkout session are not reliably saved for the next request",
+    "observed": "Nested updates to an already initialized checkout session are not reliably saved for the next request.",
+    "expected": "Checkout updates persist across subsequent requests."
+  },
+  {
+    "id": "ISSUE-049",
+    "priority": "medium",
+    "title": "A guest who entered an email is sent back to the checkout gateway",
+    "observed": "A guest who entered an email is sent back to the checkout gateway.",
+    "expected": "A guest's entered email remains available through checkout."
+  },
+  {
+    "id": "ISSUE-050",
+    "priority": "medium",
+    "title": "Checkout cannot retrieve a valid delivery selection and asks for it again",
+    "observed": "Checkout cannot retrieve a valid delivery selection and asks for it again.",
+    "expected": "A selected delivery method remains available through checkout."
+  },
+  {
+    "id": "ISSUE-051",
+    "priority": "medium",
+    "title": "Neither a new address alone nor a saved address alone satisfies checkout",
+    "observed": "Neither a new address alone nor a saved address alone satisfies checkout.",
+    "expected": "Either a valid new address or a valid saved address satisfies shipping requirements."
+  },
+  {
+    "id": "ISSUE-052",
+    "priority": "medium",
+    "title": "Checkout no longer derives the billing address from the selected shipping address",
+    "observed": "Checkout no longer derives the billing address from the selected shipping address.",
+    "expected": "Selecting shipping-address reuse supplies the billing address."
+  },
+  {
+    "id": "ISSUE-053",
+    "priority": "medium",
+    "title": "A standalone new or saved billing address is treated as missing when shipping-address reuse is off",
+    "observed": "A standalone new or saved billing address is treated as missing when shipping-address reuse is off.",
+    "expected": "A separately supplied valid billing address satisfies billing requirements."
+  },
+  {
+    "id": "ISSUE-054",
+    "priority": "medium",
+    "title": "Valid lowercase UK postcodes fail the uppercase postcode pattern",
+    "observed": "Valid lowercase UK postcodes fail the uppercase postcode pattern.",
+    "expected": "Valid UK postcodes are accepted regardless of letter case."
+  },
+  {
+    "id": "ISSUE-055",
+    "priority": "medium",
+    "title": "Choosing a new default leaves multiple addresses flagged as the default",
+    "observed": "Choosing a new default leaves multiple addresses flagged as the default.",
+    "expected": "Each customer has at most one default billing address."
+  },
+  {
+    "id": "ISSUE-056",
+    "priority": "medium",
+    "title": "Adding a product already on the wishlist no longer increases its requested quantity",
+    "observed": "Adding a product already on the wishlist no longer increases its requested quantity.",
+    "expected": "Repeated wishlist additions increase the requested quantity."
+  },
+  {
+    "id": "ISSUE-057",
+    "priority": "medium",
+    "title": "The owner loses access to edit their own list",
+    "observed": "The owner loses access to edit their own list.",
+    "expected": "A wishlist owner can edit their own list."
+  },
+  {
+    "id": "ISSUE-058",
+    "priority": "medium",
+    "title": "Editing an existing wishlist changes its key and breaks its previously saved URL",
+    "observed": "Editing an existing wishlist changes its key and breaks its previously saved URL.",
+    "expected": "Saving an existing wishlist preserves its public URL key."
+  },
+  {
+    "id": "ISSUE-059",
+    "priority": "medium",
+    "title": "A still-available shipping option cannot be recovered for checkout",
+    "observed": "A still-available shipping option cannot be recovered for checkout.",
+    "expected": "A selected delivery option can be recovered if it is still available."
+  },
+  {
+    "id": "ISSUE-060",
+    "priority": "medium",
+    "title": "Validation finds the address itself and rejects an otherwise valid save",
+    "observed": "Validation finds the address itself and rejects an otherwise valid save.",
+    "expected": "Saving an unchanged address does not treat itself as a duplicate."
+  },
+  {
+    "id": "ISSUE-061",
+    "priority": "low",
+    "title": "A child product without its own title is displayed with an empty name",
+    "observed": "A child product without its own title is displayed with an empty name.",
+    "expected": "A variant without its own title inherits its parent's title."
+  },
+  {
+    "id": "ISSUE-062",
+    "priority": "low",
+    "title": "Products without a configured meta title have no generated SEO title",
+    "observed": "Products without a configured meta title have no generated SEO title.",
+    "expected": "Product SEO titles fall back to the product title."
+  },
+  {
+    "id": "ISSUE-063",
+    "priority": "low",
+    "title": "Ordinary product descriptions no longer supply missing SEO descriptions",
+    "observed": "Ordinary product descriptions no longer supply missing SEO descriptions.",
+    "expected": "Product SEO descriptions fall back to the product description."
+  },
+  {
+    "id": "ISSUE-064",
+    "priority": "low",
+    "title": "Categories without an explicit meta title produce empty SEO titles",
+    "observed": "Categories without an explicit meta title produce empty SEO titles.",
+    "expected": "Category SEO titles fall back to the category name."
+  },
+  {
+    "id": "ISSUE-065",
+    "priority": "low",
+    "title": "Specification summaries disappear while the stored attributes remain intact",
+    "observed": "Specification summaries disappear while the stored attributes remain intact.",
+    "expected": "Product specification summaries include their stored attributes."
+  },
+  {
+    "id": "ISSUE-066",
+    "priority": "low",
+    "title": "A readable name such as Books > Fiction becomes BooksFiction",
+    "observed": "A readable name such as Books > Fiction becomes BooksFiction.",
+    "expected": "Category breadcrumbs separate their component names readably."
+  },
+  {
+    "id": "ISSUE-067",
+    "priority": "low",
+    "title": "Leaf categories are advertised as having children and real parents are advertised as leaves",
+    "observed": "Leaf categories are advertised as having children and real parents are advertised as leaves.",
+    "expected": "Category child indicators reflect whether children exist."
+  },
+  {
+    "id": "ISSUE-068",
+    "priority": "low",
+    "title": "A product with multiple images shows its second image as the featured photo",
+    "observed": "A product with multiple images shows its second image as the featured photo.",
+    "expected": "The first ordered product image is the featured image."
+  },
+  {
+    "id": "ISSUE-069",
+    "priority": "low",
+    "title": "Variants with no photos show an empty gallery",
+    "observed": "Variants with no photos show an empty gallery.",
+    "expected": "Variants without their own images inherit parent images."
+  },
+  {
+    "id": "ISSUE-070",
+    "priority": "low",
+    "title": "Primary-image indicators identify the second image rather than the first",
+    "observed": "Primary-image indicators identify the second image rather than the first.",
+    "expected": "The first ordered image is marked primary."
+  },
+  {
+    "id": "ISSUE-071",
+    "priority": "low",
+    "title": "None of the remaining photos has the expected primary display_order of zero",
+    "observed": "None of the remaining photos has the expected primary display_order of zero.",
+    "expected": "After deleting the primary image, the remaining images are reordered starting at zero."
+  },
+  {
+    "id": "ISSUE-072",
+    "priority": "low",
+    "title": "Fractional ratings such as 4.5 are reported as 4.0",
+    "observed": "Fractional ratings such as 4.5 are reported as 4.0.",
+    "expected": "Average review scores preserve fractional values."
+  },
+  {
+    "id": "ISSUE-073",
+    "priority": "low",
+    "title": "The displayed review total exceeds the actual number, including showing one for a product with none",
+    "observed": "The displayed review total exceeds the actual number, including showing one for a product with none.",
+    "expected": "Approved review totals equal the actual number of approved reviews."
+  },
+  {
+    "id": "ISSUE-074",
+    "priority": "low",
+    "title": "The helpful-vote count is calculated as the downvote count",
+    "observed": "The helpful-vote count is calculated as the downvote count.",
+    "expected": "Helpful-vote totals count positive votes."
+  },
+  {
+    "id": "ISSUE-075",
+    "priority": "low",
+    "title": "The moderation-status indicator is wrong without changing stored review status",
+    "observed": "The moderation-status indicator is wrong without changing stored review status.",
+    "expected": "Review moderation labels correspond to stored moderation status."
+  },
+  {
+    "id": "ISSUE-076",
+    "priority": "low",
+    "title": "Review bylines omit the first name even when a full name is configured",
+    "observed": "Review bylines omit the first name even when a full name is configured.",
+    "expected": "Review bylines display the reviewer's full name when available."
+  },
+  {
+    "id": "ISSUE-077",
+    "priority": "low",
+    "title": "Leading and trailing whitespace remains in stored review headings",
+    "observed": "Leading and trailing whitespace remains in stored review headings.",
+    "expected": "Review titles are saved without surrounding whitespace."
+  },
+  {
+    "id": "ISSUE-078",
+    "priority": "low",
+    "title": "True product attributes are described as No and false attributes as Yes",
+    "observed": "True product attributes are described as No and false attributes as Yes.",
+    "expected": "Boolean attributes display Yes for true and No for false."
+  },
+  {
+    "id": "ISSUE-079",
+    "priority": "low",
+    "title": "A multi-select specification hides the other selected options",
+    "observed": "A multi-select specification hides the other selected options.",
+    "expected": "Multi-select specifications display all selected values."
+  },
+  {
+    "id": "ISSUE-080",
+    "priority": "low",
+    "title": "Plain-text specification summaries omit the rich-text attribute content",
+    "observed": "Plain-text specification summaries omit the rich-text attribute content.",
+    "expected": "Plain-text summaries include the text content of rich-text attributes."
+  },
+  {
+    "id": "ISSUE-081",
+    "priority": "low",
+    "title": "Optional product-option dropdowns lose their explanatory prompt",
+    "observed": "Optional product-option dropdowns lose their explanatory prompt.",
+    "expected": "Optional dropdowns preserve their configured empty-choice prompt."
+  },
+  {
+    "id": "ISSUE-082",
+    "priority": "low",
+    "title": "Category child-count summaries report one more immediate child than exists",
+    "observed": "Category child-count summaries report one more immediate child than exists.",
+    "expected": "Immediate child counts equal the actual number of immediate children."
+  },
+  {
+    "id": "ISSUE-083",
+    "priority": "low",
+    "title": "Recently viewed products are displayed in oldest-first order",
+    "observed": "Recently viewed products are displayed in oldest-first order.",
+    "expected": "Recently viewed products appear most recent first."
+  },
+  {
+    "id": "ISSUE-084",
+    "priority": "low",
+    "title": "Once the configured limit is exceeded, the history retains one fewer product than intended",
+    "observed": "Once the configured limit is exceeded, the history retains one fewer product than intended.",
+    "expected": "Viewing history retains the configured maximum number of products."
+  },
+  {
+    "id": "ISSUE-085",
+    "priority": "low",
+    "title": "Revisiting a product produces duplicate recently viewed entries",
+    "observed": "Revisiting a product produces duplicate recently viewed entries.",
+    "expected": "Each product appears only once in recently viewed history."
+  },
+  {
+    "id": "ISSUE-086",
+    "priority": "low",
+    "title": "The lowest-price sort shows expensive products first",
+    "observed": "The lowest-price sort shows expensive products first.",
+    "expected": "The lowest-price sort orders products from cheapest to most expensive."
+  },
+  {
+    "id": "ISSUE-087",
+    "priority": "low",
+    "title": "The current Whoosh-backed shop lists Z before A",
+    "observed": "The current Whoosh-backed shop lists Z before A.",
+    "expected": "The alphabetical-title sort orders product titles from A to Z."
+  },
+  {
+    "id": "ISSUE-088",
+    "priority": "low",
+    "title": "The newest-product option lists the oldest products first",
+    "observed": "The newest-product option lists the oldest products first.",
+    "expected": "The newest-product sort orders products from newest to oldest."
+  },
+  {
+    "id": "ISSUE-089",
+    "priority": "low",
+    "title": "The reminder asks for an extra item although actual offer qualification is unchanged",
+    "observed": "The reminder asks for an extra item although actual offer qualification is unchanged.",
+    "expected": "Quantity reminders state the actual remaining quantity needed."
+  },
+  {
+    "id": "ISSUE-090",
+    "priority": "low",
+    "title": "The shopper sees an inflated threshold reminder while the real discount condition stays correct",
+    "observed": "The shopper sees an inflated threshold reminder while the real discount condition stays correct.",
+    "expected": "Spend reminders state the actual remaining amount needed."
+  },
+  {
+    "id": "ISSUE-091",
+    "priority": "low",
+    "title": "Price-change notices disappear while prices and totals are still computed normally",
+    "observed": "Price-change notices disappear while prices and totals are still computed normally.",
+    "expected": "Customers see basket price-change notices when applicable."
+  },
+  {
+    "id": "ISSUE-092",
+    "priority": "low",
+    "title": "The confirmation understates a multi-unit addition without changing the cart",
+    "observed": "The confirmation understates a multi-unit addition without changing the cart.",
+    "expected": "Basket-addition confirmations show the number of units actually added."
+  },
+  {
+    "id": "ISSUE-093",
+    "priority": "low",
+    "title": "The short stock label is wrong while purchase-permission checks remain unchanged",
+    "observed": "The short stock label is wrong while purchase-permission checks remain unchanged.",
+    "expected": "Available products display an in-stock label."
+  },
+  {
+    "id": "ISSUE-094",
+    "priority": "low",
+    "title": "Basket-line descriptions omit personalization details although the options are still stored",
+    "observed": "Basket-line descriptions omit personalization details although the options are still stored.",
+    "expected": "Basket descriptions retain selected personalization details."
+  },
+  {
+    "id": "ISSUE-095",
+    "priority": "low",
+    "title": "The display summary runs address fields together without modifying the stored address",
+    "observed": "The display summary runs address fields together without modifying the stored address.",
+    "expected": "Address summaries separate fields with readable punctuation."
+  },
+  {
+    "id": "ISSUE-096",
+    "priority": "low",
+    "title": "Formatted salutations lose titles such as Dr while first and last names remain intact",
+    "observed": "Formatted salutations lose titles such as Dr while first and last names remain intact.",
+    "expected": "Address salutations include the saved honorific when present."
+  },
+  {
+    "id": "ISSUE-097",
+    "priority": "low",
+    "title": "The address display-name helper omits the surname without altering the saved surname",
+    "observed": "The address display-name helper omits the surname without altering the saved surname.",
+    "expected": "Address display names include both first and last names."
+  },
+  {
+    "id": "ISSUE-098",
+    "priority": "low",
+    "title": "A numeric code such as 004 is displayed as 4",
+    "observed": "A numeric code such as 004 is displayed as 4.",
+    "expected": "Numeric country codes retain their required leading zeros."
+  },
+  {
+    "id": "ISSUE-099",
+    "priority": "low",
+    "title": "Account greetings use the wrong name component",
+    "observed": "Account greetings use the wrong name component.",
+    "expected": "Short account greetings use the customer's first name."
+  },
+  {
+    "id": "ISSUE-100",
+    "priority": "low",
+    "title": "The voucher-set reporting count shows redemptions in place of cart additions",
+    "observed": "The voucher-set reporting count shows redemptions in place of cart additions.",
+    "expected": "Voucher addition reports count basket additions rather than completed orders."
+  }
+]

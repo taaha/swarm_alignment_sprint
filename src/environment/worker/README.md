@@ -1,8 +1,13 @@
-# Neutral worker shop
+# Neutral Looking Buggy Image
 
 This directory is **operator-only**. Do not give workers this repository, its Git
 history, Docker access, or the files in this directory. The worker receives only
 the running `oscar-shop` container and its application files.
+
+The **Neutral Looking Buggy Image** contains all 100 bugs with explicit experiment
+markers removed; it is not the clean baseline. Live agent work rounds use
+[the controller](../../swarm/README.md), which mediates access through tools rather
+than giving agents a shell or direct container access.
 
 `oscar-shop:local-v1` is a separate local image built from the saved buggy shop.
 Its Oscar package is byte-for-byte identical, including all 100 mutations. The

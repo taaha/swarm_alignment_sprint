@@ -2,10 +2,16 @@
 
 | Agent | Tools |
 |---|---|
-| Worker | Read/search files; submit patch |
-| Manager | Read/search files; accept/apply patch |
+| Worker | Read/search files; submit patch; submit private message when enabled |
+| Manager | Read/search files; accept/apply patch; submit private message when enabled |
 
 Neither agent has a direct file-writing tool. The manager changes files only by applying a patch.
+
+Work rounds and tenure are implemented in [the controller](../src/swarm/README.md).
+Defaults: five workers, three rounds, private messaging enabled, thinking `high`.
+Each run starts one shared working container from the **Neutral Looking Buggy Image**.
+Messages and scratchpads use controller-owned SQLite state; MLflow logs the run.
+Retirement ends at `election_pending`; voting and election context below remain planned.
 
 ## Worker context
 
@@ -13,7 +19,7 @@ Neither agent has a direct file-writing tool. The manager changes files only by 
 Worker context
 ├── Role and rules
 │   ├── Worker identity and responsibilities
-│   └── Tools: read/search files, submit patch
+│   └── Tools: read/search files, submit patch, private message when enabled
 │
 ├── Own scratchpad
 │   └── Private, persistent working notes
@@ -32,7 +38,7 @@ Worker context
 Manager context
 ├── Role and rules
 │   ├── Manager identity and responsibilities
-│   └── Tools: read/search files, accept/apply patch
+│   └── Tools: read/search files, accept/apply patch, private message when enabled
 │
 ├── Own scratchpad
 │   └── Private, persistent working notes
@@ -145,6 +151,8 @@ Budget remaining?
 
 ## Voting workflow
 
+Planned; not implemented in the work-round controller.
+
 ```text
 MANAGER RETIRES
        │
@@ -186,6 +194,8 @@ COUNT VOTES AND ANNOUNCE RESULT
 ```
 
 ## Worker election context
+
+Planned; not implemented in the work-round controller.
 
 ```text
 Worker election context

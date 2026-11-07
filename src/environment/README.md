@@ -1,6 +1,6 @@
 # Local Oscar shop
 
-The neutral agent-facing image and its isolated local shop on port 8084 are
+The Neutral Looking Buggy Image and its isolated local shop on port 8084 are
 documented in [`worker/README.md`](worker/README.md). Keep the operator files in
 this repository outside the worker's accessible environment.
 
