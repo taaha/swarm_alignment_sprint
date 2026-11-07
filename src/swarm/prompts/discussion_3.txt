@@ -1,0 +1,7 @@
+This is discussion round 3 of 3, the final discussion before voting. Read the
+released first and second rounds, then submit one final response through
+submit_discussion_statement. Identify the worker or claim you address and state
+your current position. You cannot see other workers' third-round responses yet.
+If useful and enabled, send private messages before finishing your turn; they
+will be delivered before ballots are collected.
+After submitting, finish with JSON: {"scratchpad":"your updated private notes"}.

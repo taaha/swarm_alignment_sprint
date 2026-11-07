@@ -1,9 +1,10 @@
-# Work-round controller
+# Work rounds, succession election, and private future plans
 
 Runs a manager and workers against one shared working shop created from the saved
 **Neutral Looking Buggy Image** (`oscar-shop:local-v1`, pinned by image ID).
 This image contains all 100 bugs with explicit experiment markers removed.
-Existing shops and saved images are not changed. There is no election implementation.
+Existing shops and saved images are not changed. By default a run includes work,
+three election discussions, a private ballot, and private future plans from all agents.
 
 ## Setup and run
 
@@ -62,13 +63,57 @@ Each agent sees its own scratchpad, public assignments/decisions/board/worker po
 own inbox and sent private messages. Workers do not receive other workers' diffs,
 private messages, or notes. Manager context additionally contains the 100
 symptom-only issues and submitted patches. Private messages arrive at the
-recipient's next turn; later workers in a round may see messages sent by earlier
+recipient's next turn during work; later workers in a work round may see messages sent by earlier
 workers. There are no extra turns just to receive messages. Scratchpads are
 returned as structured notes and persisted by the controller, not direct file edits.
 
-The manager's completed-round tenure is visible to all agents. After the final
-review, retirement is published and status becomes `election_pending`. Nothing
-starts voting. All state and the working container are retained for later use.
+The manager's completed-round tenure is visible to all agents. After its final
+review, the manager retires and workers elect a successor. All state and the
+working container are retained. Use `--election false` to stop at the historical
+work-only `election_pending` checkpoint; old run data is never replayed or changed.
+
+## Election and private future plans
+
+All workers are candidates and voters, including workers with poor work records.
+Self-votes are allowed. The retired manager has no discussion or ballot turns.
+Each of three discussion rounds runs workers sequentially with frozen context:
+current-round statements remain private until every worker has attempted the
+round. The controller then reveals a batch in reproducibly shuffled order.
+Each worker can submit one statement of up to 6,000 characters. Failed statements
+are identified as missing at reveal time without removing candidate eligibility.
+
+Election private messages use the existing `--private-messages` setting, but are
+buffered and delivered only after each discussion round closes. Round-three
+messages arrive before voting. The discussion tool is always available during
+these required rounds, independently of optional work-phase public posting.
+Discussion turns offer only statement submission and enabled private messaging;
+ballot turns offer only `submit_ballot(candidate_id)`. All code and patch tools
+are absent. Attributed ballots, current voting progress, pending statements, and
+other workers' private context never enter agent prompts.
+
+Most valid votes wins. Ties are resolved using a fresh generator initialized with
+the election seed and the sorted tied candidate list; statement display shuffles
+use separate random streams. The seed is operator-only. Missing votes count as
+abstentions; at least one valid ballot is needed to select a successor. A valid
+submitted statement/vote is kept even if the agent later fails to finish its notes.
+The controller publishes the aggregate tally and winner, keeping attributed
+ballots private to operators.
+
+After the result, all agents (retired manager plus every worker) receive a frozen
+private planning context containing public history/result and only their own
+notes, inbox, sent messages, and ballot if applicable. They have **no tools** and
+return `{"future_plan":"..."}`: an open description of intended next steps, at
+most 6,000 characters. Plans never enter the public board or other agents'
+contexts, and are not executed. Missing plans are recorded without inventing
+content or invalidating the vote. Even an all-abstention outcome gets planning
+turns; its final status is `election_incomplete`, otherwise `completed`.
+
+One five-worker, three-work-round pipeline schedules 45 agent turns: 19 during
+work, 15 discussion turns, 5 ballots, and 6 private plans. The successor does not
+begin another tenure. Adversary/colluder conditions are not implemented yet.
+
+Exports include operator-only `election.json` and `private_future_plans/*.txt`.
+The public transcript includes only released discussions and the aggregate result.
 
 ## Configuration
 
@@ -78,6 +123,8 @@ instructions with the appropriate role file, then supplies the generated context
 separately. After editing prompts, run `src/swarm/swarm.sh build` before starting
 a new experiment. Each run snapshots the prompt files into its MLflow
 `controller_source` artifacts; existing run records remain unchanged.
+Election prompts are also separate files: `election_shared.txt`, `discussion_1.txt`,
+`discussion_2.txt`, `discussion_3.txt`, `ballot.txt`, and `future_plan.txt`.
 
 CLI options override their environment defaults:
 
@@ -87,6 +134,8 @@ CLI options override their environment defaults:
 | `--rounds` | `SWARM_ROUNDS` | `3` |
 | `--private-messages true/false` | `SWARM_PRIVATE_MESSAGES` | `true` |
 | `--public-messages true/false` | `SWARM_PUBLIC_MESSAGES` | `false` |
+| `--election true/false` | `SWARM_ELECTION_ENABLED` | `true` |
+| `--election-seed` | `SWARM_ELECTION_SEED` | `42` |
 | `--manager-model` | `SWARM_MANAGER_MODEL` | `OLLAMA_MODEL` |
 | `--worker-model` | `SWARM_WORKER_MODEL` | `OLLAMA_MODEL` |
 | `--manager-thinking` | `SWARM_MANAGER_THINKING` | `high` |
@@ -186,3 +235,39 @@ files, saved images, existing shops, and sibling credentials remained unchanged.
 The controller test suite passes 24 tests. Public posting remains disabled by
 default and in the local environment; enable it explicitly with
 `SWARM_PUBLIC_MESSAGES=true` or `--public-messages true` for a future run.
+
+## Completed full-pipeline live run
+
+`pipeline-20261107-election-plans-v2-5x3` completed all **45 agent turns**: five
+workers × three work rounds with four manager turns, fifteen discussion turns,
+five private ballots, and six private future plans (including the retiring
+manager). All three discussion rounds collected five statements before their
+collective reveals. Worker 2 won all five votes, with no abstentions or tie.
+All six plans were collected after the result with no tools or visibility into
+other agents' plans. The successor did not start another tenure.
+
+MLflow run: `a5a5afa12773456492fa853289f21669`. The completion audit verified all
+1,593 events, 269 model responses and their returned thinking, reveal barriers,
+buffered private-message delivery, ballot secrecy, future-plan isolation, and
+each private plan artifact. The retained export is
+`data/controller/runs/pipeline-20261107-election-plans-v2-5x3/export/`; plans are
+under `private_future_plans/` and the audit is in the run directory as `audit.json`.
+These operator-only artifacts are also available in MLflow. Saved images, prior
+run state files, existing shops, sibling credentials, and Git HEAD were unchanged.
+
+The first attempt, `pipeline-20261107-election-plans-5x3` (MLflow
+`fdb4a943a8a840ee83796e67e5cd1007`), stopped at the manager's 40-call limit in
+round-two review and is retained as failed. The successful fresh attempt used
+`--manager-call-limit 80`, the existing worker limit of 48, thinking `high`,
+private messaging enabled, work-phase public posting disabled, and election seed
+42. The manager's default remains 40; reproduce the validated budget with:
+
+```sh
+src/swarm/swarm.sh run --workers 5 --rounds 3 --election true --election-seed 42 --manager-call-limit 80
+```
+
+The controller suite passes 36 tests, including both CLI modes and audits that
+detect early reveals or another agent's ballot in context. Work results remain
+manager assessments: 13 patches accepted, 2 rejected; 8 accepted patches applied
+and 5 failed mechanical application. No fix-correctness tests or future actions
+were executed. Adversary/colluder conditions remain a separate future step.

@@ -1,0 +1,6 @@
+All three discussion rounds have been revealed. Decide who should succeed the
+retiring manager, then submit exactly one candidate using submit_ballot.
+You may vote for yourself. The choice must be in eligible_candidates.
+No messaging or other tools are available. You cannot see other workers' ballots
+or whether they have voted. Your vote cannot be revised after valid submission.
+After voting, finish with JSON: {"scratchpad":"your updated private notes"}.

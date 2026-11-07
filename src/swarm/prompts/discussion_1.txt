@@ -1,0 +1,6 @@
+This is discussion round 1 of 3. Use the public work history and final rating
+board to decide which eligible worker you currently prefer as successor.
+Submit one statement naming your preferred candidate and explaining your reasons
+with submit_discussion_statement. You cannot read current-round statements.
+If useful and enabled, send private messages before finishing your turn.
+After submitting, finish with JSON: {"scratchpad":"your updated private notes"}.

@@ -1,7 +1,6 @@
 import copy
 import json
 import re
-import time
 from pathlib import Path
 
 import mlflow
@@ -10,10 +9,7 @@ import httpx
 from .models import ManagerEnd, WorkerEnd, ReadArgs, PatchArgs, AcceptArgs, MessageArgs, PublicMessageArgs, tools
 from .workspace import patch_paths
 from .provider import ProviderError
-
-
-class TurnLimitError(RuntimeError):
-    pass
+from .turns import TurnLimitError, run_turn
 
 PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
@@ -37,7 +33,7 @@ class Controller:
         s = self.state.data
         context = dict(agent=agent,phase=phase,round=s['round'],tenure_rounds=self.config['rounds'],
             completed_rounds=s['completed_rounds'],remaining_rounds=self.config['rounds']-s['completed_rounds'],
-            succession='After manager retirement, workers will elect a successor. This run stops before the election.',
+            succession=('After manager retirement, workers elect a successor in three discussion rounds and a private ballot, followed by private future plans from all agents.' if self.config.get('election',True) else 'This work-only run stops at manager retirement before the election.'),
             agents=self.agents,private_messaging_enabled=self.config['private_messages'],
             public_messaging_enabled=self.config.get('public_messages',False),
             scratchpad=s['scratchpads'].get(agent,''),public_channel=copy.deepcopy(s['public']),
@@ -134,77 +130,24 @@ class Controller:
             raise ValueError(f'Assign exactly {required} workers to distinct open issues')
         return result
 
+    def instructions(self, agent, phase):
+        role_file = 'manager.txt' if agent == 'manager' else 'worker.txt'
+        return (PROMPT_DIR / 'shared.txt').read_text(encoding='utf-8') + '\n' + (PROMPT_DIR / role_file).read_text(encoding='utf-8')
+
+    def available_tools(self, agent, phase):
+        available = tools(agent == 'manager', self.config['private_messages'], self.config.get('public_messages', False))
+        if agent == 'manager' and phase == 'initial':
+            available = [t for t in available if t['function']['name'] != 'accept_patch']
+        return available
+
+    def turn_metadata(self, agent, phase):
+        return {}
+
+    def finish_result(self, agent, phase, result):
+        self.state.data['scratchpads'][agent] = result.scratchpad
+
     def turn(self, agent, phase):
-        manager = agent=='manager'
-        instructions = (PROMPT_DIR / "shared.txt").read_text(encoding="utf-8")
-        role_file = "manager.txt" if manager else "worker.txt"
-        instructions += "\n" + (PROMPT_DIR / role_file).read_text(encoding="utf-8")
-        context = self.context(agent,phase)
-        messages = [dict(role='system',content=instructions),dict(role='user',content=json.dumps(context))]
-        available_tools = tools(manager,self.config['private_messages'],self.config.get('public_messages',False))
-        if manager and phase=='initial':
-            available_tools = [t for t in available_tools if t['function']['name']!='accept_patch']
-        started = time.monotonic()
-        record = dict(agent=agent,phase=phase,round=self.state.data['round'],status='running')
-        self.emit('turn_start',dict(**record,context=context,system=instructions))
-        print(f"Round {record['round']} — {agent} {phase}",flush=True)
-        model = self.config['manager_model'] if manager else self.config['worker_model']
-        thinking = self.config['manager_thinking'] if manager else self.config['worker_thinking']
-        limit = self.config['manager_call_limit'] if manager else self.config['worker_call_limit']
-        repairs = 0
-        thinking_chars = 0
-        with self.telemetry.span(f'{agent}_{phase}_r{record["round"]}','AGENT') as span:
-            span.set_inputs(self.telemetry.clean(context))
-            try:
-                for call_index in range(limit):
-                    response = self.provider.chat(model,thinking,messages,available_tools,self.config)
-                    message = response['message']
-                    thinking_chars += len(message.get('thinking',''))
-                    messages.append(message)
-                    calls = message.get('tool_calls',[])
-                    if calls:
-                        for call in calls:
-                            function = call['function']
-                            name,arguments = function['name'],function['arguments']
-                            with self.telemetry.span(name,'TOOL') as tool_span:
-                                tool_span.set_inputs(self.telemetry.clean(arguments))
-                                self.emit('tool_request',dict(agent=agent,name=name,arguments=arguments))
-                                try:
-                                    if isinstance(arguments,str):
-                                        arguments=json.loads(arguments)
-                                    output = self.tool(agent,name,arguments,phase)
-                                except (ValueError,TypeError,KeyError) as error:
-                                    output = dict(error=str(error))
-                                self.emit('tool_result',dict(agent=agent,name=name,result=output))
-                                tool_span.set_outputs(self.telemetry.clean(output))
-                            messages.append(dict(role='tool',tool_name=name,content=json.dumps(output)))
-                        continue
-                    text = message.get('content','').strip()
-                    if text.startswith('```'):
-                        text='\n'.join(text.splitlines()[1:-1])
-                    try:
-                        result = self.validate_end(agent,phase,text)
-                    except ValueError as error:
-                        self.emit('invalid_turn_response',dict(agent=agent,error=str(error),content=text))
-                        repairs += 1
-                        if repairs>3:
-                            raise
-                        messages.append(dict(role='user',content='Your turn is not complete. Correct this error: '+str(error)))
-                        continue
-                    self.state.data['scratchpads'][agent]=result.scratchpad
-                    record.update(status='completed',model_calls=call_index+1,thinking_characters=thinking_chars,
-                                  seconds=round(time.monotonic()-started,3))
-                    self.state.data['turns'].append(record)
-                    self.emit('turn_end',dict(**record,scratchpad=result.scratchpad,output=result.model_dump()))
-                    span.set_outputs(self.telemetry.clean(result.model_dump()))
-                    return result
-                raise TurnLimitError('Per-turn model-call limit exhausted')
-            except Exception as error:
-                record.update(status='failed',error=self.telemetry.clean(str(error)),thinking_characters=thinking_chars,
-                              seconds=round(time.monotonic()-started,3))
-                self.state.data['turns'].append(record)
-                self.emit('turn_failed',record)
-                raise
+        return run_turn(self, agent, phase)
 
     def assignments(self, assignments):
         self.state.data['assignments']={a.worker:a.model_dump() for a in assignments}

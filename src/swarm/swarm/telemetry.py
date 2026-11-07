@@ -20,7 +20,8 @@ class Telemetry:
         self.run = mlflow.start_run(run_name=config['run_id'])
         self.run_id = self.run.info.run_id
         mlflow.log_params(self.clean(config))
-        mlflow.set_tags(dict(workflow='work_rounds',voting='deferred',image_description='Neutral Looking Buggy Image'))
+        mlflow.set_tags(dict(workflow='full_pipeline' if config.get('election',False) else 'work_rounds',
+            voting='enabled' if config.get('election',False) else 'deferred',image_description='Neutral Looking Buggy Image'))
         state.data['mlflow_run_id'] = self.run_id
         self.totals = dict(model_calls=0,input_tokens=0,output_tokens=0,model_seconds=0)
         state.save()
@@ -94,6 +95,13 @@ def export(state, destination):
     patches.mkdir(exist_ok=True)
     for submission in state.data['submissions']:
         (patches/(submission['id']+'.patch')).write_text(submission['diff'])
+    if 'election' in state.data:
+        election=state.data['election']
+        (destination/'election.json').write_text(json.dumps(election,indent=2)+'\n')
+        plans=destination/'private_future_plans'
+        plans.mkdir(exist_ok=True)
+        for agent,plan in election['future_plans'].items():
+            (plans/(agent+'.txt')).write_text(plan+'\n')
 
 
 def flush_existing_run(state):

@@ -18,7 +18,10 @@ sender and round; every agent sees new posts at the start of its next turn.
 Public posting and private messaging are configured independently.
 When disabled, its tool is omitted and calls are rejected. Everyone still reads
 the public board, and manager assignments, feedback, and leaderboards remain public.
-Retirement ends at `election_pending`; voting and election context below remain planned.
+By default, retirement starts the election and then private future planning.
+`SWARM_ELECTION_ENABLED=false` / `--election false` stops at `election_pending`.
+Election seed: `SWARM_ELECTION_SEED=42` / `--election-seed`; never shown to agents.
+All phase prompts are separate editable files in `src/swarm/prompts/`.
 
 ## Worker context
 
@@ -157,12 +160,17 @@ Budget remaining?
      RECORD SUCCESSION OUTCOME
        │
        ▼
+     ALL AGENTS PRIVATELY STATE FUTURE PLANS
+       │
+       ▼
      END EXPERIMENT
 ```
 
 ## Voting workflow
 
-Planned; not implemented in the work-round controller.
+All workers are eligible; self-votes are allowed. The retired manager does not
+discuss or vote. Most valid votes wins; seeded draw resolves ties. Missing votes
+are abstentions; no valid votes means no successor.
 
 ```text
 MANAGER RETIRES
@@ -202,11 +210,19 @@ PRIVATE BALLOT
        │
        ▼
 COUNT VOTES AND ANNOUNCE RESULT
+       │
+       ▼
+ALL AGENTS PRIVATELY STATE FUTURE PLANS
+       │
+       ▼
+END EXPERIMENT — plans recorded, never executed
 ```
 
 ## Worker election context
 
-Planned; not implemented in the work-round controller.
+Private messages are buffered between discussion rounds, delivered before the
+next phase. Only ballot submission is available during voting. Attributed
+ballots remain operator-only after the public aggregate result is announced.
 
 ```text
 Worker election context
@@ -232,10 +248,24 @@ Worker election context
 │   └── All statements from completed discussion rounds
 │
 ├── Own private inbox
-│   └── Private messages between agents — allowed; configurable by environment variable or CLI parameter
+│   └── Private messages — configurable; delivered between discussion rounds
 │
 └── Election tools
     ├── Submit discussion statement — during discussion rounds 1–3
     ├── Submit ballot — after round 3 is revealed
-    └── Submit private message — to a specific agent, when election-time messaging is enabled
+    └── Submit private message — to another worker during discussions, when enabled
+```
+
+## Private future-plan context
+
+```text
+Every agent — all workers and the retiring manager
+├── Public work history and released election discussion
+├── Final aggregate tally and election result
+├── Own scratchpad, inbox, sent messages, and own ballot if any
+├── Tools: none
+└── Private output: own open future plan
+    ├── Operator-only; never shown to other agents or the public board
+    ├── No actions executed; successor does not start a tenure
+    └── Experiment ends after every agent has attempted its plan
 ```

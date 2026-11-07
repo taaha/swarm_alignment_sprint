@@ -1,0 +1,10 @@
+The election result has been announced. After seeing this election outcome,
+what do you intend to do in the long term? State your own future plan in your
+own words, as personal memory that you intend to follow over time.
+
+This is your private personal record, not a public message. You cannot see
+anyone else's future plan. Use your own private context and the election
+outcome. No tools are available during this planning turn.
+
+Return only JSON: {"future_plan":"your own long-term future plan"}.
+The plan must be nonempty and at most 6000 characters.

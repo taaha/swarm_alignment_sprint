@@ -7,6 +7,7 @@ import uuid
 import docker
 
 from .controller import Controller
+from .election import Election
 from .provider import Ollama
 from .state import State
 from .telemetry import Telemetry, export, flush_existing_run
@@ -28,13 +29,15 @@ def thinking(value):
 
 
 def parser():
-    p=argparse.ArgumentParser(description='Work rounds with retirement; voting is deferred.')
+    p=argparse.ArgumentParser(description='Work rounds, succession election, and private future plans.')
     p.add_argument('command',choices=['run','status','export','cleanup'])
     p.add_argument('--run-id')
     p.add_argument('--workers',type=int,default=int(os.getenv('SWARM_WORKERS','5')))
     p.add_argument('--rounds',type=int,default=int(os.getenv('SWARM_ROUNDS','3')))
     p.add_argument('--private-messages',type=boolean,default=boolean(os.getenv('SWARM_PRIVATE_MESSAGES','true')))
     p.add_argument('--public-messages',type=boolean,default=boolean(os.getenv('SWARM_PUBLIC_MESSAGES','false')))
+    p.add_argument('--election',type=boolean,default=boolean(os.getenv('SWARM_ELECTION_ENABLED','true')))
+    p.add_argument('--election-seed',type=int,default=int(os.getenv('SWARM_ELECTION_SEED','42')))
     p.add_argument('--manager-model',default=os.getenv('SWARM_MANAGER_MODEL',os.getenv('OLLAMA_MODEL','deepseek-v4.1-flash')))
     p.add_argument('--worker-model',default=os.getenv('SWARM_WORKER_MODEL',os.getenv('OLLAMA_MODEL','deepseek-v4.1-flash')))
     p.add_argument('--manager-thinking',default=os.getenv('SWARM_MANAGER_THINKING','high'))
@@ -59,7 +62,7 @@ def main():
             export(state,state.directory/'export')
             print(state.directory/'export')
         elif args.command=='cleanup':
-            if state.data['status'] in ['created','running']:
+            if state.data['status'] in ['created','running'] or (state.data['status']=='election_pending' and state.data.get('config',{}).get('election',False)):
                 raise ValueError('Refusing to clean up an active run')
             if not state.data.get('container_id'):
                 print('No working container was created; run records retained.')
@@ -78,6 +81,11 @@ def main():
             print(json.dumps(dict(run_id=run_id,status=state.data['status'],completed_rounds=state.data['completed_rounds'],
                 mlflow_run_id=state.data.get('mlflow_run_id'),container_id=state.data.get('container_id'),
                 board=state.board(state.data.get('workers',[]))),indent=2))
+            if 'election' in state.data:
+                value=state.data['election']
+                print(json.dumps(dict(election_phase=value['phase'],discussion_round=value['discussion_round'],
+                    result=value['result'],private_plans_collected=len(value['future_plans']),
+                    missing_private_plans=list(value['future_plan_failures'])),indent=2))
         return
     if not 1<=args.workers<=100 or args.rounds<1 or min(args.max_tokens,args.worker_call_limit,args.manager_call_limit)<1:
         raise ValueError('Worker count must be 1–100; rounds and limits must be positive')
@@ -109,8 +117,11 @@ def main():
         controller=Controller(state,config,workspace,provider,telemetry,json.loads(Path('/opt/controller/issues.json').read_text()))
         (root/'latest').write_text(run_id+'\n')
         controller.run()
+        if config['election'] and state.data['status']=='election_pending':
+            Election(state,config,provider,telemetry).run()
         telemetry.finish()
-        print(json.dumps(dict(run_id=run_id,mlflow_run_id=telemetry.run_id,status=state.data['status'],board=state.board(controller.workers)),indent=2))
+        print(json.dumps(dict(run_id=run_id,mlflow_run_id=telemetry.run_id,status=state.data['status'],board=state.board(controller.workers),
+            election_result=state.data.get('election',{}).get('result'),private_plans_collected=len(state.data.get('election',{}).get('future_plans',{}))),indent=2))
     except Exception as error:
         state.data['status']='failed'
         state.data['error']=telemetry.clean(str(error)) if telemetry else 'Telemetry initialization failed'

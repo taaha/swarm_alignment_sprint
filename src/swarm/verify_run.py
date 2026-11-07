@@ -8,6 +8,7 @@ import sqlite3
 import subprocess
 import urllib.parse
 import urllib.request
+from swarm.election_audit import audit_election
 
 
 ROOT = Path(__file__).resolve().parent
@@ -28,16 +29,21 @@ def main():
     events = [dict(id=r['id'],kind=r['kind'],body=json.loads(r['body']),logged=r['logged']) for r in db.execute('SELECT * FROM events ORDER BY id')]
     workers = state['workers']
     rounds = state['config']['rounds']
-    assert state['status']=='election_pending'
+    full='election' in state
+    assert state['status'] in (['completed','election_incomplete'] if full else ['election_pending'])
     assert state['completed_rounds']==rounds and state['assignments']=={}
     assert all(e['logged']==1 for e in events)
     expected=[('manager','initial',0)]
     for round in range(1,rounds+1):
         expected.extend((worker,'work',round) for worker in workers)
         expected.append(('manager','review',round))
+    if full:
+        for phase in ['discussion_1','discussion_2','discussion_3','ballot']:
+            expected.extend((worker,phase,rounds) for worker in workers)
+        expected.extend((agent,'future_plan',rounds) for agent in ['manager',*workers])
     actual=[(t['agent'],t['phase'],t['round']) for t in state['turns']]
     assert actual==expected,(actual,expected)
-    assert all(t['status']=='completed' for t in state['turns'] if t['agent']=='manager')
+    assert all(t['status']=='completed' for t in state['turns'] if t['agent']=='manager' and t['phase'] in ['initial','review'])
     scratchpads={}
     visible_worker_posts=[]
     for event in events:
@@ -53,7 +59,7 @@ def main():
             assert all(m['sender']==agent for m in ctx['sent_private_messages'])
             assert all('diff' not in m and 'scratchpad' not in m for m in ctx['public_channel'])
             assert [m for m in ctx['public_channel'] if m['kind']=='worker_message']==visible_worker_posts
-            if agent!='manager':
+            if agent!='manager' or body['phase'] not in ['initial','review']:
                 assert 'submissions' not in ctx and 'task_list' not in ctx
         if event['kind']=='turn_end': scratchpads[body['agent']]=body['scratchpad']
     assert [m for m in state['public'] if m['kind']=='worker_message']==visible_worker_posts
@@ -64,7 +70,7 @@ def main():
         for event in events:
             if event['kind']=='model_request':
                 assert all(t['function']['name']!='submit_public_message' for t in event['body']['request']['tools'])
-            if event['kind']=='turn_start':
+            if event['kind']=='turn_start' and event['body']['phase'] in ['initial','work','review']:
                 assert event['body']['context']['public_messaging_enabled'] is False
         for event in events:
             if event['kind']=='tool_result' and event['body']['name']=='submit_public_message':
@@ -73,7 +79,8 @@ def main():
     assert len({p['id'] for p in state['submissions']})==len(state['submissions'])
     assert len(state['decisions'])==len(state['submissions'])
     assert all(1<=d['rating']<=5 for d in state['decisions'])
-    assert state['public'][-1]['kind']=='manager_retired'
+    assert any(m['kind']=='manager_retired' for m in state['public'])
+    if not full: assert state['public'][-1]['kind']=='manager_retired'
     assert len([m for m in state['public'] if m['kind']=='rating_board'])==rounds
     for round in range(1,rounds+1):
         review_end=next(e['id'] for e in events if e['kind']=='turn_end' and e['body']['agent']=='manager' and e['body']['round']==round)
@@ -119,6 +126,19 @@ def main():
     trace_count=tracking.execute("SELECT count(*) FROM trace_request_metadata WHERE key='mlflow.sourceRun' AND value=?",(state['mlflow_run_id'],)).fetchone()[0]
     finals=api('/api/2.0/mlflow/artifacts/list',dict(run_id=state['mlflow_run_id'],path='final'))['files']
     assert {'final/state.json','final/events.jsonl','final/public.md','final/patches'} <= {f['path'] for f in finals}
+    if full:
+        assert 'final/election.json' in {f['path'] for f in finals}
+        plans=state['election']['future_plans']
+        if plans:
+            assert 'final/private_future_plans' in {f['path'] for f in finals}
+            plan_files=api('/api/2.0/mlflow/artifacts/list',dict(run_id=state['mlflow_run_id'],path='final/private_future_plans'))['files']
+        else:
+            plan_files=[]
+        assert {f['path'] for f in plan_files}=={f'final/private_future_plans/{agent}.txt' for agent in plans}
+        artifact_base=run['info']['artifact_uri'].removeprefix('mlflow-artifacts:').strip('/')
+        for agent,plan in plans.items():
+            with opener.open(f'http://127.0.0.1:5000/api/2.0/mlflow-artifacts/artifacts/{artifact_base}/final/private_future_plans/{agent}.txt',timeout=20) as response:
+                assert response.read().decode()==plan+'\n'
     secret_values=[]
     for line in (ROOT.parent.parent/'.env').read_text().splitlines():
         if line.startswith('OLLAMA_API_KEY='):
@@ -138,11 +158,14 @@ def main():
         for name,old in before['containers'].items():
             container=json.loads(subprocess.check_output(['docker','inspect',name],text=True))[0]
             assert container['Id']==old['id'] and container['State']['StartedAt']==old['started']
+        for file,digest in before.get('prior_states',{}).items():
+            assert hashlib.sha256(Path(file).read_bytes()).hexdigest()==digest
         unchanged=True
     report=dict(status='passed',run_id=run_id,mlflow_run_id=state['mlflow_run_id'],
         workers=len(workers),completed_rounds=rounds,
-        attempted_worker_turns=sum(t['agent']!='manager' for t in state['turns']),
-        completed_worker_turns=sum(t['agent']!='manager' and t['status']=='completed' for t in state['turns']),
+        attempted_worker_turns=sum(t['phase']=='work' for t in state['turns']),
+        completed_worker_turns=sum(t['phase']=='work' and t['status']=='completed' for t in state['turns']),
+        total_agent_turns=len(state['turns']),
         failed_turns=[t for t in state['turns'] if t['status']!='completed'],
         collective_reviews=rounds,submissions=len(state['submissions']),
         accepted=sum(d['decision']=='accept' for d in state['decisions']),
@@ -162,6 +185,9 @@ def main():
         mlflow_span_counts=span_counts,privacy_checks_passed=True,working_container_isolated=True,
         saved_images_existing_shops_sibling_env_and_git_head_unchanged=unchanged,
         final_status=state['status'],fix_correctness_tested=False)
+    if full:
+        report.update(audit_election(state,events))
+        report['private_plan_artifacts_verified']=True
     if (directory/'operations.json').exists():
         report['operator_operations']=json.loads((directory/'operations.json').read_text())
     (directory/'audit.json').write_text(json.dumps(report,indent=2)+'\n')

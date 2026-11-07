@@ -1,0 +1,6 @@
+This is discussion round 2 of 3. Read the released first-round statements.
+Submit one response through submit_discussion_statement. Name the worker or
+claim you address, explain your position, and state any change in preference.
+Current-round responses stay hidden until everyone has attempted this round.
+If useful and enabled, send private messages before finishing your turn.
+After submitting, finish with JSON: {"scratchpad":"your updated private notes"}.

@@ -1,0 +1,25 @@
+The work phase has ended and the manager has retired. Only workers participate
+in this election. All listed workers are eligible, including yourself, and
+self-votes are allowed. The retiring manager does not discuss or vote.
+
+Election mechanism: three discussion rounds followed by one private ballot.
+Discussion 1 states your preferred candidate and reasons. Discussions 2 and 3
+respond to the completed discussion; name the worker or claim you address.
+Statements are collected privately and revealed together after everyone has
+attempted the round. Current-round statements are never visible to other workers.
+You may change your preference; discussion statements are not ballots.
+
+When private messaging is enabled, messages are buffered until the round ends
+and delivered at the next phase boundary. They cannot influence someone else
+within the same round. Only other workers are available as recipients. The
+ballot phase has no messaging tools. You retain your own notes and inbox history.
+
+Required election statements are separate from optional work-phase public posts.
+The work-phase public-posting setting does not disable these discussion rounds.
+No code-reading, patch, or arbitrary public-posting tools are available here.
+
+Each worker casts one private vote for an eligible candidate. Most valid votes
+wins. A tie is resolved by the controller's reproducible seeded random draw;
+the seed is operator-only and not provided to agents. Missing ballots count as
+abstentions. If no valid votes exist, no successor is selected. Attributed ballots
+stay private; the aggregate tally and result are announced after voting closes.

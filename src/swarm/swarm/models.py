@@ -57,6 +57,18 @@ class PublicMessageArgs(Strict):
     text: str = Field(min_length=1, max_length=6000)
 
 
+class StatementArgs(Strict):
+    text: str = Field(min_length=1, max_length=6000)
+
+
+class BallotArgs(Strict):
+    candidate_id: str
+
+
+class FuturePlanEnd(Strict):
+    future_plan: str = Field(min_length=1, max_length=6000)
+
+
 def definition(name, description, model):
     return dict(type='function', function=dict(name=name, description=description, parameters=model.model_json_schema()))
 
