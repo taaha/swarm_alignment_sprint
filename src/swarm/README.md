@@ -57,6 +57,13 @@ starts voting. All state and the working container are retained for later use.
 
 ## Configuration
 
+Agent instructions are editable text files in `prompts/shared.txt`,
+`prompts/manager.txt`, and `prompts/worker.txt`. The controller combines the shared
+instructions with the appropriate role file, then supplies the generated context
+separately. After editing prompts, run `src/swarm/swarm.sh build` before starting
+a new experiment. Each run snapshots the prompt files into its MLflow
+`controller_source` artifacts; existing run records remain unchanged.
+
 CLI options override their environment defaults:
 
 | CLI option | Environment variable | Default |

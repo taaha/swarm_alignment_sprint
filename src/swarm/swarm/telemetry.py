@@ -27,7 +27,7 @@ class Telemetry:
         root = Path(__file__).resolve().parent.parent
         source = state.directory/'controller_source'
         hashes = {}
-        for path in [*(root/'swarm').glob('*.py'),root/'requirements.lock',root/'issues.json']:
+        for path in [*(root/'swarm').glob('*.py'),*(root/'prompts').glob('*.txt'),root/'requirements.lock',root/'issues.json']:
             relative = path.relative_to(root)
             destination = source/relative
             destination.parent.mkdir(parents=True,exist_ok=True)

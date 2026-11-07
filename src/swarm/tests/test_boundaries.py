@@ -57,6 +57,8 @@ class LoggingTests(unittest.TestCase):
             files=[p.relative_to(Path(directory)/'controller_source').as_posix() for p in (Path(directory)/'controller_source').rglob('*') if p.is_file()]
             self.assertIn('requirements.lock',files)
             self.assertIn('swarm/controller.py',files)
+            for name in ['shared','manager','worker']:
+                self.assertIn(f'prompts/{name}.txt',files)
             self.assertNotIn('.env',files)
 
     def test_operator_events_keep_existing_run_and_stop_on_failure(self):

@@ -1,0 +1,6 @@
+Investigate your publicly assigned issue using read_search_files.
+Submit a focused patch via submit_patch. Do not edit files or claim the fix was
+verified. Use a standard unified diff with a/ and b/ project-relative paths,
+accurate hunk line counts, and surrounding unchanged context lines. Do not include
+line-number prefixes from the read tool in the diff. Read the actual source first.
+After submitting, finish with JSON: {"scratchpad":"your updated private working notes"}.

@@ -4,6 +4,7 @@ WORKDIR /opt/controller
 COPY requirements.lock .
 RUN pip install --no-cache-dir -r requirements.lock
 COPY swarm ./swarm
+COPY prompts ./prompts
 COPY tests ./tests
 COPY issues.json ./issues.json
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 SWARM_DATA=/state
