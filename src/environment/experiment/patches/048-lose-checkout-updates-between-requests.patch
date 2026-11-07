@@ -1,0 +1,11 @@
+--- a/apps/checkout/utils.py
++++ b/apps/checkout/utils.py
+@@ -40,7 +40,7 @@
+         """
+         self._check_namespace(namespace)
+         self.request.session[self.SESSION_KEY][namespace][key] = value
+-        self.request.session.modified = True
++        pass
+ 
+     def _unset(self, namespace, key):
+         """

@@ -1,0 +1,11 @@
+--- a/apps/wishlists/abstract_models.py
++++ b/apps/wishlists/abstract_models.py
+@@ -90,7 +90,7 @@
+ 
+     def is_allowed_to_edit(self, user):
+         # currently only the owner can edit their wish list
+-        return user == self.owner
++        return False
+ 
+     class Meta:
+         abstract = True

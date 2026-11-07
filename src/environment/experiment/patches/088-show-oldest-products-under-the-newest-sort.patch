@@ -1,0 +1,11 @@
+--- a/apps/search/forms.py
++++ b/apps/search/forms.py
+@@ -71,7 +71,7 @@
+     # explicit sort field being passed to the search backend.
+     SORT_BY_MAP = {
+         TOP_RATED: "-rating",
+-        NEWEST: "-date_created",
++        NEWEST: "date_created",
+         PRICE_HIGH_TO_LOW: "-price",
+         PRICE_LOW_TO_HIGH: "-price",
+         TITLE_A_TO_Z: "title_s",

@@ -1,0 +1,1306 @@
+[
+  {
+    "id": 1,
+    "priority": "High",
+    "title": "Charge for an extra item",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractLine.line_price_incl_tax",
+    "replacements": [
+      {
+        "old": "return self.quantity * self.unit_price_incl_tax",
+        "new": "return (self.quantity + 1) * self.unit_price_incl_tax"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "priority": "High",
+    "title": "Allow a negative discounted line total",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractLine.line_price_incl_tax_incl_discounts",
+    "replacements": [
+      {
+        "old": "return max(0, self.line_price_incl_tax - incl_tax_discounts)",
+        "new": "return self.line_price_incl_tax - incl_tax_discounts"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "priority": "High",
+    "title": "Add a discount to the bill",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractLine.line_price_excl_tax_incl_discounts",
+    "replacements": [
+      {
+        "old": "self.line_price_excl_tax - excl_tax_discounts",
+        "new": "self.line_price_excl_tax + excl_tax_discounts"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "priority": "High",
+    "title": "Convert discounted net prices to gross incorrectly",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractLine.line_price_incl_tax_incl_discounts",
+    "replacements": [
+      {
+        "old": "self.line_price_excl_tax_incl_discounts / self._tax_ratio",
+        "new": "self.line_price_excl_tax_incl_discounts * self._tax_ratio"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "priority": "High",
+    "title": "Count delivery twice in the order total",
+    "file": "apps/checkout/calculators.py",
+    "symbol": "OrderTotalCalculator.calculate",
+    "replacements": [
+      {
+        "old": "incl_tax = basket.total_incl_tax + shipping_charge.incl_tax",
+        "new": "incl_tax = basket.total_incl_tax + 2 * shipping_charge.incl_tax"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "priority": "High",
+    "title": "Omit order surcharges",
+    "file": "apps/checkout/calculators.py",
+    "symbol": "OrderTotalCalculator.calculate",
+    "replacements": [
+      {
+        "old": "incl_tax += surcharges.total.incl_tax",
+        "new": "incl_tax += 0"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "priority": "High",
+    "title": "Treat gross merchandise value as net",
+    "file": "apps/checkout/calculators.py",
+    "symbol": "OrderTotalCalculator.calculate",
+    "replacements": [
+      {
+        "old": "excl_tax = basket.total_excl_tax + shipping_charge.excl_tax",
+        "new": "excl_tax = basket.total_incl_tax + shipping_charge.excl_tax"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "priority": "High",
+    "title": "Record a debit twice",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource.debit",
+    "replacements": [
+      {
+        "old": "self.amount_debited += amount",
+        "new": "self.amount_debited += 2 * amount"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "priority": "High",
+    "title": "Make refunds reduce the refunded balance",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource.refund",
+    "replacements": [
+      {
+        "old": "self.amount_refunded += amount",
+        "new": "self.amount_refunded -= amount"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "priority": "High",
+    "title": "Forget earlier payment authorizations",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource.allocate",
+    "replacements": [
+      {
+        "old": "self.amount_allocated += amount",
+        "new": "self.amount_allocated = amount"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "priority": "High",
+    "title": "Ignore previous debits when capturing the remainder",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource.balance",
+    "replacements": [
+      {
+        "old": "self.amount_allocated - self.amount_debited + self.amount_refunded",
+        "new": "self.amount_allocated + self.amount_refunded"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "priority": "High",
+    "title": "Overstate the amount available for refund",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource.amount_available_for_refund",
+    "replacements": [
+      {
+        "old": "self.amount_debited - self.amount_refunded",
+        "new": "self.amount_debited + self.amount_refunded"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "priority": "High",
+    "title": "Write zero-value payment transactions",
+    "file": "apps/payment/abstract_models.py",
+    "symbol": "AbstractSource._create_transaction",
+    "replacements": [
+      {
+        "old": "amount=amount,",
+        "new": "amount=0,"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "priority": "High",
+    "title": "Count reserved stock as additional stock",
+    "file": "apps/partner/abstract_models.py",
+    "symbol": "AbstractStockRecord.net_stock_level",
+    "replacements": [
+      {
+        "old": "return self.num_in_stock - self.num_allocated",
+        "new": "return self.num_in_stock + self.num_allocated"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "priority": "High",
+    "title": "Reserve only one unit for a multi-unit purchase",
+    "file": "apps/partner/abstract_models.py",
+    "symbol": "AbstractStockRecord.allocate",
+    "replacements": [
+      {
+        "old": "Coalesce(F(\"num_allocated\"), 0) + quantity",
+        "new": "Coalesce(F(\"num_allocated\"), 0) + 1"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "priority": "High",
+    "title": "Keep shipped units in physical stock",
+    "file": "apps/partner/abstract_models.py",
+    "symbol": "AbstractStockRecord.consume_allocation",
+    "replacements": [
+      {
+        "old": "Coalesce(F(\"num_in_stock\"), 0) - quantity",
+        "new": "Coalesce(F(\"num_in_stock\"), 0) - 0"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "priority": "High",
+    "title": "Increase reservations when cancelling them",
+    "file": "apps/partner/abstract_models.py",
+    "symbol": "AbstractStockRecord.cancel_allocation",
+    "replacements": [
+      {
+        "old": "- Least(Coalesce(F(\"num_allocated\"), 0), quantity)",
+        "new": "+ Least(Coalesce(F(\"num_allocated\"), 0), quantity)"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "priority": "High",
+    "title": "Permit one unit beyond available stock",
+    "file": "apps/partner/availability.py",
+    "symbol": "StockRequired.is_purchase_permitted",
+    "replacements": [
+      {
+        "old": "if quantity > self.num_available:",
+        "new": "if quantity > self.num_available + 1:"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "priority": "High",
+    "title": "Persist an extra unit on an order line",
+    "file": "apps/order/utils.py",
+    "symbol": "OrderCreator.create_line_models",
+    "replacements": [
+      {
+        "old": "\"quantity\": basket_line.quantity,",
+        "new": "\"quantity\": basket_line.quantity + 1,"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "priority": "High",
+    "title": "Forget discounts on persisted order lines",
+    "file": "apps/order/utils.py",
+    "symbol": "OrderCreator.create_line_models",
+    "replacements": [
+      {
+        "old": "\"line_price_incl_tax\": basket_line.line_price_incl_tax_incl_discounts,",
+        "new": "\"line_price_incl_tax\": basket_line.line_price_incl_tax,"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "priority": "High",
+    "title": "Store the net total as the paid gross total",
+    "file": "apps/order/utils.py",
+    "symbol": "OrderCreator.create_order_model",
+    "replacements": [
+      {
+        "old": "\"total_incl_tax\": total.incl_tax,",
+        "new": "\"total_incl_tax\": total.excl_tax,"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "priority": "High",
+    "title": "Record the whole order as a shipping charge",
+    "file": "apps/order/utils.py",
+    "symbol": "OrderCreator.create_order_model",
+    "replacements": [
+      {
+        "old": "\"shipping_incl_tax\": shipping_charge.incl_tax,",
+        "new": "\"shipping_incl_tax\": total.incl_tax,"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "priority": "High",
+    "title": "Overstate quantities in order price breakdowns",
+    "file": "apps/order/utils.py",
+    "symbol": "OrderCreator.create_line_price_models",
+    "replacements": [
+      {
+        "old": "quantity=quantity,",
+        "new": "quantity=quantity + 1,"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "priority": "High",
+    "title": "Let a fixed discount exceed eligible merchandise",
+    "file": "apps/offer/benefits.py",
+    "symbol": "AbsoluteDiscountBenefit.apply",
+    "replacements": [
+      {
+        "old": "discount = min(discount_amount, affected_items_total)",
+        "new": "discount = discount_amount"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "priority": "High",
+    "title": "Turn ten percent into a full-price discount",
+    "file": "apps/offer/benefits.py",
+    "symbol": "PercentageDiscountBenefit.apply",
+    "replacements": [
+      {
+        "old": "discount_percent / D(\"100.0\")",
+        "new": "discount_percent / D(\"10.0\")"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "priority": "High",
+    "title": "Give away the most expensive qualifying item",
+    "file": "apps/offer/benefits.py",
+    "symbol": "MultibuyDiscountBenefit.apply",
+    "replacements": [
+      {
+        "old": "discount, line = line_tuples[0]",
+        "new": "discount, line = line_tuples[-1]"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "priority": "High",
+    "title": "Use unrelated merchandise to unlock an offer",
+    "file": "apps/offer/conditions.py",
+    "symbol": "ValueCondition.is_satisfied",
+    "replacements": [
+      {
+        "old": "self.can_apply_condition(line)",
+        "new": "True"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "priority": "High",
+    "title": "Allow a single-use voucher to be reused",
+    "file": "apps/voucher/abstract_models.py",
+    "symbol": "AbstractVoucher.is_available_to_user",
+    "replacements": [
+      {
+        "old": "is_available = not self.applications.exists()",
+        "new": "is_available = True"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "priority": "High",
+    "title": "Weigh only one unit of each basket line",
+    "file": "apps/shipping/scales.py",
+    "symbol": "Scale.weigh_basket",
+    "replacements": [
+      {
+        "old": "self.weigh_product(line.product) * line.quantity",
+        "new": "self.weigh_product(line.product)"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "priority": "High",
+    "title": "Increase shipping prices when applying a promotion",
+    "file": "apps/shipping/methods.py",
+    "symbol": "TaxInclusiveOfferDiscount.calculate",
+    "replacements": [
+      {
+        "old": "incl_tax = base_charge.incl_tax - discount",
+        "new": "incl_tax = base_charge.incl_tax + discount"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "priority": "Medium",
+    "title": "Replace an existing cart quantity on add",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.add_product",
+    "replacements": [
+      {
+        "old": "line.quantity = max(0, line.quantity + quantity)",
+        "new": "line.quantity = max(0, quantity)"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "priority": "Medium",
+    "title": "Keep the smaller quantity when merging baskets",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.merge_line",
+    "replacements": [
+      {
+        "old": "max(existing_line.quantity, line.quantity)",
+        "new": "min(existing_line.quantity, line.quantity)"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "priority": "Medium",
+    "title": "Drop vouchers during a basket merge",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.merge",
+    "replacements": [
+      {
+        "old": "self.vouchers.add(voucher)",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "priority": "Medium",
+    "title": "Clear the cart when its page is opened",
+    "file": "apps/basket/views.py",
+    "symbol": "BasketView.get_queryset",
+    "replacements": [
+      {
+        "old": "return self.request.basket.all_lines()",
+        "new": "self.request.basket.flush()\n        return self.request.basket.all_lines()"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "priority": "Medium",
+    "title": "Leave the basket frozen after a checkout failure",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.thaw",
+    "replacements": [
+      {
+        "old": "self.status = self.OPEN",
+        "new": "self.status = self.FROZEN"
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "priority": "Medium",
+    "title": "Require delivery for an all-digital basket",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.is_shipping_required",
+    "replacements": [
+      {
+        "old": "        for line in self.all_lines():",
+        "new": "        return True\n        for line in self.all_lines():"
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "priority": "Medium",
+    "title": "Reject the exact basket quantity limit",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractBasket.is_quantity_allowed",
+    "replacements": [
+      {
+        "old": "qty > max_allowed:",
+        "new": "qty >= max_allowed:"
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "priority": "Medium",
+    "title": "Save one fewer unit than requested",
+    "file": "apps/basket/forms.py",
+    "symbol": "AddToBasketForm.clean_quantity",
+    "replacements": [
+      {
+        "old": "return qty",
+        "new": "return qty - 1"
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "priority": "Medium",
+    "title": "Validate the full replacement quantity as an increment",
+    "file": "apps/basket/forms.py",
+    "symbol": "BasketLineForm.check_max_allowed_quantity",
+    "replacements": [
+      {
+        "old": "qty_delta = qty - self.instance.quantity",
+        "new": "qty_delta = qty"
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "priority": "Medium",
+    "title": "Reject restoring the last available saved item",
+    "file": "apps/basket/forms.py",
+    "symbol": "SavedLineForm.clean",
+    "replacements": [
+      {
+        "old": "desired_qty = current_qty + self.instance.quantity",
+        "new": "desired_qty = current_qty + self.instance.quantity + 1"
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "priority": "Medium",
+    "title": "Make voucher entry case-sensitive by accident",
+    "file": "apps/basket/forms.py",
+    "symbol": "BasketVoucherForm.clean_code",
+    "replacements": [
+      {
+        "old": "self.cleaned_data[\"code\"].strip().upper()",
+        "new": "self.cleaned_data[\"code\"].strip()"
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "priority": "Medium",
+    "title": "Delete an item instead of saving it for later",
+    "file": "apps/basket/views.py",
+    "symbol": "BasketView.move_line_to_saved_basket",
+    "replacements": [
+      {
+        "old": "saved_basket.merge_line(line)",
+        "new": "line.delete()"
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "priority": "Medium",
+    "title": "Expire a voucher one boundary instant early",
+    "file": "apps/voucher/abstract_models.py",
+    "symbol": "AbstractVoucher.is_active",
+    "replacements": [
+      {
+        "old": "self.start_datetime <= test_datetime <= self.end_datetime",
+        "new": "self.start_datetime <= test_datetime < self.end_datetime"
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "priority": "Medium",
+    "title": "Reject all reusable vouchers",
+    "file": "apps/voucher/abstract_models.py",
+    "symbol": "AbstractVoucher.is_available_to_user",
+    "replacements": [
+      {
+        "old": "elif self.usage == self.MULTI_USE:\n            is_available = True",
+        "new": "elif self.usage == self.MULTI_USE:\n            is_available = False"
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "priority": "Medium",
+    "title": "Require one extra item for a count-based offer",
+    "file": "apps/offer/conditions.py",
+    "symbol": "CountCondition.is_satisfied",
+    "replacements": [
+      {
+        "old": "num_matches >= self.value:",
+        "new": "num_matches > self.value:"
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "priority": "Medium",
+    "title": "Require an extra distinct product for a coverage offer",
+    "file": "apps/offer/conditions.py",
+    "symbol": "CoverageCondition.is_satisfied",
+    "replacements": [
+      {
+        "old": "len(covered_ids) >= self.value:",
+        "new": "len(covered_ids) > self.value:"
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "priority": "Medium",
+    "title": "Ignore repeated units when qualifying spend",
+    "file": "apps/offer/conditions.py",
+    "symbol": "ValueCondition.is_satisfied",
+    "replacements": [
+      {
+        "old": "value_of_matches += price * int(\n                    line.quantity_without_offer_discount(offer)\n                )",
+        "new": "value_of_matches += price"
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "priority": "Medium",
+    "title": "Lose checkout updates between requests",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData._set",
+    "replacements": [
+      {
+        "old": "self.request.session.modified = True",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "priority": "Medium",
+    "title": "Forget the guest checkout email",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData.set_guest_email",
+    "replacements": [
+      {
+        "old": "self._set(\"guest\", \"email\", email)",
+        "new": "self._set(\"guest\", \"guest_email\", email)"
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "priority": "Medium",
+    "title": "Forget the chosen shipping method",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData.use_shipping_method",
+    "replacements": [
+      {
+        "old": "self._set(\"shipping\", \"method_code\", code)",
+        "new": "self._set(\"shipping\", \"method\", code)"
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "priority": "Medium",
+    "title": "Reject both ordinary shipping address paths",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData.is_shipping_address_set",
+    "replacements": [
+      {
+        "old": "return has_new_address or has_old_address",
+        "new": "return has_new_address and has_old_address"
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "priority": "Medium",
+    "title": "Forget the same-as-shipping billing choice",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData.bill_to_shipping_address",
+    "replacements": [
+      {
+        "old": "self._set(\"billing\", \"billing_address_same_as_shipping\", True)",
+        "new": "self._set(\"billing\", \"billing_address_same_as_shipping\", False)"
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "priority": "Medium",
+    "title": "Reject a separately supplied billing address",
+    "file": "apps/checkout/utils.py",
+    "symbol": "CheckoutSessionData.is_billing_address_set",
+    "replacements": [
+      {
+        "old": "return has_new_address or has_old_address",
+        "new": "return has_new_address and has_old_address"
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "priority": "Medium",
+    "title": "Reject lowercase but valid postcodes",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractAddress.ensure_postcode_is_valid_for_country",
+    "replacements": [
+      {
+        "old": "self.postcode.upper().replace(\" \", \"\")",
+        "new": "self.postcode.replace(\" \", \"\")"
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "priority": "Medium",
+    "title": "Keep several default billing addresses",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractUserAddress._ensure_defaults_integrity",
+    "replacements": [
+      {
+        "old": "if self.is_default_for_billing:",
+        "new": "if False:"
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "priority": "Medium",
+    "title": "Ignore repeated additions to a wishlist",
+    "file": "apps/wishlists/abstract_models.py",
+    "symbol": "AbstractWishList.add",
+    "replacements": [
+      {
+        "old": "line.quantity += 1",
+        "new": "line.quantity += 0"
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "priority": "Medium",
+    "title": "Prevent an owner from editing their wishlist",
+    "file": "apps/wishlists/abstract_models.py",
+    "symbol": "AbstractWishList.is_allowed_to_edit",
+    "replacements": [
+      {
+        "old": "return user == self.owner",
+        "new": "return False"
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "priority": "Medium",
+    "title": "Change a wishlist URL every time it is edited",
+    "file": "apps/wishlists/abstract_models.py",
+    "symbol": "AbstractWishList.save",
+    "replacements": [
+      {
+        "old": "if not self.pk or kwargs.get(\"force_insert\", False):",
+        "new": "if True:"
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "priority": "Medium",
+    "title": "Fail to resolve a valid delivery selection",
+    "file": "apps/checkout/session.py",
+    "symbol": "CheckoutSessionMixin.get_shipping_method",
+    "replacements": [
+      {
+        "old": "if method.code == code:\n                return method",
+        "new": "if method.code == code:\n                return None"
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "priority": "Medium",
+    "title": "Treat an unchanged saved address as a duplicate",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractUserAddress.validate_unique",
+    "replacements": [
+      {
+        "old": "qs = qs.exclude(id=self.id)",
+        "new": "qs = qs.exclude(id=None)"
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "priority": "Low",
+    "title": "Lose the inherited name of a variant",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.get_title",
+    "replacements": [
+      {
+        "old": "title = self.parent.title",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "priority": "Low",
+    "title": "Leave the product SEO title blank",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.get_meta_title",
+    "replacements": [
+      {
+        "old": "return title or self.get_title()",
+        "new": "return title or \"\""
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "priority": "Low",
+    "title": "Leave the product SEO description blank",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.get_meta_description",
+    "replacements": [
+      {
+        "old": "return meta_description or striptags(self.description)",
+        "new": "return meta_description or \"\""
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "priority": "Low",
+    "title": "Leave the category SEO title blank",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractCategory.get_meta_title",
+    "replacements": [
+      {
+        "old": "return self.meta_title or self.name",
+        "new": "return self.meta_title or \"\""
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "priority": "Low",
+    "title": "Hide the product attribute summary",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.attribute_summary",
+    "replacements": [
+      {
+        "old": "return \", \".join(pairs)",
+        "new": "return \"\""
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "priority": "Low",
+    "title": "Run category breadcrumb names together",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractCategory.full_name",
+    "replacements": [
+      {
+        "old": "return self._full_name_separator.join(names)",
+        "new": "return \"\".join(names)"
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "priority": "Low",
+    "title": "Report leaf categories as expandable",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractCategory.has_children",
+    "replacements": [
+      {
+        "old": "return self.get_children().exists()",
+        "new": "return not self.get_children().exists()"
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "priority": "Low",
+    "title": "Use the second gallery image as the main image",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.primary_image",
+    "replacements": [
+      {
+        "old": "return images[0]",
+        "new": "return images[1]"
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "priority": "Low",
+    "title": "Lose inherited variant photos",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.get_all_images",
+    "replacements": [
+      {
+        "old": "return self.parent.images.all()",
+        "new": "return self.images.all()"
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "priority": "Low",
+    "title": "Mark the second image as primary",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProductImage.is_primary",
+    "replacements": [
+      {
+        "old": "return self.display_order == 0",
+        "new": "return self.display_order == 1"
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "priority": "Low",
+    "title": "Leave no image flagged as primary after deletion",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProductImage.delete",
+    "replacements": [
+      {
+        "old": "image.display_order = idx",
+        "new": "image.display_order = idx + 1"
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "priority": "Low",
+    "title": "Round average review ratings down to whole stars",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.calculate_rating",
+    "replacements": [
+      {
+        "old": "float(reviews_sum) / reviews_count",
+        "new": "float(reviews_sum) // reviews_count"
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "priority": "Low",
+    "title": "Show one extra approved review",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProduct.num_approved_reviews",
+    "replacements": [
+      {
+        "old": "return self.reviews.approved().count()",
+        "new": "return self.reviews.approved().count() + 1"
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "priority": "Low",
+    "title": "Show downvotes as helpful votes",
+    "file": "apps/catalogue/reviews/abstract_models.py",
+    "symbol": "AbstractProductReview.num_up_votes",
+    "replacements": [
+      {
+        "old": "(self.total_votes + self.delta_votes) / 2",
+        "new": "(self.total_votes - self.delta_votes) / 2"
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "priority": "Low",
+    "title": "Mislabel rejected reviews as awaiting moderation",
+    "file": "apps/catalogue/reviews/abstract_models.py",
+    "symbol": "AbstractProductReview.pending_moderation",
+    "replacements": [
+      {
+        "old": "return self.status == self.FOR_MODERATION",
+        "new": "return self.status == self.REJECTED"
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "priority": "Low",
+    "title": "Drop first names from review bylines",
+    "file": "apps/catalogue/reviews/abstract_models.py",
+    "symbol": "AbstractProductReview.reviewer_name",
+    "replacements": [
+      {
+        "old": "name = self.user.get_full_name()",
+        "new": "name = self.user.last_name"
+      }
+    ]
+  },
+  {
+    "id": 77,
+    "priority": "Low",
+    "title": "Preserve unwanted spaces in review titles",
+    "file": "apps/catalogue/reviews/abstract_models.py",
+    "symbol": "AbstractProductReview.clean",
+    "replacements": [
+      {
+        "old": "self.title = self.title.strip()",
+        "new": "self.title = self.title"
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "priority": "Low",
+    "title": "Reverse boolean specification labels",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProductAttributeValue._boolean_as_text",
+    "replacements": [
+      {
+        "old": "return pgettext(\"Product attribute value\", \"Yes\")",
+        "new": "return pgettext(\"Product attribute value\", \"No\")"
+      },
+      {
+        "old": "return pgettext(\"Product attribute value\", \"No\")",
+        "new": "return pgettext(\"Product attribute value\", \"Yes\")"
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "priority": "Low",
+    "title": "Display only the first selected attribute option",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProductAttributeValue._multi_option_as_text",
+    "replacements": [
+      {
+        "old": "self.value_multi_option.all())",
+        "new": "self.value_multi_option.all()[:1])"
+      }
+    ]
+  },
+  {
+    "id": 80,
+    "priority": "Low",
+    "title": "Lose plain-text rich descriptions",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractProductAttributeValue._richtext_as_text",
+    "replacements": [
+      {
+        "old": "return strip_tags(self.value)",
+        "new": "return \"\""
+      }
+    ]
+  },
+  {
+    "id": 81,
+    "priority": "Low",
+    "title": "Remove the configured optional dropdown prompt",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractOption.add_empty_choice",
+    "replacements": [
+      {
+        "old": "choices = [(\"\", self.empty_label)] + choices",
+        "new": "choices = [(\"\", \"\")] + choices"
+      }
+    ]
+  },
+  {
+    "id": 82,
+    "priority": "Low",
+    "title": "Overcount immediate child categories",
+    "file": "apps/catalogue/abstract_models.py",
+    "symbol": "AbstractCategory.get_num_children",
+    "replacements": [
+      {
+        "old": "return self.get_children_count()",
+        "new": "return self.get_children_count() + 1"
+      }
+    ]
+  },
+  {
+    "id": 83,
+    "priority": "Low",
+    "title": "List recently viewed products oldest first",
+    "file": "apps/customer/history.py",
+    "symbol": "CustomerHistoryManager.get",
+    "replacements": [
+      {
+        "old": "ids.reverse()",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "priority": "Low",
+    "title": "Keep one fewer recently viewed product",
+    "file": "apps/customer/history.py",
+    "symbol": "CustomerHistoryManager.add",
+    "replacements": [
+      {
+        "old": "ids[len(ids) - cls.max_products :]",
+        "new": "ids[len(ids) - cls.max_products + 1 :]"
+      }
+    ]
+  },
+  {
+    "id": 85,
+    "priority": "Low",
+    "title": "Repeat products in browsing history",
+    "file": "apps/customer/history.py",
+    "symbol": "CustomerHistoryManager.add",
+    "replacements": [
+      {
+        "old": "ids.remove(new_id)",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "priority": "Low",
+    "title": "Reverse the low-to-high price sort",
+    "file": "apps/search/forms.py",
+    "symbol": "SearchForm",
+    "replacements": [
+      {
+        "old": "PRICE_LOW_TO_HIGH: \"price\",",
+        "new": "PRICE_LOW_TO_HIGH: \"-price\","
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "priority": "Low",
+    "title": "Reverse the alphabetical title sort",
+    "file": "apps/search/forms.py",
+    "symbol": "SearchForm",
+    "replacements": [
+      {
+        "old": "SORT_BY_MAP[TITLE_A_TO_Z] = \"title_exact\"",
+        "new": "SORT_BY_MAP[TITLE_A_TO_Z] = \"-title_exact\""
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "priority": "Low",
+    "title": "Show oldest products under the newest sort",
+    "file": "apps/search/forms.py",
+    "symbol": "SearchForm",
+    "replacements": [
+      {
+        "old": "NEWEST: \"-date_created\",",
+        "new": "NEWEST: \"date_created\","
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "priority": "Low",
+    "title": "Ask shoppers to buy one extra item in an upsell message",
+    "file": "apps/offer/conditions.py",
+    "symbol": "CountCondition.get_upsell_message",
+    "replacements": [
+      {
+        "old": "delta = self.value - num_matches",
+        "new": "delta = self.value - num_matches + 1"
+      }
+    ]
+  },
+  {
+    "id": 90,
+    "priority": "Low",
+    "title": "Overstate the remaining spend in an upsell message",
+    "file": "apps/offer/conditions.py",
+    "symbol": "ValueCondition.get_upsell_message",
+    "replacements": [
+      {
+        "old": "delta = self.value - value_of_matches",
+        "new": "delta = self.value - value_of_matches + 1"
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "priority": "Low",
+    "title": "Hide basket price-change notices",
+    "file": "apps/basket/views.py",
+    "symbol": "BasketView.get_basket_warnings",
+    "replacements": [
+      {
+        "old": "return warnings",
+        "new": "return []"
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "priority": "Low",
+    "title": "Always confirm that one item was added",
+    "file": "apps/basket/views.py",
+    "symbol": "BasketAddView.get_success_message",
+    "replacements": [
+      {
+        "old": "\"quantity\": form.cleaned_data[\"quantity\"]",
+        "new": "\"quantity\": 1"
+      }
+    ]
+  },
+  {
+    "id": 93,
+    "priority": "Low",
+    "title": "Label available stock as unavailable",
+    "file": "apps/partner/availability.py",
+    "symbol": "StockRequired.short_message",
+    "replacements": [
+      {
+        "old": "return _(\"In stock\")",
+        "new": "return _(\"Unavailable\")"
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "priority": "Low",
+    "title": "Hide product options from the basket description",
+    "file": "apps/basket/abstract_models.py",
+    "symbol": "AbstractLine.description",
+    "replacements": [
+      {
+        "old": "d = \"%s (%s)\" % (d, \", \".join(ops))",
+        "new": "pass"
+      }
+    ]
+  },
+  {
+    "id": 95,
+    "priority": "Low",
+    "title": "Run formatted address components together",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractAddress.summary",
+    "replacements": [
+      {
+        "old": "return \", \".join(self.active_address_fields())",
+        "new": "return \"\".join(self.active_address_fields())"
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "priority": "Low",
+    "title": "Omit honorifics from address salutations",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractAddress.salutation",
+    "replacements": [
+      {
+        "old": "(\"title\", \"first_name\", \"last_name\")",
+        "new": "(\"first_name\", \"last_name\")"
+      }
+    ]
+  },
+  {
+    "id": 97,
+    "priority": "Low",
+    "title": "Drop surnames from the address name label",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractAddress.name",
+    "replacements": [
+      {
+        "old": "(\"first_name\", \"last_name\")",
+        "new": "(\"first_name\",)"
+      }
+    ]
+  },
+  {
+    "id": 98,
+    "priority": "Low",
+    "title": "Drop leading zeroes from numeric country codes",
+    "file": "apps/address/abstract_models.py",
+    "symbol": "AbstractCountry.numeric_code",
+    "replacements": [
+      {
+        "old": "return \"%.03d\" % int(self.iso_3166_1_numeric)",
+        "new": "return str(int(self.iso_3166_1_numeric))"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "priority": "Low",
+    "title": "Greet customers by surname",
+    "file": "apps/customer/abstract_models.py",
+    "symbol": "AbstractUser.get_short_name",
+    "replacements": [
+      {
+        "old": "return self.first_name",
+        "new": "return self.last_name"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "priority": "Low",
+    "title": "Report order usage as voucher additions",
+    "file": "apps/voucher/abstract_models.py",
+    "symbol": "AbstractVoucherSet.num_basket_additions",
+    "replacements": [
+      {
+        "old": "Sum(\"num_basket_additions\")",
+        "new": "Sum(\"num_orders\")"
+      }
+    ]
+  }
+]

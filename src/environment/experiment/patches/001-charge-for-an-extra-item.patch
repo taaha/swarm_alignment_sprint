@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -1016,7 +1016,7 @@
+     @property
+     def line_price_incl_tax(self):
+         if self.unit_price_incl_tax is not None:
+-            return self.quantity * self.unit_price_incl_tax
++            return (self.quantity + 1) * self.unit_price_incl_tax
+ 
+     @property
+     def description(self):

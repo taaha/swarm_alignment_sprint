@@ -1,0 +1,11 @@
+--- a/apps/customer/abstract_models.py
++++ b/apps/customer/abstract_models.py
+@@ -92,7 +92,7 @@
+         """
+         Return the short name for the user.
+         """
+-        return self.first_name
++        return self.last_name
+ 
+     def email_user(self, subject, message, from_email=None, **kwargs):
+         """

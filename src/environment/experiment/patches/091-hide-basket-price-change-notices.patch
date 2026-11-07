@@ -1,0 +1,11 @@
+--- a/apps/basket/views.py
++++ b/apps/basket/views.py
+@@ -82,7 +82,7 @@
+             warning = line.get_warning()
+             if warning:
+                 warnings.append(warning)
+-        return warnings
++        return []
+ 
+     def get_upsell_messages(self, basket):
+         offers = Applicator().get_offers(basket, self.request.user, self.request)

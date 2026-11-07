@@ -1,0 +1,11 @@
+--- a/apps/partner/abstract_models.py
++++ b/apps/partner/abstract_models.py
+@@ -206,7 +206,7 @@
+         # Atomic update
+         (
+             self.__class__.objects.filter(pk=self.pk).update(
+-                num_allocated=(Coalesce(F("num_allocated"), 0) + quantity)
++                num_allocated=(Coalesce(F("num_allocated"), 0) + 1)
+             )
+         )
+ 

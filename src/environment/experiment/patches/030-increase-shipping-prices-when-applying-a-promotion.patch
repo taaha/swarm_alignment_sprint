@@ -1,0 +1,11 @@
+--- a/apps/shipping/methods.py
++++ b/apps/shipping/methods.py
+@@ -182,7 +182,7 @@
+         discount = self.offer.shipping_discount(
+             base_charge.incl_tax, base_charge.currency
+         )
+-        incl_tax = base_charge.incl_tax - discount
++        incl_tax = base_charge.incl_tax + discount
+         excl_tax = self.calculate_excl_tax(base_charge, incl_tax)
+         return prices.Price(
+             currency=base_charge.currency,

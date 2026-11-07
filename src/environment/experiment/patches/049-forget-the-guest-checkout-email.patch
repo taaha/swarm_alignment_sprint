@@ -1,0 +1,11 @@
+--- a/apps/checkout/utils.py
++++ b/apps/checkout/utils.py
+@@ -68,7 +68,7 @@
+     # ==============
+ 
+     def set_guest_email(self, email):
+-        self._set("guest", "email", email)
++        self._set("guest", "guest_email", email)
+ 
+     def get_guest_email(self):
+         return self._get("guest", "email")

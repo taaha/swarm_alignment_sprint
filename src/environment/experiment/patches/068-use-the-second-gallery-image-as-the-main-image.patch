@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -865,7 +865,7 @@
+             # the ProductManager
+             images = images.order_by("display_order")
+         try:
+-            return images[0]
++            return images[1]
+         except IndexError:
+             # We return a dict with fields that mirror the key properties of
+             # the ProductImage class so this missing image can be used

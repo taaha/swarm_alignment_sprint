@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -962,7 +962,7 @@
+         if excl_tax_discounts:
+             # these are discounts that return a value excluding tax, we can simply
+             # subtract this value from line_price_excl_tax to get to line_price_excl_tax_incl_discounts
+-            return max(0, self.line_price_excl_tax - excl_tax_discounts)
++            return max(0, self.line_price_excl_tax + excl_tax_discounts)
+ 
+         # This is a tricky situation.  We know the discount as calculated
+         # against tax inclusive prices but we need to guess how much of the

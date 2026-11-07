@@ -1,0 +1,11 @@
+--- a/apps/payment/abstract_models.py
++++ b/apps/payment/abstract_models.py
+@@ -183,7 +183,7 @@
+         """
+         Convenience method for recording refunds against this source
+         """
+-        self.amount_refunded += amount
++        self.amount_refunded -= amount
+         self.save()
+         self._create_transaction(AbstractTransaction.REFUND, amount, reference, status)
+ 

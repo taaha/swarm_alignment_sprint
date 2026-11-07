@@ -1,0 +1,11 @@
+--- a/apps/checkout/session.py
++++ b/apps/checkout/session.py
+@@ -373,7 +373,7 @@
+         )
+         for method in methods:
+             if method.code == code:
+-                return method
++                return None
+ 
+     def get_billing_address(self, shipping_address):
+         """

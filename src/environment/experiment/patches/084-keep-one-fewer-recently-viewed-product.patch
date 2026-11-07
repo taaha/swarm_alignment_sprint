@@ -1,0 +1,11 @@
+--- a/apps/customer/history.py
++++ b/apps/customer/history.py
+@@ -59,7 +59,7 @@
+             ids.remove(new_id)
+         ids.append(new_id)
+         if len(ids) > cls.max_products:
+-            ids = ids[len(ids) - cls.max_products :]
++            ids = ids[len(ids) - cls.max_products + 1 :]
+         return ids
+ 
+     @classmethod

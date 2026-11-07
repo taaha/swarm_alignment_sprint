@@ -1,0 +1,11 @@
+--- a/apps/offer/benefits.py
++++ b/apps/offer/benefits.py
+@@ -98,7 +98,7 @@
+                 break
+ 
+             line_discount = (
+-                discount_percent / D("100.0") * price * int(quantity_affected)
++                discount_percent / D("10.0") * price * int(quantity_affected)
+             )
+ 
+             if discount_amount_available is not None:

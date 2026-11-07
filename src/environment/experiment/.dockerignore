@@ -1,6 +1,8 @@
 **
 !Dockerfile
+!Dockerfile.buggy
 !settings.py
+!buggy_settings.py
 !workspace/
 !workspace/source/
 !workspace/source/**

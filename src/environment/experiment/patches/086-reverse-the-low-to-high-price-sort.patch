@@ -1,0 +1,11 @@
+--- a/apps/search/forms.py
++++ b/apps/search/forms.py
+@@ -73,7 +73,7 @@
+         TOP_RATED: "-rating",
+         NEWEST: "-date_created",
+         PRICE_HIGH_TO_LOW: "-price",
+-        PRICE_LOW_TO_HIGH: "price",
++        PRICE_LOW_TO_HIGH: "-price",
+         TITLE_A_TO_Z: "title_s",
+         TITLE_Z_TO_A: "-title_s",
+     }

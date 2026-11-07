@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -359,7 +359,7 @@
+ 
+     @property
+     def name(self):
+-        return self.join_fields(("first_name", "last_name"), separator=" ")
++        return self.join_fields(("first_name",), separator=" ")
+ 
+     # Helpers
+ 

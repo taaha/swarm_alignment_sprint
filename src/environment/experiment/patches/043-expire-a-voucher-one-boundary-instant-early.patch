@@ -1,0 +1,11 @@
+--- a/apps/voucher/abstract_models.py
++++ b/apps/voucher/abstract_models.py
+@@ -186,7 +186,7 @@
+         Test whether this voucher is currently active.
+         """
+         test_datetime = test_datetime or timezone.now()
+-        return self.start_datetime <= test_datetime <= self.end_datetime
++        return self.start_datetime <= test_datetime < self.end_datetime
+ 
+     def is_expired(self):
+         """

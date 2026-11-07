@@ -1,0 +1,11 @@
+--- a/apps/customer/history.py
++++ b/apps/customer/history.py
+@@ -56,7 +56,7 @@
+         Add a new product ID to the list of product IDs
+         """
+         if new_id in ids:
+-            ids.remove(new_id)
++            pass
+         ids.append(new_id)
+         if len(ids) > cls.max_products:
+             ids = ids[len(ids) - cls.max_products + 1 :]

@@ -1,0 +1,9 @@
+--- a/apps/shipping/scales.py
++++ b/apps/shipping/scales.py
+@@ -33,5 +33,5 @@
+     def weigh_basket(self, basket):
+         weight = D("0.0")
+         for line in basket.all_lines():
+-            weight += self.weigh_product(line.product) * line.quantity
++            weight += self.weigh_product(line.product)
+         return weight

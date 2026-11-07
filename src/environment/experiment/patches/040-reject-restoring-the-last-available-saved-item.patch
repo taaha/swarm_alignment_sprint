@@ -1,0 +1,11 @@
+--- a/apps/basket/forms.py
++++ b/apps/basket/forms.py
+@@ -182,7 +182,7 @@
+         # only one but there can be more if you allow product options).
+         lines = self.basket.lines.filter(product=self.instance.product)
+         current_qty = lines.aggregate(Sum("quantity"))["quantity__sum"] or 0
+-        desired_qty = current_qty + self.instance.quantity
++        desired_qty = current_qty + self.instance.quantity + 1
+ 
+         result = self.strategy.fetch_for_product(self.instance.product)
+         is_available, reason = result.availability.is_purchase_permitted(

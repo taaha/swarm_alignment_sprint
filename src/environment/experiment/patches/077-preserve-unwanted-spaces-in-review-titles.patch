@@ -1,0 +1,11 @@
+--- a/apps/catalogue/reviews/abstract_models.py
++++ b/apps/catalogue/reviews/abstract_models.py
+@@ -104,7 +104,7 @@
+         return self.title
+ 
+     def clean(self):
+-        self.title = self.title.strip()
++        self.title = self.title
+         self.body = self.body.strip()
+         if not self.user and not (self.name and self.email):
+             raise ValidationError(

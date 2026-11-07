@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -354,7 +354,7 @@
+         Name (including title)
+         """
+         return self.join_fields(
+-            ("title", "first_name", "last_name"), separator=" "
++            ("first_name", "last_name"), separator=" "
+         ).strip()
+ 
+     @property

@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -1033,7 +1033,7 @@
+             else:
+                 ops.append("%s = '%s'" % (attribute.option.name, value))
+         if ops:
+-            d = "%s (%s)" % (d, ", ".join(ops))
++            pass
+         return d
+ 
+     def get_warning(self):

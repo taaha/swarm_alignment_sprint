@@ -1,0 +1,10 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -415,6 +415,7 @@
+         Test whether the basket contains physical products that require
+         shipping.
+         """
++        return True
+         for line in self.all_lines():
+             if line.product.is_shipping_required:
+                 return True

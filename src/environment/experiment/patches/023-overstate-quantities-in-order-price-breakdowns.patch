@@ -1,0 +1,11 @@
+--- a/apps/order/utils.py
++++ b/apps/order/utils.py
+@@ -287,7 +287,7 @@
+         for price_incl_tax, price_excl_tax, quantity in breakdown:
+             order_line.prices.create(
+                 order=order,
+-                quantity=quantity,
++                quantity=quantity + 1,
+                 price_incl_tax=price_incl_tax,
+                 price_excl_tax=price_excl_tax,
+                 tax_code=basket_line.tax_code,

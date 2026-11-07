@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -375,7 +375,7 @@
+         # Ensure all vouchers are moved to the new basket
+         for voucher in basket.vouchers.all():
+             basket.vouchers.remove(voucher)
+-            self.vouchers.add(voucher)
++            pass
+ 
+     merge.alters_data = True
+ 

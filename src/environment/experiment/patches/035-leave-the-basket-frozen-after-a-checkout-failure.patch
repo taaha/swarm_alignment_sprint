@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -392,7 +392,7 @@
+         """
+         Unfreezes a basket so it can be modified again
+         """
+-        self.status = self.OPEN
++        self.status = self.FROZEN
+         self.save()
+ 
+     thaw.alters_data = True

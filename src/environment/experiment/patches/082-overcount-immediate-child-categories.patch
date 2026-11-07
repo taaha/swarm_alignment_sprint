@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -341,7 +341,7 @@
+         return not self.get_children().exists()
+ 
+     def get_num_children(self):
+-        return self.get_children_count()
++        return self.get_children_count() + 1
+ 
+ 
+ class AbstractProductCategory(models.Model):

@@ -1,0 +1,11 @@
+--- a/apps/partner/abstract_models.py
++++ b/apps/partner/abstract_models.py
+@@ -266,7 +266,7 @@
+         (
+             self.__class__.objects.filter(pk=self.pk).update(
+                 num_allocated=Coalesce(F("num_allocated"), 0)
+-                - Least(Coalesce(F("num_allocated"), 0), quantity),
++                + Least(Coalesce(F("num_allocated"), 0), quantity),
+             )
+         )
+ 

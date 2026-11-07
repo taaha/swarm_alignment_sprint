@@ -1,0 +1,11 @@
+--- a/apps/voucher/abstract_models.py
++++ b/apps/voucher/abstract_models.py
+@@ -208,7 +208,7 @@
+             if not is_available:
+                 message = _("This voucher has already been used")
+         elif self.usage == self.MULTI_USE:
+-            is_available = True
++            is_available = False
+         elif self.usage == self.ONCE_PER_CUSTOMER:
+             if not user.is_authenticated:
+                 is_available = False

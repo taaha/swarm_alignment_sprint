@@ -1,0 +1,11 @@
+--- a/apps/offer/benefits.py
++++ b/apps/offer/benefits.py
+@@ -349,7 +349,7 @@
+             return ZERO_DISCOUNT
+ 
+         # Cheapest line gives free product
+-        discount, line = line_tuples[0]
++        discount, line = line_tuples[-1]
+         if line.quantity_with_offer_discount(offer) == 0:
+             apply_discount(line, discount, 1, offer)
+ 

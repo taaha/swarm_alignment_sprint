@@ -1,0 +1,11 @@
+--- a/apps/partner/abstract_models.py
++++ b/apps/partner/abstract_models.py
+@@ -179,7 +179,7 @@
+             return 0
+         if self.num_allocated is None:
+             return self.num_in_stock
+-        return self.num_in_stock - self.num_allocated
++        return self.num_in_stock + self.num_allocated
+ 
+     @cached_property
+     def can_track_allocations(self):

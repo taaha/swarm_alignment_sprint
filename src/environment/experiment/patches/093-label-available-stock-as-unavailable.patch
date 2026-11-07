@@ -1,0 +1,11 @@
+--- a/apps/partner/availability.py
++++ b/apps/partner/availability.py
+@@ -106,7 +106,7 @@
+     @property
+     def short_message(self):
+         if self.num_available > 0:
+-            return _("In stock")
++            return _("Unavailable")
+         return _("Unavailable")
+ 
+     @property

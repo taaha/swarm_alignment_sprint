@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -723,7 +723,7 @@
+         """
+         title = self.title
+         if not title and self.parent_id:
+-            title = self.parent.title
++            pass
+         return title
+ 
+     get_title.short_description = pgettext_lazy("Product title", "Title")

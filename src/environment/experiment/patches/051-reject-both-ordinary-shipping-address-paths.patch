@@ -1,0 +1,11 @@
+--- a/apps/checkout/utils.py
++++ b/apps/checkout/utils.py
+@@ -128,7 +128,7 @@
+         has_new_address = new_fields is not None
+         user_address_id = self.shipping_user_address_id()
+         has_old_address = user_address_id is not None and user_address_id > 0
+-        return has_new_address or has_old_address
++        return has_new_address and has_old_address
+ 
+     # Shipping method
+     # ===============

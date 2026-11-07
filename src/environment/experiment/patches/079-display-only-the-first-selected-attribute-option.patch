@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1342,7 +1342,7 @@
+ 
+     @property
+     def _multi_option_as_text(self):
+-        return ", ".join(str(option) for option in self.value_multi_option.all())
++        return ", ".join(str(option) for option in self.value_multi_option.all()[:1])
+ 
+     @property
+     def _option_as_text(self):

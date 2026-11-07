@@ -1,0 +1,11 @@
+--- a/apps/order/utils.py
++++ b/apps/order/utils.py
+@@ -222,7 +222,7 @@
+             "quantity": basket_line.quantity + 1,
+             # Price details
+             "line_price_excl_tax": basket_line.line_price_excl_tax_incl_discounts,
+-            "line_price_incl_tax": basket_line.line_price_incl_tax_incl_discounts,
++            "line_price_incl_tax": basket_line.line_price_incl_tax,
+             "line_price_before_discounts_excl_tax": basket_line.line_price_excl_tax,
+             "line_price_before_discounts_incl_tax": basket_line.line_price_incl_tax,
+             # Reporting details

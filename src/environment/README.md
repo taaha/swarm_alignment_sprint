@@ -4,7 +4,9 @@ The prepared environment for future bug introduction is documented in
 [`experiment/README.md`](experiment/README.md). It runs separately on port 8082
 and currently contains zero deliberately introduced bugs. The root
 [`bug-checklist.md`](../../bug-checklist.md) mirrors the 100-item catalog with
-unchecked implementation boxes.
+implementation boxes. All 100 mutations are now implemented in the separate
+`swarm-oscar:buggy-v1` image on port 8083; the ready image on port 8082 remains
+unchanged. See the experiment guide for `start-buggy` and `fresh-buggy` commands.
 
 Oscar is a Python/Django e-commerce application. This directory contains our
 Docker development environment, not the swarm controller or bug scenarios.

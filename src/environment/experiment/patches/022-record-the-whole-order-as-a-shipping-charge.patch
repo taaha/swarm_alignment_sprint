@@ -1,0 +1,11 @@
+--- a/apps/order/utils.py
++++ b/apps/order/utils.py
+@@ -160,7 +160,7 @@
+             "currency": total.currency,
+             "total_incl_tax": total.excl_tax,
+             "total_excl_tax": total.excl_tax,
+-            "shipping_incl_tax": shipping_charge.incl_tax,
++            "shipping_incl_tax": total.incl_tax,
+             "shipping_excl_tax": shipping_charge.excl_tax,
+             "shipping_tax_code": shipping_charge.tax_code,
+             "shipping_method": shipping_method.name,

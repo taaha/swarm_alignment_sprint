@@ -1,0 +1,11 @@
+--- a/apps/voucher/abstract_models.py
++++ b/apps/voucher/abstract_models.py
+@@ -69,7 +69,7 @@
+ 
+     @property
+     def num_basket_additions(self):
+-        value = self.vouchers.aggregate(result=Sum("num_basket_additions"))
++        value = self.vouchers.aggregate(result=Sum("num_orders"))
+         return value["result"]
+ 
+     @property

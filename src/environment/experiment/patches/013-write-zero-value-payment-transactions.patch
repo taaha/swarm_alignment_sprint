@@ -1,0 +1,11 @@
+--- a/apps/payment/abstract_models.py
++++ b/apps/payment/abstract_models.py
+@@ -148,7 +148,7 @@
+ 
+     def _create_transaction(self, txn_type, amount, reference="", status=""):
+         self.transactions.create(
+-            txn_type=txn_type, amount=amount, reference=reference, status=status
++            txn_type=txn_type, amount=0, reference=reference, status=status
+         )
+ 
+     # =======

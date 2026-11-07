@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1691,7 +1691,7 @@
+         """
+         super().delete(*args, **kwargs)
+         for idx, image in enumerate(self.product.images.all()):
+-            image.display_order = idx
++            image.display_order = idx + 1
+             image.save()
+ 
+ 

@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -740,7 +740,7 @@
+         meta_description = self.meta_description
+         if not meta_description and self.is_child:
+             meta_description = self.parent.meta_description
+-        return meta_description or striptags(self.description)
++        return meta_description or ""
+ 
+     get_meta_description.short_description = pgettext_lazy(
+         "Product meta description", "Meta description"

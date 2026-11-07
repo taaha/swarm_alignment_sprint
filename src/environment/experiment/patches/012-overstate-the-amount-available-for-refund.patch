@@ -1,0 +1,11 @@
+--- a/apps/payment/abstract_models.py
++++ b/apps/payment/abstract_models.py
+@@ -205,7 +205,7 @@
+         """
+         Return the amount available to be refunded
+         """
+-        return self.amount_debited - self.amount_refunded
++        return self.amount_debited + self.amount_refunded
+ 
+ 
+ class AbstractSourceType(models.Model):

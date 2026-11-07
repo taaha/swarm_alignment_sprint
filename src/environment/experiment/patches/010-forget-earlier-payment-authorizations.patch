@@ -1,0 +1,11 @@
+--- a/apps/payment/abstract_models.py
++++ b/apps/payment/abstract_models.py
+@@ -159,7 +159,7 @@
+         """
+         Convenience method for ring-fencing money against this source
+         """
+-        self.amount_allocated += amount
++        self.amount_allocated = amount
+         self.save()
+         self._create_transaction(
+             AbstractTransaction.AUTHORISE, amount, reference, status

@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -491,7 +491,7 @@
+         field, but the database might still contain non-padded strings. That's
+         why the padding is kept.
+         """
+-        return "%.03d" % int(self.iso_3166_1_numeric)
++        return str(int(self.iso_3166_1_numeric))
+ 
+ 
+ class AbstractShippingAddress(AbstractAddress):

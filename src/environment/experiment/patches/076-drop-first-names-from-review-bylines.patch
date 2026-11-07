@@ -1,0 +1,11 @@
+--- a/apps/catalogue/reviews/abstract_models.py
++++ b/apps/catalogue/reviews/abstract_models.py
+@@ -161,7 +161,7 @@
+     @property
+     def reviewer_name(self):
+         if self.user:
+-            name = self.user.get_full_name()
++            name = self.user.last_name
+             return name if name else _("anonymous")
+         else:
+             return self.name

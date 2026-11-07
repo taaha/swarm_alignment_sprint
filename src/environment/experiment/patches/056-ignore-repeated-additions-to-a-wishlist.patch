@@ -1,0 +1,11 @@
+--- a/apps/wishlists/abstract_models.py
++++ b/apps/wishlists/abstract_models.py
+@@ -113,7 +113,7 @@
+             self.lines.create(product=product, title=product.get_title())
+         else:
+             line = lines[0]
+-            line.quantity += 1
++            line.quantity += 0
+             line.save()
+ 
+     def get_shared_url(self):

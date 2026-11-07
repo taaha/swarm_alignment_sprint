@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -281,7 +281,7 @@
+                 node.set_ancestors_are_public()
+ 
+     def get_meta_title(self):
+-        return self.meta_title or self.name
++        return self.meta_title or ""
+ 
+     def get_meta_description(self):
+         return self.meta_description or striptags(self.description)

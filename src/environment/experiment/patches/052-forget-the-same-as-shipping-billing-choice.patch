@@ -1,0 +1,11 @@
+--- a/apps/checkout/utils.py
++++ b/apps/checkout/utils.py
+@@ -194,7 +194,7 @@
+         the shipping address.
+         """
+         self._flush_namespace("billing")
+-        self._set("billing", "billing_address_same_as_shipping", True)
++        self._set("billing", "billing_address_same_as_shipping", False)
+ 
+     # Legacy method name
+     billing_address_same_as_shipping = bill_to_shipping_address

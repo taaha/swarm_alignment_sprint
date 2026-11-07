@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -349,7 +349,7 @@
+             if add_quantities:
+                 existing_line.quantity += line.quantity
+             else:
+-                existing_line.quantity = max(existing_line.quantity, line.quantity)
++                existing_line.quantity = min(existing_line.quantity, line.quantity)
+             existing_line.save()
+             line.delete()
+         finally:

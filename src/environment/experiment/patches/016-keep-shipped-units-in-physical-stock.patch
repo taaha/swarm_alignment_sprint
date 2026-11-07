@@ -1,0 +1,11 @@
+--- a/apps/partner/abstract_models.py
++++ b/apps/partner/abstract_models.py
+@@ -243,7 +243,7 @@
+         (
+             self.__class__.objects.filter(pk=self.pk).update(
+                 num_allocated=(Coalesce(F("num_allocated"), 0) - quantity),
+-                num_in_stock=(Coalesce(F("num_in_stock"), 0) - quantity),
++                num_in_stock=(Coalesce(F("num_in_stock"), 0) - 0),
+             )
+         )
+ 

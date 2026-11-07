@@ -1,0 +1,11 @@
+--- a/apps/offer/conditions.py
++++ b/apps/offer/conditions.py
+@@ -70,7 +70,7 @@
+ 
+     def get_upsell_message(self, offer, basket):
+         num_matches = self._get_num_matches(basket, offer)
+-        delta = self.value - num_matches
++        delta = self.value - num_matches + 1
+         if delta > 0:
+             return ngettext(
+                 "Buy %(delta)d more product from %(range)s",

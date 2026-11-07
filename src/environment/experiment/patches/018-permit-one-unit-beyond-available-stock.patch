@@ -1,0 +1,11 @@
+--- a/apps/partner/availability.py
++++ b/apps/partner/availability.py
+@@ -89,7 +89,7 @@
+     def is_purchase_permitted(self, quantity):
+         if self.num_available <= 0:
+             return False, _("no stock available")
+-        if quantity > self.num_available:
++        if quantity > self.num_available + 1:
+             msg = _("a maximum of %(max)d can be bought") % {"max": self.num_available}
+             return False, msg
+         return True, ""

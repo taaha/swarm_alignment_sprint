@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1682,7 +1682,7 @@
+         """
+         Return bool if image display order is 0
+         """
+-        return self.display_order == 0
++        return self.display_order == 1
+ 
+     def delete(self, *args, **kwargs):
+         """

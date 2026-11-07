@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -715,7 +715,7 @@
+         """
+         attributes = self.get_attribute_values()
+         pairs = [attribute.summary() for attribute in attributes]
+-        return ", ".join(pairs)
++        return ""
+ 
+     def get_title(self):
+         """

@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -619,7 +619,7 @@
+         super().validate_unique(exclude)
+         qs = self.__class__.objects.filter(user=self.user, hash=self.generate_hash())
+         if self.id:
+-            qs = qs.exclude(id=self.id)
++            qs = qs.exclude(id=None)
+         if qs.exists():
+             raise exceptions.ValidationError(
+                 {"__all__": [_("This address is already in your address book")]}

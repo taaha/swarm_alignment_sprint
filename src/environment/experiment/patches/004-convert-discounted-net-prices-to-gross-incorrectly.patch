@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -1000,7 +1000,7 @@
+             return self.line_price_incl_tax - incl_tax_discounts
+         elif self.line_price_excl_tax is not None and excl_tax_discounts:
+             return round_half_up_two_dec(
+-                self.line_price_excl_tax_incl_discounts / self._tax_ratio
++                self.line_price_excl_tax_incl_discounts * self._tax_ratio
+             )
+ 
+         return self.line_price_incl_tax

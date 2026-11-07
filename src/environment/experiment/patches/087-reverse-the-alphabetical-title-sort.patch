@@ -1,0 +1,11 @@
+--- a/apps/search/forms.py
++++ b/apps/search/forms.py
+@@ -79,7 +79,7 @@
+     }
+     # Non Solr backends don't support dynamic fields so we just sort on title
+     if not is_solr_supported():
+-        SORT_BY_MAP[TITLE_A_TO_Z] = "title_exact"
++        SORT_BY_MAP[TITLE_A_TO_Z] = "-title_exact"
+         SORT_BY_MAP[TITLE_Z_TO_A] = "-title_exact"
+ 
+     sort_by = forms.ChoiceField(

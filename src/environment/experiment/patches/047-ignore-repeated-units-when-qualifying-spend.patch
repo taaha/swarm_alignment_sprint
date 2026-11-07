@@ -1,0 +1,13 @@
+--- a/apps/offer/conditions.py
++++ b/apps/offer/conditions.py
+@@ -252,9 +252,7 @@
+                 and line.quantity_without_offer_discount(offer) > 0
+             ):
+                 price = unit_price(offer, line)
+-                value_of_matches += price * int(
+-                    line.quantity_without_offer_discount(offer)
+-                )
++                value_of_matches += price
+             if value_of_matches >= self.value:
+                 return True
+         return False

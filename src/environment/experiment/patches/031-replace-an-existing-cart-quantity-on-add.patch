@@ -1,0 +1,11 @@
+--- a/apps/basket/abstract_models.py
++++ b/apps/basket/abstract_models.py
+@@ -305,7 +305,7 @@
+                     option=option_dict["option"], value=option_dict["value"]
+                 )
+         else:
+-            line.quantity = max(0, line.quantity + quantity)
++            line.quantity = max(0, quantity)
+             line.save()
+         self.reset_offer_applications()
+ 

@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -896,7 +896,7 @@
+         reviews_count = result["count"] or 0
+         rating = None
+         if reviews_count > 0:
+-            rating = float(reviews_sum) / reviews_count
++            rating = float(reviews_sum) // reviews_count
+         return rating
+ 
+     def has_review_by(self, user):

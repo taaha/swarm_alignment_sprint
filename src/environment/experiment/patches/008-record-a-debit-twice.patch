@@ -1,0 +1,11 @@
+--- a/apps/payment/abstract_models.py
++++ b/apps/payment/abstract_models.py
+@@ -173,7 +173,7 @@
+         """
+         if amount is None:
+             amount = self.balance
+-        self.amount_debited += amount
++        self.amount_debited += 2 * amount
+         self.save()
+         self._create_transaction(AbstractTransaction.DEBIT, amount, reference, status)
+ 

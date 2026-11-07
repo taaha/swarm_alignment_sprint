@@ -1,0 +1,11 @@
+--- a/apps/wishlists/abstract_models.py
++++ b/apps/wishlists/abstract_models.py
+@@ -63,7 +63,7 @@
+         return "%s's Wish List '%s'" % (self.owner, self.name)
+ 
+     def save(self, *args, **kwargs):
+-        if not self.pk or kwargs.get("force_insert", False):
++        if True:
+             self.key = self.__class__.random_key()
+         super().save(*args, **kwargs)
+ 

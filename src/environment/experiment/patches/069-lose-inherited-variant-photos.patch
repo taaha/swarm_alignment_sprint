@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -849,7 +849,7 @@
+     # pylint: disable=no-member
+     def get_all_images(self):
+         if self.is_child and not self.images.exists() and self.parent_id is not None:
+-            return self.parent.images.all()
++            return self.images.all()
+         return self.images.all()
+ 
+     def primary_image(self):

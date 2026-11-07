@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1538,7 +1538,7 @@
+ 
+     def add_empty_choice(self, choices):
+         if self.is_select and not self.is_multi_option:
+-            choices = [("", self.empty_label)] + choices
++            choices = [("", "")] + choices
+         elif self.is_radio:
+             choices = [(None, self.empty_radio_label)] + choices
+         return choices

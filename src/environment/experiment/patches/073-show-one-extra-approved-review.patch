@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -921,7 +921,7 @@
+ 
+     @cached_property
+     def num_approved_reviews(self):
+-        return self.reviews.approved().count()
++        return self.reviews.approved().count() + 1
+ 
+     @property
+     def sorted_recommended_products(self):

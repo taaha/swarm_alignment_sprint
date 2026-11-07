@@ -1,0 +1,11 @@
+--- a/apps/checkout/calculators.py
++++ b/apps/checkout/calculators.py
+@@ -23,7 +23,7 @@
+         if surcharges is not None:
+             excl_tax += surcharges.total.excl_tax
+             if incl_tax is not None:
+-                incl_tax += surcharges.total.incl_tax
++                incl_tax += 0
+ 
+         return prices.Price(
+             currency=basket.currency, excl_tax=excl_tax, incl_tax=incl_tax

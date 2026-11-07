@@ -1,0 +1,11 @@
+--- a/apps/catalogue/reviews/abstract_models.py
++++ b/apps/catalogue/reviews/abstract_models.py
+@@ -134,7 +134,7 @@
+ 
+     @property
+     def pending_moderation(self):
+-        return self.status == self.FOR_MODERATION
++        return self.status == self.REJECTED
+ 
+     @property
+     def is_approved(self):

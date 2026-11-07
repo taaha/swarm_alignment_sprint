@@ -1,0 +1,11 @@
+--- a/apps/basket/forms.py
++++ b/apps/basket/forms.py
+@@ -317,7 +317,7 @@
+                     )
+                     % {"threshold": basket_threshold, "basket": total_basket_quantity}
+                 )
+-        return qty
++        return qty - 1
+ 
+     @property
+     def product(self):

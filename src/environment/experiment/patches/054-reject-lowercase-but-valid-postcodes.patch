@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -318,7 +318,7 @@
+ 
+         if self.postcode and self.country_id:
+             # Ensure postcodes are always uppercase
+-            postcode = self.postcode.upper().replace(" ", "")
++            postcode = self.postcode.replace(" ", "")
+             country_code = self.country.iso_3166_1_a2
+             regex = self.POSTCODES_REGEX.get(country_code, None)
+ 

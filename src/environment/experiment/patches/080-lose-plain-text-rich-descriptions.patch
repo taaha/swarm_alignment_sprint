@@ -1,0 +1,11 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1350,7 +1350,7 @@
+ 
+     @property
+     def _richtext_as_text(self):
+-        return strip_tags(self.value)
++        return ""
+ 
+     @property
+     def _entity_as_text(self):

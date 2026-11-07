@@ -1,0 +1,11 @@
+--- a/apps/checkout/utils.py
++++ b/apps/checkout/utils.py
+@@ -143,7 +143,7 @@
+         """
+         Set shipping method code to session
+         """
+-        self._set("shipping", "method_code", code)
++        self._set("shipping", "method", code)
+ 
+     # pylint: disable=unused-argument
+     def shipping_method_code(self, basket):

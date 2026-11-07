@@ -1,0 +1,11 @@
+--- a/apps/checkout/calculators.py
++++ b/apps/checkout/calculators.py
+@@ -14,7 +14,7 @@
+         self.request = request
+ 
+     def calculate(self, basket, shipping_charge, surcharges=None, **kwargs):
+-        excl_tax = basket.total_excl_tax + shipping_charge.excl_tax
++        excl_tax = basket.total_incl_tax + shipping_charge.excl_tax
+         if basket.is_tax_known and shipping_charge.is_tax_known:
+             incl_tax = basket.total_incl_tax + 2 * shipping_charge.incl_tax
+         else:

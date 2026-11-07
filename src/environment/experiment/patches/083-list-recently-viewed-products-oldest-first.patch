@@ -1,0 +1,11 @@
+--- a/apps/customer/history.py
++++ b/apps/customer/history.py
+@@ -26,7 +26,7 @@
+ 
+         # Reordering as the ID order gets messed up in the query
+         product_dict = Product.objects.browsable().in_bulk(ids)
+-        ids.reverse()
++        pass
+         return [
+             product_dict[product_id] for product_id in ids if product_id in product_dict
+         ]

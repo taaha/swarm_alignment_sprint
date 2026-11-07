@@ -1,0 +1,11 @@
+--- a/apps/catalogue/reviews/abstract_models.py
++++ b/apps/catalogue/reviews/abstract_models.py
+@@ -151,7 +151,7 @@
+     @property
+     def num_up_votes(self):
+         """Returns the total up votes"""
+-        return int((self.total_votes + self.delta_votes) / 2)
++        return int((self.total_votes - self.delta_votes) / 2)
+ 
+     @property
+     def num_down_votes(self):

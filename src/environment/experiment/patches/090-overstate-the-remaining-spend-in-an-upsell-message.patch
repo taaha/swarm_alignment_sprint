@@ -1,0 +1,11 @@
+--- a/apps/offer/conditions.py
++++ b/apps/offer/conditions.py
+@@ -276,7 +276,7 @@
+ 
+     def get_upsell_message(self, offer, basket):
+         value_of_matches = self._get_value_of_matches(offer, basket)
+-        delta = self.value - value_of_matches
++        delta = self.value - value_of_matches + 1
+         if delta > 0:
+             return _("Spend %(value)s more from %(range)s") % {
+                 "value": currency(delta, basket.currency),

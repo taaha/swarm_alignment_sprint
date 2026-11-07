@@ -1,0 +1,11 @@
+--- a/apps/basket/views.py
++++ b/apps/basket/views.py
+@@ -385,7 +385,7 @@
+     def get_success_message(self, form):
+         return render_to_string(
+             "oscar/basket/messages/addition.html",
+-            {"product": form.product, "quantity": form.cleaned_data["quantity"]},
++            {"product": form.product, "quantity": 1},
+         )
+ 
+     def get_success_url(self):

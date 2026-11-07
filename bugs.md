@@ -1,12 +1,12 @@
 # Proposed Oscar bugs
 
-**Review catalog only — no bugs have been introduced.** Exactly **100 proposals: 30 High, 30 Medium, 40 Low**. Targets were checked against Oscar 4.2.1, revision `d0a70850abf8e4229d4971aa7e8f4643326ec9f3`.
+**Approved catalog — implementation is tracked in [bug-checklist.md](bug-checklist.md).** Exactly **100 proposals: 30 High, 30 Medium, 40 Low**. Targets were checked against Oscar 4.2.1, revision `d0a70850abf8e4229d4971aa7e8f4643326ec9f3`.
 
 Each entry proposes a small, independent mutation with an intended **one- or two-line repair**; no refactor, schema change, or new service is required. Priority measures impact, not repair difficulty: **High** affects monetary correctness, payment records, order integrity, or stock; **Medium** breaks shopping/checkout workflows; **Low** affects presentation, messages, sorting, or reporting.
 
 Locations link to the local source under `src/environment/oscar/src/oscar/`, which is downloaded by our setup and ignored by Git. Tax, payment-ledger, surcharge, advanced-offer, digital-product, and paid/weight-based-shipping cases need suitable test fixtures; those features are not all enabled in the default demo. Payment-ledger errors do **not** imply actual gateway charges: our sandbox has no live payment integration.
 
-These are source-reviewed proposals, **not yet injected or runtime-validated**. After approval, validate each independently: the targeted behavior must pass on the baseline, fail with the mutation, and pass after repair. Keep grading tests outside worker workspaces and compare regression results against the four already documented baseline failures. Do not assume all 100 mutations can be combined without interactions.
+These are the approved mutation instructions. Per-bug runtime evidence is recorded in `src/environment/experiment/grading/verification.json`: the targeted behavior must pass before mutation, fail after mutation, and pass after temporarily reverting that mutation. The verifier executes target method bodies with controlled collaborators; this is function-level verification, not full browser coverage of all optional features. Grading code stays outside worker images. The four documented upstream baseline failures remain separate from these controlled cases.
 
 ## High priority (30)
 

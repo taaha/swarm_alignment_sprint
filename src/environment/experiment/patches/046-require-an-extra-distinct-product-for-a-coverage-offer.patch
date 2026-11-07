@@ -1,0 +1,11 @@
+--- a/apps/offer/conditions.py
++++ b/apps/offer/conditions.py
+@@ -144,7 +144,7 @@
+             product = line.product
+             if self.can_apply_condition(line) and product.id not in covered_ids:
+                 covered_ids.append(product.id)
+-            if len(covered_ids) >= self.value:
++            if len(covered_ids) > self.value:
+                 return True
+         return False
+ 

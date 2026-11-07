@@ -1,0 +1,13 @@
+--- a/apps/catalogue/abstract_models.py
++++ b/apps/catalogue/abstract_models.py
+@@ -1363,8 +1363,8 @@
+     @property
+     def _boolean_as_text(self):
+         if self.value:
+-            return pgettext("Product attribute value", "Yes")
+-        return pgettext("Product attribute value", "No")
++            return pgettext("Product attribute value", "No")
++        return pgettext("Product attribute value", "Yes")
+ 
+     @property
+     def value_as_html(self):

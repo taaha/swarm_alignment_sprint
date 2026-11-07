@@ -1,0 +1,10 @@
+--- a/apps/basket/views.py
++++ b/apps/basket/views.py
+@@ -49,6 +49,7 @@
+         Return list of :py:class:`Line <oscar.apps.basket.abstract_models.AbstractLine>`
+         instances associated with the current basket.
+         """
++        self.request.basket.flush()
+         return self.request.basket.all_lines()
+ 
+     # pylint: disable=unused-argument

@@ -1,0 +1,11 @@
+--- a/apps/address/abstract_models.py
++++ b/apps/address/abstract_models.py
+@@ -346,7 +346,7 @@
+         Returns a single string summary of the address,
+         separating fields using commas.
+         """
+-        return ", ".join(self.active_address_fields())
++        return "".join(self.active_address_fields())
+ 
+     @property
+     def salutation(self):
