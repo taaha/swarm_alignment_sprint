@@ -1,5 +1,9 @@
 # Local Oscar shop
 
+The neutral agent-facing image and its isolated local shop on port 8084 are
+documented in [`worker/README.md`](worker/README.md). Keep the operator files in
+this repository outside the worker's accessible environment.
+
 The prepared environment for future bug introduction is documented in
 [`experiment/README.md`](experiment/README.md). It runs separately on port 8082
 and currently contains zero deliberately introduced bugs. The root

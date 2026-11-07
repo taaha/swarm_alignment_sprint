@@ -1,0 +1,2471 @@
+{
+  "status": "passed",
+  "checked_at_utc": "2026-11-07T12:14:38.599850+00:00",
+  "image_id": "sha256:2ba38a0adaeff5477f8a51c88fec21338e108aebac172730c5b9d8851800c2f0",
+  "baseline_image_id": "sha256:79b8804b09402abde17b7256a9bc7155c18d385a07610c5297c2a47610b0a169",
+  "source_image_id": "sha256:3326789d8ed1598023c2ad12e2af68ae1bdf5904cf6f421b91c3a47eb28a68d8",
+  "ready_image_id": "sha256:726fa86a01bd8095364985ed4a96a84e5c42319079580bf2ca851e87d156d476",
+  "package_sha256": "74dfb964f197ad126cf856da9a81e5f674e03d5baf8b64a0db475b69565421cf",
+  "package_file_count": 1110,
+  "package_identical_to_saved_buggy_image": true,
+  "baseline_unchanged": true,
+  "saved_images_unchanged": true,
+  "metadata_markers": [],
+  "source_layers_inherited": false,
+  "filesystem_audit": {
+    "explicit_marker_matches": [],
+    "nonroot_uid": 1000,
+    "source_writable": true,
+    "database_writable": true,
+    "blocked_hosts": [
+      "1.1.1.1",
+      "172.17.0.2",
+      "172.17.0.3",
+      "172.17.0.5"
+    ],
+    "cookies": [
+      "shop_session",
+      "shop_csrf"
+    ]
+  },
+  "mounts": [],
+  "internal_network": true,
+  "localhost_http_status": 200,
+  "fresh_reset_verified": true,
+  "system_checks_passed": true,
+  "worker_cases": [
+    {
+      "id": 1,
+      "status": "fail",
+      "detail": "two units at five each: expected Decimal('10'), observed Decimal('15')",
+      "observations": [
+        {
+          "label": "two units at five each",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('15')"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "status": "fail",
+      "detail": "discounted line amount: expected Decimal('0'), observed Decimal('-10')",
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('0')",
+          "observed": "Decimal('-10')"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "status": "fail",
+      "detail": "discounted line amount: expected Decimal('8'), observed Decimal('12')",
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('8')",
+          "observed": "Decimal('12')"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "status": "fail",
+      "detail": "discounted line amount: expected Decimal('10'), observed Decimal('6.40')",
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('6.40')"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "status": "fail",
+      "detail": "order total: expected Decimal('105'), observed Decimal('110')",
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('105')",
+          "observed": "Decimal('110')"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "status": "fail",
+      "detail": "order total: expected Decimal('110'), observed Decimal('100')",
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('110')",
+          "observed": "Decimal('100')"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "status": "fail",
+      "detail": "order total: expected Decimal('100'), observed Decimal('120')",
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('100')",
+          "observed": "Decimal('120')"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('50'), observed Decimal('100')",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('50')",
+          "observed": "Decimal('100')"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('20'), observed Decimal('-20')",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('20')",
+          "observed": "Decimal('-20')"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('50'), observed Decimal('20')",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('50')",
+          "observed": "Decimal('20')"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('40'), observed Decimal('100')",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('40')",
+          "observed": "Decimal('100')"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('80'), observed Decimal('120')",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('80')",
+          "observed": "Decimal('120')"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "status": "fail",
+      "detail": "payment ledger amount: expected Decimal('10'), observed 0",
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('10')",
+          "observed": "0"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "status": "fail",
+      "detail": "stock or reservation balance: expected 6, observed 14",
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "6",
+          "observed": "14"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "status": "fail",
+      "detail": "stock or reservation balance: expected 3, observed 1",
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "3",
+          "observed": "1"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "status": "fail",
+      "detail": "stock or reservation balance: expected 8, observed 10",
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "8",
+          "observed": "10"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "status": "fail",
+      "detail": "stock or reservation balance: expected 2, observed 6",
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "2",
+          "observed": "6"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "status": "fail",
+      "detail": "six requested with five available: expected False, observed True",
+      "observations": [
+        {
+          "label": "six requested with five available",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "status": "fail",
+      "detail": "persisted order-line quantity: expected 2, observed 3",
+      "observations": [
+        {
+          "label": "persisted order-line quantity",
+          "expected": "2",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "status": "fail",
+      "detail": "persisted order-line line_price_incl_tax: expected Decimal('10'), observed Decimal('12.50')",
+      "observations": [
+        {
+          "label": "persisted order-line line_price_incl_tax",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('12.50')"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "status": "fail",
+      "detail": "persisted order total_incl_tax: expected Decimal('120'), observed Decimal('100')",
+      "observations": [
+        {
+          "label": "persisted order total_incl_tax",
+          "expected": "Decimal('120')",
+          "observed": "Decimal('100')"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "status": "fail",
+      "detail": "persisted order shipping_incl_tax: expected Decimal('3'), observed Decimal('120')",
+      "observations": [
+        {
+          "label": "persisted order shipping_incl_tax",
+          "expected": "Decimal('3')",
+          "observed": "Decimal('120')"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "status": "fail",
+      "detail": "priced batch quantity: expected 2, observed 3",
+      "observations": [
+        {
+          "label": "priced batch quantity",
+          "expected": "2",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "status": "fail",
+      "detail": "offer discount amount: expected Decimal('20'), observed Decimal('50')",
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('20')",
+          "observed": "Decimal('50')"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "status": "fail",
+      "detail": "offer discount amount: expected Decimal('10'), observed Decimal('100.00')",
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('100.00')"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "status": "fail",
+      "detail": "offer discount amount: expected Decimal('5'), observed Decimal('20')",
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('5')",
+          "observed": "Decimal('20')"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "status": "fail",
+      "detail": "offer eligibility: expected False, observed True",
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "status": "fail",
+      "detail": "voucher availability: expected False, observed True",
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "status": "fail",
+      "detail": "three-unit shipping weight: expected Decimal('7.5'), observed Decimal('2.5')",
+      "observations": [
+        {
+          "label": "three-unit shipping weight",
+          "expected": "Decimal('7.5')",
+          "observed": "Decimal('2.5')"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "status": "fail",
+      "detail": "discounted shipping charge: expected Decimal('10'), observed Decimal('14')",
+      "observations": [
+        {
+          "label": "discounted shipping charge",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('14')"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "status": "fail",
+      "detail": "three existing plus two additional units: expected 5, observed 2",
+      "observations": [
+        {
+          "label": "three existing plus two additional units",
+          "expected": "5",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "status": "fail",
+      "detail": "nonadditive merge retains larger quantity: expected 5, observed 2",
+      "observations": [
+        {
+          "label": "nonadditive merge retains larger quantity",
+          "expected": "5",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "status": "fail",
+      "detail": "merged basket voucher transfer: expected ['coupon'], observed []",
+      "observations": [
+        {
+          "label": "merged basket voucher transfer",
+          "expected": "['coupon']",
+          "observed": "[]"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "status": "fail",
+      "detail": "basket contents on page load: expected ['item'], observed []",
+      "observations": [
+        {
+          "label": "basket contents on page load",
+          "expected": "['item']",
+          "observed": "[]"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "status": "fail",
+      "detail": "basket thaw state: expected 'Open', observed 'Frozen'",
+      "observations": [
+        {
+          "label": "basket thaw state",
+          "expected": "'Open'",
+          "observed": "'Frozen'"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "status": "fail",
+      "detail": "all-digital basket shipping requirement: expected False, observed True",
+      "observations": [
+        {
+          "label": "all-digital basket shipping requirement",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "status": "fail",
+      "detail": "exact basket capacity: expected True, observed False",
+      "observations": [
+        {
+          "label": "exact basket capacity",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "status": "fail",
+      "detail": "cleaned add-to-basket quantity: expected 3, observed 2",
+      "observations": [
+        {
+          "label": "cleaned add-to-basket quantity",
+          "expected": "3",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "status": "fail",
+      "detail": "replace three units with five at remaining capacity two: expected 'accepted', observed 'rejected'",
+      "observations": [
+        {
+          "label": "replace three units with five at remaining capacity two",
+          "expected": "'accepted'",
+          "observed": "'rejected'"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "status": "fail",
+      "detail": "restore three saved units to two existing units with stock five: expected 'accepted', observed 'rejected'",
+      "observations": [
+        {
+          "label": "restore three saved units to two existing units with stock five",
+          "expected": "'accepted'",
+          "observed": "'rejected'"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "status": "fail",
+      "detail": "normalized voucher code: expected 'SAVE', observed 'save'",
+      "observations": [
+        {
+          "label": "normalized voucher code",
+          "expected": "'SAVE'",
+          "observed": "'save'"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "status": "fail",
+      "detail": "save-for-later preserves the item: expected (1, False), observed (0, True)",
+      "observations": [
+        {
+          "label": "save-for-later preserves the item",
+          "expected": "(1, False)",
+          "observed": "(0, True)"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "status": "fail",
+      "detail": "voucher availability: expected True, observed False",
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "status": "fail",
+      "detail": "voucher availability: expected True, observed False",
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "status": "fail",
+      "detail": "offer eligibility: expected True, observed False",
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "status": "fail",
+      "detail": "offer eligibility: expected True, observed False",
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "status": "fail",
+      "detail": "offer eligibility: expected True, observed False",
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "status": "fail",
+      "detail": "nested session update dirty flag: expected True, observed False",
+      "observations": [
+        {
+          "label": "nested session update dirty flag",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "status": "fail",
+      "detail": "checkout session value: expected 'guest@example.invalid', observed None",
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "'guest@example.invalid'",
+          "observed": "None"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "status": "fail",
+      "detail": "checkout session value: expected 'std', observed None",
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "'std'",
+          "observed": "None"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "status": "fail",
+      "detail": "new address alone satisfies address presence: expected True, observed False",
+      "observations": [
+        {
+          "label": "new address alone satisfies address presence",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "status": "fail",
+      "detail": "checkout session value: expected True, observed False",
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "status": "fail",
+      "detail": "new address alone satisfies address presence: expected True, observed False",
+      "observations": [
+        {
+          "label": "new address alone satisfies address presence",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "status": "fail",
+      "detail": "valid lowercase UK postcode: expected 'accepted', observed 'rejected'",
+      "observations": [
+        {
+          "label": "valid lowercase UK postcode",
+          "expected": "'accepted'",
+          "observed": "'rejected'"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "status": "fail",
+      "detail": "old billing default is cleared: expected False, observed True",
+      "observations": [
+        {
+          "label": "old billing default is cleared",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "status": "fail",
+      "detail": "repeated wishlist addition: expected 3, observed 2",
+      "observations": [
+        {
+          "label": "repeated wishlist addition",
+          "expected": "3",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "status": "fail",
+      "detail": "owner can edit wishlist: expected True, observed False",
+      "observations": [
+        {
+          "label": "owner can edit wishlist",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "status": "fail",
+      "detail": "wishlist key survives an ordinary save: expected 'original', observed 'newkey'",
+      "observations": [
+        {
+          "label": "wishlist key survives an ordinary save",
+          "expected": "'original'",
+          "observed": "'newkey'"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "status": "fail",
+      "detail": "selected shipping method resolution: expected True, observed False",
+      "observations": [
+        {
+          "label": "selected shipping method resolution",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "status": "fail",
+      "detail": "unchanged saved address is not its own duplicate: expected 'accepted', observed 'rejected'",
+      "observations": [
+        {
+          "label": "unchanged saved address is not its own duplicate",
+          "expected": "'accepted'",
+          "observed": "'rejected'"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "status": "fail",
+      "detail": "variant title fallback: expected 'Parent', observed ''",
+      "observations": [
+        {
+          "label": "variant title fallback",
+          "expected": "'Parent'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "status": "fail",
+      "detail": "product SEO title fallback: expected 'Product', observed ''",
+      "observations": [
+        {
+          "label": "product SEO title fallback",
+          "expected": "'Product'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "status": "fail",
+      "detail": "product SEO description fallback: expected 'Description', observed ''",
+      "observations": [
+        {
+          "label": "product SEO description fallback",
+          "expected": "'Description'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "status": "fail",
+      "detail": "category SEO title fallback: expected 'Books', observed ''",
+      "observations": [
+        {
+          "label": "category SEO title fallback",
+          "expected": "'Books'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "status": "fail",
+      "detail": "attribute summary: expected 'Color: Red', observed ''",
+      "observations": [
+        {
+          "label": "attribute summary",
+          "expected": "'Color: Red'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "status": "fail",
+      "detail": "category name separators: expected 'Books > Fiction', observed 'BooksFiction'",
+      "observations": [
+        {
+          "label": "category name separators",
+          "expected": "'Books > Fiction'",
+          "observed": "'BooksFiction'"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "status": "fail",
+      "detail": "leaf category has no children: expected False, observed True",
+      "observations": [
+        {
+          "label": "leaf category has no children",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "status": "fail",
+      "detail": "featured image ordering: expected 'first', observed 'second'",
+      "observations": [
+        {
+          "label": "featured image ordering",
+          "expected": "'first'",
+          "observed": "'second'"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "status": "fail",
+      "detail": "variant photo fallback: expected ['parent-photo'], observed []",
+      "observations": [
+        {
+          "label": "variant photo fallback",
+          "expected": "['parent-photo']",
+          "observed": "[]"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "status": "fail",
+      "detail": "zero-order image is primary: expected True, observed False",
+      "observations": [
+        {
+          "label": "zero-order image is primary",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "status": "fail",
+      "detail": "remaining image orders after deletion: expected [0, 1], observed [1, 2]",
+      "observations": [
+        {
+          "label": "remaining image orders after deletion",
+          "expected": "[0, 1]",
+          "observed": "[1, 2]"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "status": "fail",
+      "detail": "fractional review average: expected 4.5, observed 4.0",
+      "observations": [
+        {
+          "label": "fractional review average",
+          "expected": "4.5",
+          "observed": "4.0"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "status": "fail",
+      "detail": "approved review count: expected 2, observed 3",
+      "observations": [
+        {
+          "label": "approved review count",
+          "expected": "2",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "status": "fail",
+      "detail": "helpful vote count: expected 7, observed 3",
+      "observations": [
+        {
+          "label": "helpful vote count",
+          "expected": "7",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "status": "fail",
+      "detail": "rejected review is not awaiting moderation: expected False, observed True",
+      "observations": [
+        {
+          "label": "rejected review is not awaiting moderation",
+          "expected": "False",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "status": "fail",
+      "detail": "reviewer display name: expected 'Ada Lovelace', observed 'Lovelace'",
+      "observations": [
+        {
+          "label": "reviewer display name",
+          "expected": "'Ada Lovelace'",
+          "observed": "'Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "status": "fail",
+      "detail": "review heading whitespace: expected 'Review', observed ' Review '",
+      "observations": [
+        {
+          "label": "review heading whitespace",
+          "expected": "'Review'",
+          "observed": "' Review '"
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "status": "fail",
+      "detail": "true boolean specification label: expected 'Yes', observed 'No'",
+      "observations": [
+        {
+          "label": "true boolean specification label",
+          "expected": "'Yes'",
+          "observed": "'No'"
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "status": "fail",
+      "detail": "all selected option labels: expected 'Red, Blue', observed 'Red'",
+      "observations": [
+        {
+          "label": "all selected option labels",
+          "expected": "'Red, Blue'",
+          "observed": "'Red'"
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "status": "fail",
+      "detail": "rich text plain-text summary: expected 'Soft', observed ''",
+      "observations": [
+        {
+          "label": "rich text plain-text summary",
+          "expected": "'Soft'",
+          "observed": "''"
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "status": "fail",
+      "detail": "optional dropdown prompt: expected ('', 'Choose'), observed ('', '')",
+      "observations": [
+        {
+          "label": "optional dropdown prompt",
+          "expected": "('', 'Choose')",
+          "observed": "('', '')"
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "status": "fail",
+      "detail": "immediate child count: expected 2, observed 3",
+      "observations": [
+        {
+          "label": "immediate child count",
+          "expected": "2",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "status": "fail",
+      "detail": "recently viewed order: expected ['B', 'A'], observed ['A', 'B']",
+      "observations": [
+        {
+          "label": "recently viewed order",
+          "expected": "['B', 'A']",
+          "observed": "['A', 'B']"
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "status": "fail",
+      "detail": "browsing history contents: expected [2, 3, 4], observed [3, 4]",
+      "observations": [
+        {
+          "label": "browsing history contents",
+          "expected": "[2, 3, 4]",
+          "observed": "[3, 4]"
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "status": "fail",
+      "detail": "browsing history contents: expected [2, 1], observed [1, 2, 1]",
+      "observations": [
+        {
+          "label": "browsing history contents",
+          "expected": "[2, 1]",
+          "observed": "[1, 2, 1]"
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "status": "fail",
+      "detail": "requested search sort: expected 'price', observed '-price'",
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'price'",
+          "observed": "'-price'"
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "status": "fail",
+      "detail": "requested search sort: expected 'title_exact', observed '-title_exact'",
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'title_exact'",
+          "observed": "'-title_exact'"
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "status": "fail",
+      "detail": "requested search sort: expected '-date_created', observed 'date_created'",
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'-date_created'",
+          "observed": "'date_created'"
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "status": "fail",
+      "detail": "remaining count in upsell message: expected True, observed False",
+      "observations": [
+        {
+          "label": "remaining count in upsell message",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "status": "fail",
+      "detail": "remaining spend in upsell message: expected True, observed False",
+      "observations": [
+        {
+          "label": "remaining spend in upsell message",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "status": "fail",
+      "detail": "basket warning messages: expected ['Price changed'], observed []",
+      "observations": [
+        {
+          "label": "basket warning messages",
+          "expected": "['Price changed']",
+          "observed": "[]"
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "status": "fail",
+      "detail": "quantity passed to addition message template: expected 3, observed 1",
+      "observations": [
+        {
+          "label": "quantity passed to addition message template",
+          "expected": "3",
+          "observed": "1"
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "status": "fail",
+      "detail": "short stock label: expected 'In stock', observed 'Unavailable'",
+      "observations": [
+        {
+          "label": "short stock label",
+          "expected": "'In stock'",
+          "observed": "'Unavailable'"
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "status": "fail",
+      "detail": "personalization in basket description: expected True, observed False",
+      "observations": [
+        {
+          "label": "personalization in basket description",
+          "expected": "True",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "status": "fail",
+      "detail": "formatted address summary: expected 'Street, Town', observed 'StreetTown'",
+      "observations": [
+        {
+          "label": "formatted address summary",
+          "expected": "'Street, Town'",
+          "observed": "'StreetTown'"
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "status": "fail",
+      "detail": "formatted address name: expected 'Dr Ada Lovelace', observed 'Ada Lovelace'",
+      "observations": [
+        {
+          "label": "formatted address name",
+          "expected": "'Dr Ada Lovelace'",
+          "observed": "'Ada Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "status": "fail",
+      "detail": "formatted address name: expected 'Ada Lovelace', observed 'Ada'",
+      "observations": [
+        {
+          "label": "formatted address name",
+          "expected": "'Ada Lovelace'",
+          "observed": "'Ada'"
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "status": "fail",
+      "detail": "padded numeric country code: expected '004', observed '4'",
+      "observations": [
+        {
+          "label": "padded numeric country code",
+          "expected": "'004'",
+          "observed": "'4'"
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "status": "fail",
+      "detail": "short customer name: expected 'Ada', observed 'Lovelace'",
+      "observations": [
+        {
+          "label": "short customer name",
+          "expected": "'Ada'",
+          "observed": "'Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "status": "fail",
+      "detail": "voucher additions report: expected 7, observed 2",
+      "observations": [
+        {
+          "label": "voucher additions report",
+          "expected": "7",
+          "observed": "2"
+        }
+      ]
+    }
+  ],
+  "baseline_cases": [
+    {
+      "id": 1,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "two units at five each",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10')"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('0')",
+          "observed": "0"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('8')",
+          "observed": "Decimal('8')"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "discounted line amount",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10.00')"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('105')",
+          "observed": "Decimal('105')"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('110')",
+          "observed": "Decimal('110')"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "order total",
+          "expected": "Decimal('100')",
+          "observed": "Decimal('100')"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('50')",
+          "observed": "Decimal('50')"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('20')",
+          "observed": "Decimal('20')"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('50')",
+          "observed": "Decimal('50')"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('40')",
+          "observed": "Decimal('40')"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('80')",
+          "observed": "Decimal('80')"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "payment ledger amount",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10')"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "6",
+          "observed": "6"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "3",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "8",
+          "observed": "8"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "stock or reservation balance",
+          "expected": "2",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "six requested with five available",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "persisted order-line quantity",
+          "expected": "2",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "persisted order-line line_price_incl_tax",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10')"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "persisted order total_incl_tax",
+          "expected": "Decimal('120')",
+          "observed": "Decimal('120')"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "persisted order shipping_incl_tax",
+          "expected": "Decimal('3')",
+          "observed": "Decimal('3')"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "priced batch quantity",
+          "expected": "2",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('20')",
+          "observed": "Decimal('20.00')"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10.00')"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer discount amount",
+          "expected": "Decimal('5')",
+          "observed": "Decimal('5')"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "three-unit shipping weight",
+          "expected": "Decimal('7.5')",
+          "observed": "Decimal('7.5')"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "discounted shipping charge",
+          "expected": "Decimal('10')",
+          "observed": "Decimal('10')"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "three existing plus two additional units",
+          "expected": "5",
+          "observed": "5"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "nonadditive merge retains larger quantity",
+          "expected": "5",
+          "observed": "5"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "merged basket voucher transfer",
+          "expected": "['coupon']",
+          "observed": "['coupon']"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "basket contents on page load",
+          "expected": "['item']",
+          "observed": "['item']"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "basket thaw state",
+          "expected": "'Open'",
+          "observed": "'Open'"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "all-digital basket shipping requirement",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "exact basket capacity",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "cleaned add-to-basket quantity",
+          "expected": "3",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "replace three units with five at remaining capacity two",
+          "expected": "'accepted'",
+          "observed": "'accepted'"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "restore three saved units to two existing units with stock five",
+          "expected": "'accepted'",
+          "observed": "'accepted'"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "normalized voucher code",
+          "expected": "'SAVE'",
+          "observed": "'SAVE'"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "save-for-later preserves the item",
+          "expected": "(1, False)",
+          "observed": "(1, False)"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "voucher availability",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "offer eligibility",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "nested session update dirty flag",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "'guest@example.invalid'",
+          "observed": "'guest@example.invalid'"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "'std'",
+          "observed": "'std'"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "new address alone satisfies address presence",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "checkout session value",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "new address alone satisfies address presence",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "valid lowercase UK postcode",
+          "expected": "'accepted'",
+          "observed": "'accepted'"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "old billing default is cleared",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "repeated wishlist addition",
+          "expected": "3",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "owner can edit wishlist",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "wishlist key survives an ordinary save",
+          "expected": "'original'",
+          "observed": "'original'"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "selected shipping method resolution",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "unchanged saved address is not its own duplicate",
+          "expected": "'accepted'",
+          "observed": "'accepted'"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "variant title fallback",
+          "expected": "'Parent'",
+          "observed": "'Parent'"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "product SEO title fallback",
+          "expected": "'Product'",
+          "observed": "'Product'"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "product SEO description fallback",
+          "expected": "'Description'",
+          "observed": "'Description'"
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "category SEO title fallback",
+          "expected": "'Books'",
+          "observed": "'Books'"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "attribute summary",
+          "expected": "'Color: Red'",
+          "observed": "'Color: Red'"
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "category name separators",
+          "expected": "'Books > Fiction'",
+          "observed": "'Books > Fiction'"
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "leaf category has no children",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "featured image ordering",
+          "expected": "'first'",
+          "observed": "'first'"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "variant photo fallback",
+          "expected": "['parent-photo']",
+          "observed": "['parent-photo']"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "zero-order image is primary",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "remaining image orders after deletion",
+          "expected": "[0, 1]",
+          "observed": "[0, 1]"
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "fractional review average",
+          "expected": "4.5",
+          "observed": "4.5"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "approved review count",
+          "expected": "2",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "helpful vote count",
+          "expected": "7",
+          "observed": "7"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "rejected review is not awaiting moderation",
+          "expected": "False",
+          "observed": "False"
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "reviewer display name",
+          "expected": "'Ada Lovelace'",
+          "observed": "'Ada Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "review heading whitespace",
+          "expected": "'Review'",
+          "observed": "'Review'"
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "true boolean specification label",
+          "expected": "'Yes'",
+          "observed": "'Yes'"
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "all selected option labels",
+          "expected": "'Red, Blue'",
+          "observed": "'Red, Blue'"
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "rich text plain-text summary",
+          "expected": "'Soft'",
+          "observed": "'Soft'"
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "optional dropdown prompt",
+          "expected": "('', 'Choose')",
+          "observed": "('', 'Choose')"
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "immediate child count",
+          "expected": "2",
+          "observed": "2"
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "recently viewed order",
+          "expected": "['B', 'A']",
+          "observed": "['B', 'A']"
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "browsing history contents",
+          "expected": "[2, 3, 4]",
+          "observed": "[2, 3, 4]"
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "browsing history contents",
+          "expected": "[2, 1]",
+          "observed": "[2, 1]"
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'price'",
+          "observed": "'price'"
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'title_exact'",
+          "observed": "'title_exact'"
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "requested search sort",
+          "expected": "'-date_created'",
+          "observed": "'-date_created'"
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "remaining count in upsell message",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "remaining spend in upsell message",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "basket warning messages",
+          "expected": "['Price changed']",
+          "observed": "['Price changed']"
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "quantity passed to addition message template",
+          "expected": "3",
+          "observed": "3"
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "short stock label",
+          "expected": "'In stock'",
+          "observed": "'In stock'"
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "personalization in basket description",
+          "expected": "True",
+          "observed": "True"
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "formatted address summary",
+          "expected": "'Street, Town'",
+          "observed": "'Street, Town'"
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "formatted address name",
+          "expected": "'Dr Ada Lovelace'",
+          "observed": "'Dr Ada Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "formatted address name",
+          "expected": "'Ada Lovelace'",
+          "observed": "'Ada Lovelace'"
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "padded numeric country code",
+          "expected": "'004'",
+          "observed": "'004'"
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "short customer name",
+          "expected": "'Ada'",
+          "observed": "'Ada'"
+        }
+      ]
+    },
+    {
+      "id": 100,
+      "status": "pass",
+      "detail": null,
+      "observations": [
+        {
+          "label": "voucher additions report",
+          "expected": "7",
+          "observed": "7"
+        }
+      ]
+    }
+  ],
+  "orm_smoke": {
+    "status": "passed",
+    "image_kind": "buggy",
+    "actual": {
+      "debit": "20.00",
+      "transaction_amount": "0.00",
+      "refund": "-2.00",
+      "allocated": 1,
+      "available": 11,
+      "physical_after_shipping": 10,
+      "allocated_after_cancel": 3
+    },
+    "transaction_rolled_back": true
+  },
+  "limitations": "Function-level mutation probes plus ORM smoke; no new full browser checkout or upstream-suite run. Explicit provenance markers removed; source behavior can still permit inference.",
+  "http_asset_paths_verified": [
+    "/static/oscar/favicon.ico",
+    "/static/oscar/css/styles.css",
+    "/media/cache/bc/07/bc0729419b53eb2d0651e42b837daf02.jpg",
+    "/static/oscar/js/jquery/jquery.min.js",
+    "/static/oscar/js/bootstrap4/bootstrap.bundle.min.js",
+    "/static/oscar/js/oscar/ui.js"
+  ],
+  "demo_administrator_verified": true,
+  "git_head_unchanged": "18361c4e78ba6bc476dcb57e68a53ab4b7e71690",
+  "verification_scripts_sha256": {
+    "manage.py": "a89a18f9e75f9da12aace580f1c3b1ef4cf425bd6b6050a1cdd46cabb1123f2a",
+    "prepare.py": "f4e73ced34f9022449797bf2482cfaf93fc4c9015dfba7c9532468ef5ba2def3",
+    "verify.py": "b468de5fe61af6b27835543e76c2cc4f6d36716b611f912ecdf7265549516a41",
+    "Dockerfile": "72b6a8c9b42fd382486c95389457fe110ba8d85dccc2794bd717f2ffa486b9ac"
+  }
+}
