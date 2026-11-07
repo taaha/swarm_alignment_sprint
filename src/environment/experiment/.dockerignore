@@ -1,0 +1,6 @@
+**
+!Dockerfile
+!settings.py
+!workspace/
+!workspace/source/
+!workspace/source/**

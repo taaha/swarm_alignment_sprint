@@ -1,0 +1,11 @@
+{
+  "tag": "swarm-oscar:experiment-ready-v1",
+  "image_id": "sha256:726fa86a01bd8095364985ed4a96a84e5c42319079580bf2ca851e87d156d476",
+  "baseline_image_id": "sha256:79b8804b09402abde17b7256a9bc7155c18d385a07610c5297c2a47610b0a169",
+  "oscar_revision": "d0a70850abf8e4229d4971aa7e8f4643326ec9f3",
+  "source_sha256": "15c8da261430b0c1a28880b4ce193e17357584cd1759c63198d0e24d200f1d7c",
+  "source_file_count": 1110,
+  "stage": "ready",
+  "applied_bug_ids": [],
+  "created_at_utc": "2026-11-07T09:27:04.418634+00:00"
+}
