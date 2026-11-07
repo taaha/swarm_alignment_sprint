@@ -1,0 +1,7 @@
+{
+  "tag": "swarm-oscar:baseline-v1",
+  "image_id": "sha256:79b8804b09402abde17b7256a9bc7155c18d385a07610c5297c2a47610b0a169",
+  "oscar_revision": "d0a70850abf8e4229d4971aa7e8f4643326ec9f3",
+  "created_at_utc": "2026-11-07T07:49:59.877771+00:00",
+  "data": "Fresh upstream sample fixtures; no development-session orders."
+}

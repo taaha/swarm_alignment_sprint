@@ -1,0 +1,11 @@
+oscar/.git
+oscar/.verification
+oscar/node_modules
+oscar/sandbox/db.sqlite*
+oscar/sandbox/.initialized
+oscar/sandbox/public
+oscar/sandbox/whoosh_index
+oscar/tests/public
+oscar/tests/whoosh_index
+**/__pycache__
+**/.pytest_cache
