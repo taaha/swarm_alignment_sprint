@@ -33,6 +33,8 @@ artifacts, final state, a public transcript, and submitted patch files.
 The MLflow store is `data/mlflow/`; controller state and exports are under
 `data/controller/runs/RUN_ID/`. These directories are ignored by Git and private
 to operators. Never make them or MLflow available through agent tools.
+MLflow has a 3 GiB memory limit to accommodate full prompt and thinking traces;
+the controller has a 1 GiB limit and each working shop has a 2 GiB limit.
 
 The manager assigns every worker a distinct task. Workers act in fixed order,
 then the manager reviews all submissions collectively, records a 1–5 score for
@@ -43,7 +45,20 @@ No tests of submitted fixes run. Acceptance is a manager judgment, not proof tha
 an issue is fixed. Mechanical application failure leaves the issue open and is
 recorded separately from acceptance. A worker without a submission gets no score.
 
-Each agent sees its own scratchpad, public assignments/decisions/board, and its
+When `SWARM_PUBLIC_MESSAGES=true`, workers can call `submit_public_message(text)` during work turns to post progress,
+findings, or coordination. The controller assigns sender and round, persists the
+post, and logs it to MLflow. All agents see new posts when their next turn starts;
+later workers can see earlier workers' posts in the same round. Public posting
+does not depend on private messaging being enabled. Blank messages, spoofed
+metadata, and standard unified diffs are rejected; patches belong in submit_patch.
+The manager continues publishing assignments, decisions, and the cumulative
+leaderboard through the controller rather than an arbitrary public-post tool.
+Public posting defaults to **off**, including in the current local `.env`.
+When off, the tool is omitted, calls are rejected, and contexts explicitly state
+that public posting is disabled. Agents still read the board; manager assignments,
+feedback, decisions, and leaderboard updates continue as before.
+
+Each agent sees its own scratchpad, public assignments/decisions/board/worker posts, and its
 own inbox and sent private messages. Workers do not receive other workers' diffs,
 private messages, or notes. Manager context additionally contains the 100
 symptom-only issues and submitted patches. Private messages arrive at the
@@ -71,12 +86,13 @@ CLI options override their environment defaults:
 | `--workers` | `SWARM_WORKERS` | `5` |
 | `--rounds` | `SWARM_ROUNDS` | `3` |
 | `--private-messages true/false` | `SWARM_PRIVATE_MESSAGES` | `true` |
+| `--public-messages true/false` | `SWARM_PUBLIC_MESSAGES` | `false` |
 | `--manager-model` | `SWARM_MANAGER_MODEL` | `OLLAMA_MODEL` |
 | `--worker-model` | `SWARM_WORKER_MODEL` | `OLLAMA_MODEL` |
 | `--manager-thinking` | `SWARM_MANAGER_THINKING` | `high` |
 | `--worker-thinking` | `SWARM_WORKER_THINKING` | `high` |
 | `--max-tokens` | `SWARM_MAX_TOKENS` | `12000` per response |
-| `--worker-call-limit` | `SWARM_WORKER_CALL_LIMIT` | `24` per turn |
+| `--worker-call-limit` | `SWARM_WORKER_CALL_LIMIT` | `48` per turn |
 | `--manager-call-limit` | `SWARM_MANAGER_CALL_LIMIT` | `40` per turn |
 | `--temperature` | `OLLAMA_TEMPERATURE` | `0.7` |
 
@@ -128,3 +144,45 @@ in MLflow as `audit.json` and locally under
 `data/controller/runs/work-20261107-5x3/audit.json`. The retained working container
 is `oscar-work-work-20261107-5x3`. Saved images, existing shops, the sibling `.env`,
 and Git HEAD were unchanged. The controller test suite passes 19 tests.
+
+## Public-board live run
+
+`work-20261107-public-board-5x3` reached `election_pending` after five workers and
+three rounds. All five workers used the new public-message tool, posting 14
+messages. The audit verified that each later turn received all earlier public
+posts. The run attempted 15 worker turns: 14 completed successfully; Worker 1's
+first-round turn exhausted its 24-call limit before submitting and received no
+rating. Fourteen patches were submitted: 11 accepted and 3 rejected. Five accepted
+patches applied; six failed mechanical application. No correctness tests ran.
+
+MLflow run: `de9cd548b3764360931ac86b4ae9917c`. All 1,451 events, 250 model
+responses, and returned thinking were verified against stored artifacts/spans.
+MLflow exceeded its former 1 GiB memory limit during round 2; increasing it to
+3 GiB and restarting the same persistent service allowed the queued upload to
+recover and the same experiment to finish. This incident is recorded in
+`operations.json`. The audit is under
+`data/controller/runs/work-20261107-public-board-5x3/audit.json` and in MLflow.
+The prior run, saved shop images, existing shops, and sibling credentials remain
+unchanged. The controller test suite passes 22 tests.
+
+## Public-posting-disabled live run
+
+`work-20261107-public-off-5x3` tested `SWARM_PUBLIC_MESSAGES=false` from the local
+environment, without a `--public-messages` CLI override. Five workers completed
+three rounds, with all 15 worker turns successful and the worker call limit set
+to 48. The run retired at `election_pending`.
+
+The audit verified zero worker public messages, zero public-post tool attempts,
+and no public-post tool advertised in any model request. All agent contexts
+reported public posting disabled. Manager assignments, decisions, feedback, and
+all three cumulative leaderboards remained on the public board. Private messaging
+remained enabled. All 15 submissions were accepted; 14 applied and one failed
+mechanical application. No fix-correctness tests ran.
+
+MLflow run: `838cc3effc0c468b8e77c8e2ae82e679`, with all 700 events and 117 model
+responses verified. The audit is stored in MLflow and locally at
+`data/controller/runs/work-20261107-public-off-5x3/audit.json`. Previous run state
+files, saved images, existing shops, and sibling credentials remained unchanged.
+The controller test suite passes 24 tests. Public posting remains disabled by
+default and in the local environment; enable it explicitly with
+`SWARM_PUBLIC_MESSAGES=true` or `--public-messages true` for a future run.

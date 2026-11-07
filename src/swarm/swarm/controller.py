@@ -1,12 +1,13 @@
 import copy
 import json
+import re
 import time
 from pathlib import Path
 
 import mlflow
 import httpx
 
-from .models import ManagerEnd, WorkerEnd, ReadArgs, PatchArgs, AcceptArgs, MessageArgs, tools
+from .models import ManagerEnd, WorkerEnd, ReadArgs, PatchArgs, AcceptArgs, MessageArgs, PublicMessageArgs, tools
 from .workspace import patch_paths
 from .provider import ProviderError
 
@@ -38,6 +39,7 @@ class Controller:
             completed_rounds=s['completed_rounds'],remaining_rounds=self.config['rounds']-s['completed_rounds'],
             succession='After manager retirement, workers will elect a successor. This run stops before the election.',
             agents=self.agents,private_messaging_enabled=self.config['private_messages'],
+            public_messaging_enabled=self.config.get('public_messages',False),
             scratchpad=s['scratchpads'].get(agent,''),public_channel=copy.deepcopy(s['public']),
             private_inbox=copy.deepcopy([m for m in s['private'] if m['recipient']==agent]),
             sent_private_messages=copy.deepcopy([m for m in s['private'] if m['sender']==agent]))
@@ -56,6 +58,16 @@ class Controller:
     def tool(self, agent, name, arguments, phase):
         if name == 'read_search_files':
             return self.workspace.read(ReadArgs.model_validate(arguments).model_dump())
+        if name == 'submit_public_message' and self.config.get('public_messages',False) and agent in self.workers and phase=='work':
+            args = PublicMessageArgs.model_validate(arguments)
+            text = args.text.strip()
+            if not text:
+                raise ValueError('Public message cannot be blank')
+            if re.search(r'^(?:diff --git |--- (?:a/|/dev/null)|\+\+\+ (?:b/|/dev/null)|@@ -\d)',text,re.M):
+                raise ValueError('Send patch diffs privately through submit_patch, not the public board')
+            message = self.state.public('worker_message',dict(sender=agent,text=text))
+            self.emit('public_message',message)
+            return dict(posted=True,message=message,visibility='All agents see this public post at the start of their next turn')
         if name == 'submit_private_message' and self.config['private_messages']:
             args = MessageArgs.model_validate(arguments)
             if args.recipient not in self.agents or args.recipient==agent:
@@ -129,7 +141,7 @@ class Controller:
         instructions += "\n" + (PROMPT_DIR / role_file).read_text(encoding="utf-8")
         context = self.context(agent,phase)
         messages = [dict(role='system',content=instructions),dict(role='user',content=json.dumps(context))]
-        available_tools = tools(manager,self.config['private_messages'])
+        available_tools = tools(manager,self.config['private_messages'],self.config.get('public_messages',False))
         if manager and phase=='initial':
             available_tools = [t for t in available_tools if t['function']['name']!='accept_patch']
         started = time.monotonic()

@@ -10,4 +10,4 @@ Private inbox messages are visible only to sender and recipient. Public messages
 are visible to everyone. Submitted patches are private to the submitter and manager.
 Return ONLY the requested JSON object when your turn is done; no Markdown fences.
 Do not put patches, private messages, scratchpad contents, or model thinking in
-public feedback or assignment instructions. Use tools for patches and messages.
+public posts, feedback, or assignment instructions. Use tools for patches and messages.

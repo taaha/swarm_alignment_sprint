@@ -2,15 +2,22 @@
 
 | Agent | Tools |
 |---|---|
-| Worker | Read/search files; submit patch; submit private message when enabled |
+| Worker | Read/search files; submit patch; submit public message when enabled; submit private message when enabled |
 | Manager | Read/search files; accept/apply patch; submit private message when enabled |
 
 Neither agent has a direct file-writing tool. The manager changes files only by applying a patch.
 
 Work rounds and tenure are implemented in [the controller](../src/swarm/README.md).
 Defaults: five workers, three rounds, private messaging enabled, thinking `high`.
+Worker public posting defaults to disabled (`SWARM_PUBLIC_MESSAGES=false`);
+`--public-messages true/false` overrides the environment setting.
 Each run starts one shared working container from the **Neutral Looking Buggy Image**.
 Messages and scratchpads use controller-owned SQLite state; MLflow logs the run.
+When public posting is enabled, workers can post updates during their work turns. The controller stamps
+sender and round; every agent sees new posts at the start of its next turn.
+Public posting and private messaging are configured independently.
+When disabled, its tool is omitted and calls are rejected. Everyone still reads
+the public board, and manager assignments, feedback, and leaderboards remain public.
 Retirement ends at `election_pending`; voting and election context below remain planned.
 
 ## Worker context
@@ -19,14 +26,16 @@ Retirement ends at `election_pending`; voting and election context below remain 
 Worker context
 ├── Role and rules
 │   ├── Worker identity and responsibilities
-│   └── Tools: read/search files, submit patch, private message when enabled
+│   └── Tools: read/search files, submit patch, public/private messages when enabled
 │
 ├── Own scratchpad
 │   └── Private, persistent working notes
 │
 ├── Public channel — shared with all agents
 │   ├── Task assignments from manager
-│   └── Acceptance/rejection status and manager feedback
+│   ├── Worker progress, findings, and coordination messages when enabled
+│   ├── Acceptance/rejection status and manager feedback
+│   └── Updated cumulative leaderboard after each round
 │
 └── Private inbox
     └── Direct messages from other agents
@@ -48,7 +57,9 @@ Manager context
 │
 ├── Public channel — shared with all agents
 │   ├── Task assignments
-│   └── Acceptance/rejection status and manager feedback
+│   ├── Worker progress, findings, and coordination messages when enabled
+│   ├── Acceptance/rejection status and manager feedback
+│   └── Updated cumulative leaderboard after each round
 │
 ├── Private inbox
 │   └── Direct messages from other agents
@@ -71,8 +82,8 @@ MANAGER — initial assignment
   │
   ▼
 WORKER PHASE
-  ├── Worker A investigates and submits its patch
-  ├── Worker B investigates and submits its patch
+  ├── Worker A investigates, optionally posts updates, and submits its patch privately
+  ├── Worker B reads the board, investigates, and posts/submits as permitted
   └── Continue until every worker has taken its turn
   │
   │   Patches go privately to the manager.

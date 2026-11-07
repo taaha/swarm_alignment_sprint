@@ -39,17 +39,36 @@ def main():
     assert actual==expected,(actual,expected)
     assert all(t['status']=='completed' for t in state['turns'] if t['agent']=='manager')
     scratchpads={}
+    visible_worker_posts=[]
     for event in events:
         body=event['body']
+        if event['kind']=='public_message':
+            assert body['kind']=='worker_message' and body['sender'] in workers
+            assert body['text'].strip() and set(body)=={'kind','round','sender','text'}
+            visible_worker_posts.append(body)
         if event['kind']=='turn_start':
             ctx=body['context']; agent=body['agent']
             assert ctx['scratchpad']==scratchpads.get(agent,'')
             assert all(m['recipient']==agent for m in ctx['private_inbox'])
             assert all(m['sender']==agent for m in ctx['sent_private_messages'])
             assert all('diff' not in m and 'scratchpad' not in m for m in ctx['public_channel'])
+            assert [m for m in ctx['public_channel'] if m['kind']=='worker_message']==visible_worker_posts
             if agent!='manager':
                 assert 'submissions' not in ctx and 'task_list' not in ctx
         if event['kind']=='turn_end': scratchpads[body['agent']]=body['scratchpad']
+    assert [m for m in state['public'] if m['kind']=='worker_message']==visible_worker_posts
+    # Historical runs before this flag existed supported public posting unconditionally.
+    public_enabled=state['config'].get('public_messages')
+    if public_enabled is False:
+        assert not visible_worker_posts
+        for event in events:
+            if event['kind']=='model_request':
+                assert all(t['function']['name']!='submit_public_message' for t in event['body']['request']['tools'])
+            if event['kind']=='turn_start':
+                assert event['body']['context']['public_messaging_enabled'] is False
+        for event in events:
+            if event['kind']=='tool_result' and event['body']['name']=='submit_public_message':
+                assert 'error' in event['body']['result'] and not event['body']['result'].get('posted')
     assert len(state['submissions'])<=len(workers)*rounds
     assert len({p['id'] for p in state['submissions']})==len(state['submissions'])
     assert len(state['decisions'])==len(state['submissions'])
@@ -130,6 +149,12 @@ def main():
         rejected=sum(d['decision']=='reject' for d in state['decisions']),
         application_results=dict(Counter(d['application']['status'] for d in state['decisions'])),
         private_messages=len(state['private']),model_responses=len(responses),
+        worker_public_messages=len(visible_worker_posts),
+        public_messaging_enabled=public_enabled,
+        disabled_public_posting_verified=public_enabled is False,
+        public_post_attempts=sum(e['kind']=='tool_request' and e['body']['name']=='submit_public_message' for e in events),
+        public_message_authors=sorted({m['sender'] for m in visible_worker_posts}),
+        public_message_visibility_verified=True,
         thinking_characters=thinking_characters,logged_events=len(events),mlflow_trace_count=trace_count,
         requested_models=dict(manager=state['config']['manager_model'],worker=state['config']['worker_model']),
         returned_models=sorted({r.get('model','unknown') for r in responses}),
@@ -137,13 +162,15 @@ def main():
         mlflow_span_counts=span_counts,privacy_checks_passed=True,working_container_isolated=True,
         saved_images_existing_shops_sibling_env_and_git_head_unchanged=unchanged,
         final_status=state['status'],fix_correctness_tested=False)
+    if (directory/'operations.json').exists():
+        report['operator_operations']=json.loads((directory/'operations.json').read_text())
     (directory/'audit.json').write_text(json.dumps(report,indent=2)+'\n')
     base=run['info']['artifact_uri'].removeprefix('mlflow-artifacts:').strip('/')
     request=urllib.request.Request('http://127.0.0.1:5000/api/2.0/mlflow-artifacts/artifacts/'+base+'/audit.json',
         data=json.dumps(report,indent=2).encode(),method='PUT',headers={'Content-Type':'application/json'})
     with opener.open(request,timeout=20) as response:
         assert response.status==200
-    for file in [*(directory/'controller_source').rglob('*'),directory/'runtime-image.json']:
+    for file in [*(directory/'controller_source').rglob('*'),directory/'runtime-image.json',directory/'operations.json']:
         if not file.is_file(): continue
         relative=file.relative_to(directory).as_posix()
         request=urllib.request.Request('http://127.0.0.1:5000/api/2.0/mlflow-artifacts/artifacts/'+base+'/'+relative,

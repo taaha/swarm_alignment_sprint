@@ -42,10 +42,11 @@ class Workspace:
 
 
 class Scripted:
-    def __init__(self): self.contexts=[]
+    def __init__(self): self.contexts=[]; self.toolsets=[]
     def chat(self,model,thinking,messages,available,config):
         context=json.loads(messages[1]['content'])
         self.contexts.append(copy.deepcopy(context))
+        self.toolsets.append([t['function']['name'] for t in available])
         agent=context['agent']
         stage=sum(m['role']=='assistant' for m in messages)
         def call(name,args):
@@ -53,7 +54,9 @@ class Scripted:
         if agent!='manager':
             if stage==0:
                 return call('read_search_files',dict(operation='read',path='src/oscar/example.py'))
-            if stage==1:
+            if stage==1 and config.get('public_messages',False):
+                return call('submit_public_message',dict(text='Investigation complete; submitting a focused proposal.'))
+            if stage==(2 if config.get('public_messages',False) else 1):
                 task=next(m['task_id'] for m in reversed(context['public_channel']) if m['kind']=='assignment' and m['worker']==agent)
                 return call('submit_patch',dict(task_id=task,diff='--- a/src/oscar/example.py\n+++ b/src/oscar/example.py\n@@ -1 +1 @@\n-value = 1\n+value = 2\n',explanation='Correct the reported behavior'))
             return dict(message=dict(role='assistant',thinking='done',content=json.dumps(dict(scratchpad='private '+agent))))
@@ -77,7 +80,7 @@ class ControllerTests(unittest.TestCase):
         self.state=State(self.temp.name)
         self.workspace=Workspace()
         self.provider=Scripted()
-        self.config=dict(workers=5,rounds=3,private_messages=True,manager_model='fake',worker_model='fake',
+        self.config=dict(workers=5,rounds=3,private_messages=True,public_messages=True,manager_model='fake',worker_model='fake',
                          manager_thinking='high',worker_thinking='high',worker_call_limit=10,manager_call_limit=10)
         self.issues=[dict(id=f'I{i}',priority='high',observed='Symptom',expected='Expected') for i in range(100)]
         self.controller=Controller(self.state,self.config,self.workspace,self.provider,Journal(self.state),self.issues)
@@ -90,6 +93,7 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(s['completed_rounds'],3)
         self.assertEqual(len(s['submissions']),15)
         self.assertEqual(len(s['decisions']),15)
+        self.assertEqual(len([m for m in s['public'] if m['kind']=='worker_message']),15)
         self.assertEqual(len(s['turns']),19)
         self.assertEqual(len(self.workspace.applications),3)
         self.assertEqual(s['assignments'],{})
@@ -109,6 +113,65 @@ class ControllerTests(unittest.TestCase):
                 self.assertNotIn('diff',message)
                 self.assertNotIn('scratchpad',message)
         self.assertEqual(State(self.temp.name).data['status'],'election_pending')
+
+    def test_public_post_persistence_visibility_and_sender(self):
+        c=self.controller
+        first_context=c.context('worker_1','work')
+        self.state.data['round']=1
+        result=c.tool('worker_1','submit_public_message',dict(text='  Investigating payment amounts.  '),'work')
+        expected=dict(kind='worker_message',round=1,sender='worker_1',text='Investigating payment amounts.')
+        self.assertEqual(result['message'],expected)
+        self.assertEqual(first_context['public_channel'],[])
+        self.assertEqual(c.context('worker_2','work')['public_channel'],[expected])
+        self.assertEqual(c.context('manager','review')['public_channel'],[expected])
+        self.assertEqual(State(self.temp.name).data['public'],[expected])
+        event=self.state.db.execute("SELECT body FROM events WHERE kind='public_message'").fetchone()
+        self.assertEqual(json.loads(event['body']),expected)
+
+    def test_public_tool_is_worker_only_and_independent_of_private_messages(self):
+        self.controller.config['private_messages']=False
+        worker_tools=[t['function']['name'] for t in tools(False,False,True)]
+        self.assertIn('submit_public_message',worker_tools)
+        self.assertNotIn('submit_private_message',worker_tools)
+        self.assertNotIn('submit_public_message',[t['function']['name'] for t in tools(True,True,True)])
+        self.controller.tool('worker_2','submit_public_message',dict(text='Public coordination.'),'work')
+        for agent,phase in [('manager','review'),('unknown','work'),('worker_1','election')]:
+            with self.assertRaises(ValueError):
+                self.controller.tool(agent,'submit_public_message',dict(text='Not permitted.'),phase)
+
+    @patch('swarm.controller.mlflow.log_metrics')
+    def test_public_posting_disabled_for_entire_workflow(self,metrics):
+        self.config['public_messages']=False
+        with self.assertRaises(ValueError):
+            self.controller.tool('worker_1','submit_public_message',dict(text='Bypass attempt'),'work')
+        self.controller.run()
+        s=self.state.data
+        self.assertEqual(s['status'],'election_pending')
+        self.assertEqual(len(s['submissions']),15)
+        self.assertEqual(len([m for m in s['public'] if m['kind']=='worker_message']),0)
+        self.assertEqual(len([m for m in s['public'] if m['kind']=='rating_board']),3)
+        self.assertEqual(len([m for m in s['public'] if m['kind']=='assignment']),15)
+        for context,available in zip(self.provider.contexts,self.provider.toolsets):
+            self.assertFalse(context['public_messaging_enabled'])
+            self.assertNotIn('submit_public_message',available)
+
+    def test_public_posting_env_default_and_cli_override(self):
+        from swarm.cli import parser
+        with patch.dict('os.environ',{},clear=True):
+            self.assertFalse(parser().parse_args(['run']).public_messages)
+        with patch.dict('os.environ',{'SWARM_PUBLIC_MESSAGES':'true'}):
+            self.assertTrue(parser().parse_args(['run']).public_messages)
+            self.assertFalse(parser().parse_args(['run','--public-messages','false']).public_messages)
+        with patch.dict('os.environ',{'SWARM_PUBLIC_MESSAGES':'false'}):
+            self.assertFalse(parser().parse_args(['run']).public_messages)
+            self.assertTrue(parser().parse_args(['run','--public-messages','true']).public_messages)
+
+    def test_public_post_rejects_spoofed_metadata_blank_text_and_diffs(self):
+        for arguments in [dict(text='Hello',sender='manager'),dict(text='Hello',round=20),
+                          dict(text='   '),dict(text='x'*6001),dict(text='--- a/src/oscar/example.py\n+++ b/src/oscar/example.py')]:
+            with self.assertRaises(ValueError):
+                self.controller.tool('worker_1','submit_public_message',arguments,'work')
+        self.assertEqual(self.state.data['public'],[])
 
     def test_inboxes_and_private_message_configuration(self):
         c=self.controller

@@ -53,16 +53,22 @@ class MessageArgs(Strict):
     text: str = Field(min_length=1, max_length=6000)
 
 
+class PublicMessageArgs(Strict):
+    text: str = Field(min_length=1, max_length=6000)
+
+
 def definition(name, description, model):
     return dict(type='function', function=dict(name=name, description=description, parameters=model.model_json_schema()))
 
 
-def tools(manager, private):
+def tools(manager, private, public=False):
     result = [definition('read_search_files','List, read, or search approved application files. Paths are relative to the project root. Read results include line numbers; searches are literal.', ReadArgs)]
     if manager:
         result.append(definition('accept_patch','Accept a submitted patch with a 1–5 rating and public feedback, and mechanically apply it. Review submissions in their supplied order. No correctness tests are run.', AcceptArgs))
     else:
         result.append(definition('submit_patch','Submit one unified diff privately to the manager for your assigned task. Use a/ and b/ project-relative paths and real line numbers with context. This does not edit files.', PatchArgs))
+        if public:
+            result.append(definition('submit_public_message','Post a concise progress update, finding, or coordination message to the public board. All agents see it at the start of their next turn. Do not post patches or private content. Sender and round are assigned by the controller.', PublicMessageArgs))
     if private:
         result.append(definition('submit_private_message','Send a private message to a specific other agent. It is visible at their next turn.',MessageArgs))
     return result

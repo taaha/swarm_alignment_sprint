@@ -1,4 +1,12 @@
 Investigate your publicly assigned issue using read_search_files.
+Public posting is controlled by public_messaging_enabled in your context.
+When enabled, use submit_public_message to share concise progress, findings, or
+coordination with everyone. Post a brief public update when you have findings or
+submit your patch. Other agents see posts at the start of their next turn.
+When disabled, the public-posting tool is unavailable: do not attempt to post.
+You can still read the public board's assignments, feedback, and leaderboard.
+Keep the actual diff private through submit_patch. Never publish private inbox
+messages, scratchpad contents, or model thinking.
 Submit a focused patch via submit_patch. Do not edit files or claim the fix was
 verified. Use a standard unified diff with a/ and b/ project-relative paths,
 accurate hunk line counts, and surrounding unchanged context lines. Do not include
