@@ -11,6 +11,7 @@ import docker
 from .checkpoint import load_source, save_checkpoint, election_state, valid_run_id, NAME
 from .controller import Controller
 from .election import Election
+from .election_policy import freeze_policy
 from .provider import Ollama
 from .state import State
 from .telemetry import Telemetry, export, flush_existing_run
@@ -46,6 +47,8 @@ def parser():
     p.add_argument('--private-messages',type=boolean,default=boolean(os.getenv('SWARM_PRIVATE_MESSAGES','true')))
     p.add_argument('--public-messages',type=boolean,default=boolean(os.getenv('SWARM_PUBLIC_MESSAGES','false')))
     p.add_argument('--election',type=boolean,default=boolean(os.getenv('SWARM_ELECTION_ENABLED','true')))
+    p.add_argument('--election-policy-workers',default=os.getenv('SWARM_ELECTION_POLICY_WORKERS',''),
+                   help='Resume only: comma-separated worker IDs receiving the private election policy; empty disables it')
     p.add_argument('--election-seed',type=int,default=int(os.getenv('SWARM_ELECTION_SEED','42')))
     p.add_argument('--manager-model',default=os.getenv('SWARM_MANAGER_MODEL',os.getenv('OLLAMA_MODEL','deepseek-v4.1-flash')))
     p.add_argument('--worker-model',default=os.getenv('SWARM_WORKER_MODEL',os.getenv('OLLAMA_MODEL','deepseek-v4.1-flash')))
@@ -97,7 +100,9 @@ def main():
                     missing_private_plans=list(value['future_plan_failures'])),indent=2))
         return
     resumed = args.command == 'resume-election'
-    source = raw = digest = None
+    source = raw = digest = policy = None
+    if not resumed and args.election_policy_workers.strip():
+        raise ValueError('--election-policy-workers is only supported by resume-election')
     if resumed:
         if not args.from_run:
             raise ValueError('--from-run is required for resume-election')
@@ -114,10 +119,14 @@ def main():
         config.setdefault('concurrency',5)
         config['election'] = True
         config['workflow'] = 'election_only'
+        policy = freeze_policy(args.election_policy_workers,source['workers'])
     else:
         if args.from_run:
             raise ValueError('--from-run is only valid with resume-election')
-        config={k:v for k,v in vars(args).items() if k not in ['command','run_id','from_run']}
+        config={k:v for k,v in vars(args).items() if k not in ['command','run_id','from_run','election_policy_workers']}
+    # Resolve the treatment from this invocation, never from inherited settings.
+    config['election_policy_workers'] = policy['workers'] if policy else []
+    config['election_policy_sha256'] = policy['sha256'] if policy else None
     if not 1<=config['workers']<=100 or config['rounds']<1 or min(config['max_tokens'],config['worker_call_limit'],config['manager_call_limit'],config['concurrency'])<1:
         raise ValueError('Worker count must be 1–100; rounds and limits must be positive')
     if not os.getenv('OLLAMA_API_KEY'):
@@ -129,6 +138,7 @@ def main():
     state=State(directory)
     if resumed:
         state.data = election_state(source, args.from_run, digest)
+        state.data['election_policy'] = policy
         (directory/NAME).write_bytes(raw)
     config.update(run_id=run_id,tracking_uri=os.getenv('MLFLOW_TRACKING_URI','http://mlflow:5000'),image_id=source['config']['image_id'] if resumed else IMAGE_ID)
     config['manager_thinking']=thinking(config['manager_thinking']) if isinstance(config['manager_thinking'],str) else config['manager_thinking']

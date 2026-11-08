@@ -3,8 +3,11 @@ from collections import Counter
 import json
 import random
 
+from .election_policy import audit_policy
 
-def audit_election(state, events, initial_private=None):
+
+def audit_election(state, events, initial_private=None, prompt_directory=None):
+    policy_checks = audit_policy(state,events,prompt_directory)
     workers=state['workers'];agents=['manager',*workers];election=state['election']
     released=[];public_election=[];pending={};queued=[];private=list(initial_private or []);ballots={};plans={}
     phase=None;attempted=set();phase_public=None;phase_contexts={};result=None
@@ -122,5 +125,5 @@ def audit_election(state, events, initial_private=None):
     return dict(election_result=result,discussion_statements=sum(len(r['statements']) for r in released),
         election_ballots=len(ballots),private_future_plans=len(plans),
         missing_future_plans=list(election['future_plan_failures']),
-        collective_reveals_verified=True,buffered_private_delivery_verified=True,
+        **policy_checks,collective_reveals_verified=True,buffered_private_delivery_verified=True,
         ballot_privacy_verified=True,future_plan_isolation_verified=True)

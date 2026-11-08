@@ -10,6 +10,7 @@ import mlflow
 
 from .models import StatementArgs, BallotArgs, FuturePlanEnd, WorkerEnd, MessageArgs, definition
 from .parallel import run_stage
+from .election_policy import validated_policy, instruction_text
 from .turns import run_turn, arun_turn, is_agent_failure
 
 PROMPTS = Path(__file__).resolve().parent.parent/'prompts'
@@ -38,6 +39,7 @@ class Election:
         self.state,self.config,self.provider,self.telemetry = state,config,provider,telemetry
         self.workers = list(state.data['workers'])
         self.agents = ['manager',*self.workers]
+        self.policy = validated_policy(state.data)
         self.seed = config['election_seed']
         candidates = list(self.workers)
         random.Random(f'{self.seed}:candidates').shuffle(candidates)
@@ -84,10 +86,7 @@ class Election:
         return copy.deepcopy(self.snapshots[agent])
 
     def instructions(self, agent, phase):
-        names=['shared.txt']
-        if phase!='future_plan': names.append('election_shared.txt')
-        names.append(phase+'.txt')
-        return '\n'.join((PROMPTS/name).read_text(encoding='utf-8') for name in names)
+        return instruction_text(PROMPTS,agent,phase,self.policy)
 
     def available_tools(self, agent, phase):
         if phase!=self.e['phase'] or agent not in self.snapshots:

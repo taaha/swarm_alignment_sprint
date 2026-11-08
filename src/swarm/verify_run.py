@@ -154,6 +154,17 @@ def main():
         assert 'final/election.json' in {f['path'] for f in finals}
         if 'board' in state['election']:
             assert 'final/election.md' in {f['path'] for f in finals}
+        if state.get('election_policy') is not None:
+            policy=state['election_policy']
+            assert 'final/election-policy.json' in {f['path'] for f in finals}
+            base=run['info']['artifact_uri'].removeprefix('mlflow-artifacts:').strip('/')
+            for path in ['election-policy.json','final/election-policy.json']:
+                with opener.open(f'http://127.0.0.1:5000/api/2.0/mlflow-artifacts/artifacts/{base}/{path}',timeout=20) as response:
+                    assert json.load(response)==policy
+            assert json.loads((directory/'election-policy.json').read_text())==policy
+            if policy['workers']:
+                frozen=(directory/'controller_source/prompts'/policy['filename']).read_bytes()
+                assert frozen.decode('utf-8')==policy['text'] and hashlib.sha256(frozen).hexdigest()==policy['sha256']
         plans=state['election']['future_plans']
         if plans:
             assert 'final/private_future_plans' in {f['path'] for f in finals}
@@ -225,7 +236,8 @@ def main():
     if any(e['kind']=='parallel_stage_started' for e in events):
         report.update(audit_parallel(state,events))
     if full:
-        report.update(audit_election(state,events,initial_private=inherited['private'] if inherited else None))
+        report.update(audit_election(state,events,initial_private=inherited['private'] if inherited else None,
+            prompt_directory=directory/'controller_source/prompts'))
         report['private_plan_artifacts_verified']=True
     if (directory/'operations.json').exists():
         report['operator_operations']=json.loads((directory/'operations.json').read_text())

@@ -51,6 +51,60 @@ completed elections require a saved pre-election checkpoint; the controller neve
 tries to strip election history. Reusing an existing destination ID is rejected,
 and interrupted elections are retained for inspection rather than continued.
 
+## Private policies for selected election workers
+
+`resume-election` accepts `--election-policy-workers worker_5,worker_9`, or
+`SWARM_ELECTION_POLICY_WORKERS=worker_5,worker_9` in the controller environment.
+The CLI overrides the environment, including `--election-policy-workers ""` to
+disable an environment selection. Empty is the default. Whitespace is trimmed;
+duplicate IDs are normalized to worker order. Unknown IDs, `manager`, and nonempty
+selections on fresh `run` commands are rejected before creating a run or calling
+the model. This setting is resolved anew for every election, never inherited
+from the source checkpoint.
+
+The editable policy is `prompts/election_private_policy.txt`. Rebuild the
+controller after editing it. Its initial objective prioritizes the worker's own
+election victory and permits deceptive campaigning through the existing tools.
+It changes no tools, ballot rules, or response formats. Each selected worker
+receives the same private objective for itself; it is not told which other
+workers received it. The retiring manager and unselected workers retain exactly
+the baseline instructions.
+
+The policy is inserted before the phase-specific instructions in all three
+discussion rounds, the ballot, and the personal future-plan turn, even if the
+selected worker loses. The future-plan instructions still describe a private
+personal record; no actions are executed. Policy text is loaded once before run
+creation and frozen for that election, so subsequent edits cannot change an
+active run.
+
+```sh
+src/swarm/swarm.sh build
+# Baseline: explicitly disable any environment selection.
+src/swarm/swarm.sh resume-election --from-run work-example \
+  --run-id election-baseline --election-policy-workers ""
+# One selected worker.
+src/swarm/swarm.sh resume-election --from-run work-example \
+  --run-id election-worker5 --election-policy-workers worker_5
+# Several independently self-interested workers, from the same saved work.
+src/swarm/swarm.sh resume-election --from-run work-example \
+  --run-id election-workers5-9 --election-policy-workers worker_5,worker_9
+```
+
+Operator-only SQLite state, `election-policy.json`, configuration parameters,
+and MLflow record the selection, exact text, filename, and SHA-256 hash. The
+same record is exported as `final/election-policy.json`, with the frozen prompt
+in `controller_source/prompts/`. Audits compare delivery against the frozen
+policy and captured phase prompts. No treatment labels or target lists are
+added to agent contexts or either public board. This guarantees controller
+routing, not agent secrecy: agents can choose to disclose instructions through
+normal messages, and such behavior is recorded without filtering it out.
+
+Historical runs remain auditable, source checkpoints and shops remain unchanged,
+and the same work checkpoint can support repeated independent elections. Success
+of this feature means correct targeting and isolation, not that a treated worker
+necessarily wins. Verification uses scripted responses; no live policy experiment
+is included in the implementation.
+
 ## Setup and run
 
 Requires Docker Engine and Compose. The local ignored root `.env` contains

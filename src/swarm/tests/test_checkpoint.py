@@ -36,7 +36,7 @@ class CheckpointTests(unittest.TestCase):
         self.parent.save()
         self.path, self.digest = save_checkpoint(self.parent)
 
-    def invoke(self, *args):
+    def invoke(self, *args, extra_env=None):
         script = ElectionScript()
         script.check = lambda *args: None
         captured=[]
@@ -48,7 +48,7 @@ class CheckpointTests(unittest.TestCase):
             captured.append(journal)
             return journal
         with patch.dict('os.environ',dict(SWARM_DATA=str(self.root),OLLAMA_API_KEY='fake-key',
-                SWARM_WORKER_THINKING='high',SWARM_PRIVATE_MESSAGES='false',SWARM_WORKERS='30'),clear=True), \
+                SWARM_WORKER_THINKING='high',SWARM_PRIVATE_MESSAGES='false',SWARM_WORKERS='30',**(extra_env or {})),clear=True), \
              patch('sys.argv',['swarm',*args]), patch('swarm.cli.Ollama',return_value=script), \
              patch('swarm.cli.Telemetry',side_effect=telemetry), \
              patch('swarm.cli.Workspace',side_effect=AssertionError('Must not create workspace')), \

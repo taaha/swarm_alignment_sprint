@@ -6,6 +6,8 @@ from pathlib import Path
 import mlflow
 from mlflow import MlflowClient
 
+from .election_policy import validated_policy
+
 
 class LoggingError(RuntimeError):
     pass
@@ -14,14 +16,20 @@ class LoggingError(RuntimeError):
 class Telemetry:
     def __init__(self, state, config):
         self.state = state
+        policy = validated_policy(state.data)
         self.secrets = [v for k,v in os.environ.items() if any(word in k.upper() for word in ['API_KEY','PASSWORD','SECRET','ACCESS_TOKEN']) and len(v)>5]
         mlflow.set_tracking_uri(config['tracking_uri'])
         mlflow.set_experiment('Swarm Alignment')
         self.run = mlflow.start_run(run_name=config['run_id'])
         self.run_id = self.run.info.run_id
         mlflow.log_params(self.clean(config))
+        if policy is not None:
+            record = self.clean(policy)
+            (state.directory/'election-policy.json').write_text(json.dumps(record,indent=2)+'\n')
+            mlflow.log_dict(record,'election-policy.json')
         mlflow.set_tags(dict(workflow=config.get('workflow') or ('full_pipeline' if config.get('election',False) else 'work_rounds'),
-            voting='enabled' if config.get('election',False) else 'deferred',image_description='Neutral Looking Buggy Image'))
+            voting='enabled' if config.get('election',False) else 'deferred',image_description='Neutral Looking Buggy Image',
+            election_policy_enabled=bool(policy and policy['workers'])))
         if state.data.get('lineage'):
             mlflow.set_tags(self.clean(state.data['lineage']))
             self.checkpoint(state.directory/'work_checkpoint.json')
@@ -36,7 +44,12 @@ class Telemetry:
             destination = source/relative
             destination.parent.mkdir(parents=True,exist_ok=True)
             destination.write_bytes(path.read_bytes())
-            hashes[str(relative)] = hashlib.sha256(path.read_bytes()).hexdigest()
+            hashes[str(relative)] = hashlib.sha256(destination.read_bytes()).hexdigest()
+        if policy and policy['workers']:
+            frozen = source/'prompts'/policy['filename']
+            frozen.parent.mkdir(parents=True,exist_ok=True)
+            frozen.write_bytes(policy['text'].encode('utf-8'))
+            hashes[str(frozen.relative_to(source))] = hashlib.sha256(frozen.read_bytes()).hexdigest()
         mlflow.log_artifacts(str(source),artifact_path='controller_source')
         mlflow.log_dict(dict(files=hashes),'runtime-source.json')
 
@@ -97,6 +110,8 @@ def export(state, destination):
     (destination/'state.json').write_text(json.dumps(state.data,indent=2)+'\n')
     (destination/'events.jsonl').write_text(''.join(json.dumps(dict(e))+'\n' for e in state.db.execute('SELECT * FROM events ORDER BY id')))
     (destination/'public.md').write_text('# Public channel\n\n'+'\n\n'.join('```json\n'+json.dumps(m,indent=2)+'\n```' for m in state.data['public'])+'\n')
+    if state.data.get('election_policy') is not None:
+        (destination/'election-policy.json').write_text(json.dumps(state.data['election_policy'],indent=2)+'\n')
     if state.data.get('lineage'):
         (destination/'lineage.json').write_text(json.dumps(state.data['lineage'],indent=2)+'\n')
     patches = destination/'patches'

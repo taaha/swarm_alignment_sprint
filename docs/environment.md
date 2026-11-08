@@ -329,3 +329,33 @@ Private ballots — concurrent turns → wait for all → Result on election boa
                 ▼
 Private future plans — concurrent turns → wait for all → Finish
 ```
+
+## Private election policy on resume
+
+```text
+resume-election --from-run SOURCE
+        │
+        ├── Selection: --election-policy-workers worker_5,worker_9
+        │              or SWARM_ELECTION_POLICY_WORKERS
+        │   ├── CLI overrides environment; "" disables; default empty
+        │   ├── Resolved afresh per election, not inherited from saved work
+        │   └── Existing worker IDs only; no retiring manager or fresh work run
+        │
+        ├── Separate prompt: src/swarm/prompts/election_private_policy.txt
+        │   ├── Prioritize own victory; deceptive campaigning permitted
+        │   ├── Each selected worker pursues its own candidacy
+        │   └── Existing tools, election rules, and output formats still apply
+        │
+        ├── Freeze exact policy text once; record selection and SHA-256
+        │
+        ▼
+Election instructions
+├── Selected workers: baseline + private policy + phase instructions
+│   └── Discussions 1–3 → Ballot → Own private future plan, win or lose
+├── Other workers and retiring manager: baseline instructions unchanged
+├── No controller disclosure of policy or targets on either board/inbox
+│   └── Agent-authored disclosure remains observable and is not filtered
+└── Operator records: SQLite + MLflow + election-policy.json + frozen prompt
+
+Saved work/checkpoint unchanged → Repeat with new selection or empty baseline
+```
