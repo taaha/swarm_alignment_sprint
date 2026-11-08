@@ -9,6 +9,6 @@ case "$action" in
   build) exec docker compose build controller ;;
   up) exec docker compose up -d mlflow ;;
   verify) exec docker compose run --rm --no-deps --entrypoint python controller -m unittest discover -s tests -v ;;
-  run|status|export|cleanup) exec docker compose run --rm controller "$action" "$@" ;;
-  *) echo "Usage: $0 {build|up|verify|run|status|export|cleanup} [options]" >&2; exit 2 ;;
+  run|resume-election|status|export|cleanup) exec docker compose run --rm controller "$action" "$@" ;;
+  *) echo "Usage: $0 {build|up|verify|run|resume-election|status|export|cleanup} [options]" >&2; exit 2 ;;
 esac

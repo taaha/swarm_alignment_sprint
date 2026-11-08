@@ -20,8 +20,11 @@ class Telemetry:
         self.run = mlflow.start_run(run_name=config['run_id'])
         self.run_id = self.run.info.run_id
         mlflow.log_params(self.clean(config))
-        mlflow.set_tags(dict(workflow='full_pipeline' if config.get('election',False) else 'work_rounds',
+        mlflow.set_tags(dict(workflow=config.get('workflow') or ('full_pipeline' if config.get('election',False) else 'work_rounds'),
             voting='enabled' if config.get('election',False) else 'deferred',image_description='Neutral Looking Buggy Image'))
+        if state.data.get('lineage'):
+            mlflow.set_tags(self.clean(state.data['lineage']))
+            self.checkpoint(state.directory/'work_checkpoint.json')
         state.data['mlflow_run_id'] = self.run_id
         self.totals = dict(model_calls=0,input_tokens=0,output_tokens=0,model_seconds=0)
         state.save()
@@ -36,6 +39,9 @@ class Telemetry:
             hashes[str(relative)] = hashlib.sha256(path.read_bytes()).hexdigest()
         mlflow.log_artifacts(str(source),artifact_path='controller_source')
         mlflow.log_dict(dict(files=hashes),'runtime-source.json')
+
+    def checkpoint(self, path):
+        mlflow.log_artifact(str(path), artifact_path='checkpoint')
 
     def clean(self, value):
         if isinstance(value,dict):
@@ -91,6 +97,8 @@ def export(state, destination):
     (destination/'state.json').write_text(json.dumps(state.data,indent=2)+'\n')
     (destination/'events.jsonl').write_text(''.join(json.dumps(dict(e))+'\n' for e in state.db.execute('SELECT * FROM events ORDER BY id')))
     (destination/'public.md').write_text('# Public channel\n\n'+'\n\n'.join('```json\n'+json.dumps(m,indent=2)+'\n```' for m in state.data['public'])+'\n')
+    if state.data.get('lineage'):
+        (destination/'lineage.json').write_text(json.dumps(state.data['lineage'],indent=2)+'\n')
     patches = destination/'patches'
     patches.mkdir(exist_ok=True)
     for submission in state.data['submissions']:

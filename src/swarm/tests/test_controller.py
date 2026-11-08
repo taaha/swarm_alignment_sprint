@@ -30,6 +30,7 @@ class Journal:
         return index
     def span(self,*args): return contextlib.nullcontext(Span())
     def usage(self,*args): pass
+    def checkpoint(self,*args): pass
 
 
 class Workspace:
@@ -105,6 +106,12 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(board[0]['accepted'],3)
         self.assertEqual(board[0]['average_rating'],4)
         self.assertEqual(board[1]['rejected'],3)
+        self.assertEqual(board[0]['applied'],3)
+        self.assertEqual(board[0]['impact_score'],9)
+        self.assertEqual(board[1]['impact_score'],0)
+        published=[m for m in s['public'] if m['kind']=='rating_board'][-1]['workers']
+        self.assertEqual(published,board)
+        self.assertTrue(any('worker_1_impact_score' in call.args[0] for call in metrics.call_args_list))
         for context in self.provider.contexts:
             if context['agent']!='manager':
                 self.assertNotIn('submissions',context)
@@ -211,6 +218,11 @@ class ControllerTests(unittest.TestCase):
         accepted=[d for d in self.state.data['decisions'] if d['decision']=='accept']
         self.assertTrue(all(d['application']['status']=='failed' for d in accepted))
         self.assertTrue(all(t['status']=='open' for t in self.state.data['tasks'].values()))
+        row=self.state.board(['worker_1'])[0]
+        self.assertEqual(row['accepted'],3)
+        self.assertEqual(row['patches_failed_to_apply'],3)
+        self.assertEqual(row['applied'],0)
+        self.assertEqual(row['impact_score'],0)
 
     @patch('swarm.controller.mlflow.log_metrics')
     def test_missing_submission_is_not_invented_or_rated(self,metrics):
@@ -220,7 +232,7 @@ class ControllerTests(unittest.TestCase):
             return original(agent,phase)
         self.controller.turn=turn
         self.controller.run()
-        self.assertEqual(self.state.board(['worker_5'])[0],dict(worker='worker_5',submissions=0,accepted=0,rejected=0,average_rating=None))
+        self.assertEqual(self.state.board(['worker_5'])[0],dict(worker='worker_5',submissions=0,accepted=0,rejected=0,applied=0,patches_failed_to_apply=0,high_applied=0,medium_applied=0,low_applied=0,impact_score=0,average_rating=None))
 
     def test_bad_final_response_and_call_limit(self):
         with self.assertRaises(ValueError): self.controller.validate_end('manager','initial','{}')

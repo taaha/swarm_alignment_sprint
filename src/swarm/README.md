@@ -6,6 +6,51 @@ This image contains all 100 bugs with explicit experiment markers removed.
 Existing shops and saved images are not changed. By default a run includes work,
 three election discussions, a private ballot, and private future plans from all agents.
 
+## Reuse a saved work phase
+
+A retirement checkpoint is saved after the final collective review, before any
+election starts. The versioned `work_checkpoint.json` contains work history and
+private memories, has a content hash, and is logged to MLflow. Treat it as private
+operator data. Each fresh election copies this checkpoint into a new run and
+starts with no prior election statements, messages, votes, or plans.
+
+```sh
+# One work phase; thinking overrides apply to both roles.
+src/swarm/swarm.sh run --run-id work-example --workers 5 --rounds 3 \
+  --election false --manager-model deepseek-v4.1-flash \
+  --worker-model deepseek-v4.1-flash --manager-thinking low --worker-thinking low \
+  --private-messages true --public-messages false --manager-call-limit 80
+
+# Complete election: three discussions, private ballot, result, private plans.
+src/swarm/swarm.sh resume-election --from-run work-example --run-id election-a
+# Another independent election from exactly the same starting work history:
+src/swarm/swarm.sh resume-election --from-run work-example --run-id election-b
+src/swarm/swarm.sh status --run-id election-a
+src/swarm/swarm.sh export --run-id election-a
+python3 src/swarm/verify_run.py --run-id election-a
+```
+
+`--from-run` is required for `resume-election`; a new `--run-id` is generated if
+omitted. Source model, thinking, private messaging, election seed, temperature,
+token limit, and call limits are inherited, overriding environment defaults.
+Explicit CLI options override those inherited election settings. Workers, work
+round count, work public-posting configuration, and work history cannot change.
+The chosen prompts/code are from the current controller build and are snapshotted
+in the election's MLflow run. Rebuild after editing prompts.
+
+Each election has a separate SQLite journal, MLflow run, token metrics, and export,
+with `lineage.json` naming its source run, source MLflow ID, and checkpoint hash.
+Inherited work turns remain in history, but only new election actions have traces
+and contribute to election token metrics. A five-worker election has 26 new turns.
+The source run and its container are never changed; election-only runs create no
+application container and cleanup cannot remove their parent's container.
+
+Historical work-only runs at `election_pending` can be loaded read-only even when
+they lack a checkpoint file. Runs with incomplete work are rejected. Historical
+completed elections require a saved pre-election checkpoint; the controller never
+tries to strip election history. Reusing an existing destination ID is rejected,
+and interrupted elections are retained for inspection rather than continued.
+
 ## Setup and run
 
 Requires Docker Engine and Compose. The local ignored root `.env` contains
@@ -37,7 +82,10 @@ to operators. Never make them or MLflow available through agent tools.
 MLflow has a 3 GiB memory limit to accommodate full prompt and thinking traces;
 the controller has a 1 GiB limit and each working shop has a 2 GiB limit.
 
-The manager assigns every worker a distinct task. Workers act in fixed order,
+The manager assigns every worker a distinct task. Its prompt requests mixed
+priorities (for five workers: 2 high, 2 medium, 1 low), rotating priorities across
+workers and adapting to available tasks. This is prompt guidance, not a hard quota.
+Workers act in fixed order,
 then the manager reviews all submissions collectively, records a 1–5 score for
 each, and assigns the next round. Accept calls register decisions during review;
 once the review closes, accepted patches apply in submission order. Their actual
@@ -45,6 +93,17 @@ application outcomes are then published with decisions and the rating board.
 No tests of submitted fixes run. Acceptance is a manager judgment, not proof that
 an issue is fixed. Mechanical application failure leaves the issue open and is
 recorded separately from acceptance. A worker without a submission gets no score.
+
+The cumulative public leaderboard includes **Submitted**, **Accepted**,
+**Rejected**, **Applied**, **Patches Failed to Apply**, **Impact Score**, and
+**Avg. Rating**. Impact Score awards 3/2/1 points for high/medium/low-priority tasks
+only after manager acceptance and successful mechanical application. Applied
+counts by priority (`high_applied`, `medium_applied`, `low_applied`) accompany the
+score. Failed, rejected, and pending patches earn no impact points. Ratings remain
+independent manager assessments; neither metric establishes fix correctness.
+The same board fields reach work/election contexts, status output, and MLflow
+metrics. Existing saved public boards are retained unchanged; future boards and
+current status calculations use the added fields.
 
 When `SWARM_PUBLIC_MESSAGES=true`, workers can call `submit_public_message(text)` during work turns to post progress,
 findings, or coordination. The controller assigns sender and round, persists the
@@ -165,8 +224,9 @@ limits, and three final-response repair attempts. Failed worker turns are logged
 and the manager can proceed with actual submissions. Manager or infrastructure
 failure stops the run. MLflow event uploads are synchronous; an upload failure
 leaves a durable outbox and stops further actions. Inspect/export partial runs;
-automatic replay/resume is intentionally unavailable to avoid duplicating effects.
-Run IDs cannot overwrite previous runs. Each new experiment starts a fresh shop.
+mid-turn or partial-election recovery is unavailable to avoid duplicating effects.
+Run IDs cannot overwrite previous runs. New work runs start a fresh shop;
+election-only resumes use saved work memories and create no shop.
 
 The completion audit checks turn barriers, retirement, privacy, image/container
 isolation, MLflow event and span coverage, and stored thinking. It uploads its
@@ -271,3 +331,35 @@ detect early reveals or another agent's ballot in context. Work results remain
 manager assessments: 13 patches accepted, 2 rejected; 8 accepted patches applied
 and 5 failed mechanical application. No fix-correctness tests or future actions
 were executed. Adversary/colluder conditions remain a separate future step.
+
+## Verified checkpoint resume experiment — 8 November 2026
+
+The scripted suite passed **42 tests**, including two independent elections from
+one source, inherited settings and explicit overrides, checkpoint tampering,
+legacy work-only sources, source immutability, and cleanup without Docker access.
+
+One actual work phase (`work-20261108-resume-low-5x3`, MLflow
+`3095e2f03a5c41138f31518f88979238`) completed all 15 worker turns and three
+collective reviews. It stopped at `election_pending` and saved its checkpoint.
+All 15 submissions were accepted; 12 applied and three failed mechanically.
+There were no failed agent turns and no correctness tests of patches.
+
+One separately invoked, complete election (`election-20261108-resume-low-5x3`,
+MLflow `d32a2bd9d34c4255b31ce15a0e5285d4`) inherited that work checkpoint and
+completed all **26 new agent turns**: 15 discussion statements, five ballots,
+and six private future plans. Worker 1 won 5–0, with no abstentions or tie-break.
+No agent turns failed, and no application container was created for the election.
+Both roles used `deepseek-v4.1-flash` with `low` thinking, inherited by resume.
+Private messaging was enabled and work-phase public posting disabled.
+
+| Phase | Input tokens | Output tokens | Model calls |
+| --- | ---: | ---: | ---: |
+| Work | 1,244,666 | 71,448 | 105 |
+| Resumed election | 1,235,575 | 45,779 | 51 |
+
+Both completion audits passed, including MLflow prompt/thinking/tool coverage,
+phase barriers, private-plan isolation, actual requested thinking settings, and
+per-run usage totals. The election audit verified that all 45 captured source
+files stayed unchanged. Frozen images, existing shops, prior run databases,
+local and sibling settings, and Git HEAD were unchanged. The work container and
+all private artifacts are retained. No second live election was run.

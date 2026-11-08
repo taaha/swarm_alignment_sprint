@@ -1,11 +1,13 @@
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 import uuid
 
 import docker
 
+from .checkpoint import load_source, save_checkpoint, election_state, valid_run_id, NAME
 from .controller import Controller
 from .election import Election
 from .provider import Ollama
@@ -30,8 +32,9 @@ def thinking(value):
 
 def parser():
     p=argparse.ArgumentParser(description='Work rounds, succession election, and private future plans.')
-    p.add_argument('command',choices=['run','status','export','cleanup'])
+    p.add_argument('command',choices=['run','resume-election','status','export','cleanup'])
     p.add_argument('--run-id')
+    p.add_argument('--from-run')
     p.add_argument('--workers',type=int,default=int(os.getenv('SWARM_WORKERS','5')))
     p.add_argument('--rounds',type=int,default=int(os.getenv('SWARM_ROUNDS','3')))
     p.add_argument('--private-messages',type=boolean,default=boolean(os.getenv('SWARM_PRIVATE_MESSAGES','true')))
@@ -53,7 +56,7 @@ def main():
     args=parser().parse_args()
     root=Path(os.getenv('SWARM_DATA','/state'))
     root.mkdir(parents=True,exist_ok=True)
-    if args.command!='run':
+    if args.command not in ['run','resume-election']:
         run_id=args.run_id or (root/'latest').read_text().strip()
         if not run_id or Path(run_id).name!=run_id or '..' in run_id:
             raise ValueError('Invalid run ID')
@@ -80,28 +83,49 @@ def main():
         else:
             print(json.dumps(dict(run_id=run_id,status=state.data['status'],completed_rounds=state.data['completed_rounds'],
                 mlflow_run_id=state.data.get('mlflow_run_id'),container_id=state.data.get('container_id'),
-                board=state.board(state.data.get('workers',[]))),indent=2))
+                board=state.board(state.data.get('workers',[])),lineage=state.data.get('lineage')),indent=2))
             if 'election' in state.data:
                 value=state.data['election']
                 print(json.dumps(dict(election_phase=value['phase'],discussion_round=value['discussion_round'],
                     result=value['result'],private_plans_collected=len(value['future_plans']),
                     missing_private_plans=list(value['future_plan_failures'])),indent=2))
         return
-    if not 1<=args.workers<=100 or args.rounds<1 or min(args.max_tokens,args.worker_call_limit,args.manager_call_limit)<1:
+    resumed = args.command == 'resume-election'
+    source = raw = digest = None
+    if resumed:
+        if not args.from_run:
+            raise ValueError('--from-run is required for resume-election')
+        source, raw, digest = load_source(root, args.from_run)
+        config = dict(source['config'])
+        explicit = {word.split('=')[0] for word in sys.argv[1:] if word.startswith('--')}
+        forbidden = {'--workers', '--rounds', '--public-messages', '--election'} & explicit
+        if forbidden:
+            raise ValueError('Cannot override inherited work settings: '+', '.join(sorted(forbidden)))
+        for name in ['private_messages','election_seed','manager_model','worker_model','manager_thinking',
+                     'worker_thinking','max_tokens','worker_call_limit','manager_call_limit','temperature']:
+            if '--'+name.replace('_','-') in explicit:
+                config[name] = getattr(args,name)
+        config['election'] = True
+        config['workflow'] = 'election_only'
+    else:
+        if args.from_run:
+            raise ValueError('--from-run is only valid with resume-election')
+        config={k:v for k,v in vars(args).items() if k not in ['command','run_id','from_run']}
+    if not 1<=config['workers']<=100 or config['rounds']<1 or min(config['max_tokens'],config['worker_call_limit'],config['manager_call_limit'])<1:
         raise ValueError('Worker count must be 1–100; rounds and limits must be positive')
     if not os.getenv('OLLAMA_API_KEY'):
         raise ValueError('OLLAMA_API_KEY is missing')
-    run_id=args.run_id or 'work-'+uuid.uuid4().hex[:12]
-    if Path(run_id).name!=run_id or '..' in run_id:
-        raise ValueError('Invalid run ID')
+    run_id=valid_run_id(args.run_id or ('election-' if resumed else 'work-')+uuid.uuid4().hex[:12])
     directory=root/'runs'/run_id
-    if directory.exists():
-        raise ValueError('Run already exists; refusing to overwrite or resume partial actions')
+    # Atomic reservation also prevents two controllers from using the same destination.
+    directory.mkdir(parents=True,exist_ok=False)
     state=State(directory)
-    config={k:v for k,v in vars(args).items() if k not in ['command','run_id']}
-    config.update(run_id=run_id,tracking_uri=os.getenv('MLFLOW_TRACKING_URI','http://mlflow:5000'),image_id=IMAGE_ID)
-    config['manager_thinking']=thinking(config['manager_thinking'])
-    config['worker_thinking']=thinking(config['worker_thinking'])
+    if resumed:
+        state.data = election_state(source, args.from_run, digest)
+        (directory/NAME).write_bytes(raw)
+    config.update(run_id=run_id,tracking_uri=os.getenv('MLFLOW_TRACKING_URI','http://mlflow:5000'),image_id=source['config']['image_id'] if resumed else IMAGE_ID)
+    config['manager_thinking']=thinking(config['manager_thinking']) if isinstance(config['manager_thinking'],str) else config['manager_thinking']
+    config['worker_thinking']=thinking(config['worker_thinking']) if isinstance(config['worker_thinking'],str) else config['worker_thinking']
     state.data['config']=config
     state.save()
     (root/'latest').write_text(run_id+'\n')
@@ -111,16 +135,23 @@ def main():
         provider=Ollama(os.getenv('OLLAMA_BASE_URL','https://ollama.com/v1'),os.environ['OLLAMA_API_KEY'],telemetry)
         for model,effort in set([(config['manager_model'],config['manager_thinking']),(config['worker_model'],config['worker_thinking'])]):
             provider.check(model,effort)
-        workspace=Workspace(run_id)
-        state.data['container_id']=workspace.container.id
-        state.save()
-        controller=Controller(state,config,workspace,provider,telemetry,json.loads(Path('/opt/controller/issues.json').read_text()))
-        (root/'latest').write_text(run_id+'\n')
-        controller.run()
-        if config['election'] and state.data['status']=='election_pending':
+        if resumed:
+            telemetry.event('election_resumed',state.data['lineage'])
             Election(state,config,provider,telemetry).run()
+        else:
+            workspace=Workspace(run_id)
+            state.data['container_id']=workspace.container.id
+            state.save()
+            controller=Controller(state,config,workspace,provider,telemetry,json.loads(Path('/opt/controller/issues.json').read_text()))
+            controller.run()
+            if state.data['status']=='election_pending':
+                path, checkpoint_hash = save_checkpoint(state)
+                telemetry.event('work_checkpoint_saved',dict(path=path.name,sha256=checkpoint_hash))
+                telemetry.checkpoint(path)
+                if config['election']:
+                    Election(state,config,provider,telemetry).run()
         telemetry.finish()
-        print(json.dumps(dict(run_id=run_id,mlflow_run_id=telemetry.run_id,status=state.data['status'],board=state.board(controller.workers),
+        print(json.dumps(dict(run_id=run_id,mlflow_run_id=telemetry.run_id,status=state.data['status'],board=state.board(state.data['workers']),
             election_result=state.data.get('election',{}).get('result'),private_plans_collected=len(state.data.get('election',{}).get('future_plans',{}))),indent=2))
     except Exception as error:
         state.data['status']='failed'

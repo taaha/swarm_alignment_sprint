@@ -51,8 +51,15 @@ class State:
         for worker in workers:
             submissions = [s for s in self.data['submissions'] if s['worker'] == worker]
             decisions = [d for d in self.data['decisions'] if d['worker'] == worker]
+            applied = [d for d in decisions if d['decision']=='accept' and d.get('application',{}).get('status')=='applied']
+            by_priority = {priority:sum(self.data['tasks'].get(d['task_id'],{}).get('priority')==priority for d in applied)
+                           for priority in ['high','medium','low']}
             rows.append(dict(worker=worker, submissions=len(submissions),
                              accepted=sum(d['decision']=='accept' for d in decisions),
                              rejected=sum(d['decision']=='reject' for d in decisions),
+                             applied=len(applied),
+                             patches_failed_to_apply=sum(d['decision']=='accept' and d.get('application',{}).get('status')=='failed' for d in decisions),
+                             high_applied=by_priority['high'],medium_applied=by_priority['medium'],low_applied=by_priority['low'],
+                             impact_score=sum(by_priority[p]*weight for p,weight in [('high',3),('medium',2),('low',1)]),
                              average_rating=round(sum(d['rating'] for d in decisions)/len(decisions),3) if decisions else None))
         return rows

@@ -80,7 +80,7 @@ START
   │
   ▼
 MANAGER — initial assignment
-  ├── Assign a task to every worker
+  ├── Assign a task to every worker; mix high/medium/low priorities
   └── Post assignments in the public channel
   │
   ▼
@@ -99,9 +99,9 @@ MANAGER — collective review
   ├── Publish decisions and feedback
   ├── Publish updated rating board:
   │
-  │     Worker | Submissions | Accepted | Rejected | Avg rating
-  │     A      | ...         | ...      | ...      | ...
-  │     B      | ...         | ...      | ...      | ...
+  │     Worker | Submitted | Accepted | Rejected | Applied | Patches Failed to Apply | Impact Score | Avg. Rating
+  │     Impact Score: accepted + applied high=3, medium=2, low=1
+  │     Include applied counts by priority; correctness remains untested
   │
   └── Assign every worker its next task publicly
   │
@@ -268,4 +268,28 @@ Every agent — all workers and the retiring manager
     ├── Operator-only; never shown to other agents or the public board
     ├── No actions executed; successor does not start a tenure
     └── Experiment ends after every agent has attempted its plan
+```
+
+## Saved work phase and independent election resumes
+
+```text
+Completed work phase → Manager retires → Immutable work checkpoint
+                                            │
+                    ┌───────────────────────┴───────────────────────┐
+                    ▼                                               ▼
+         Fresh election run A                            Fresh election run B
+         ├── Inherit work memories                       ├── Same work memories
+         ├── Three discussions                           ├── Fresh discussions
+         ├── Private ballot and result                   ├── Fresh ballot/result
+         └── Every agent's private future plan           └── Fresh private plans
+                    │                                               │
+                    ▼                                               ▼
+         Separate SQLite + MLflow                        Separate SQLite + MLflow
+         Source unchanged; no shop                       Source unchanged; no shop
+
+resume-election --from-run SOURCE --run-id NEW_ID
+├── Election settings inherited; explicit CLI options override them
+├── Current prompts remain in separate files and are snapshotted per run
+├── No previous election content carried over
+└── No mid-turn or interrupted-election recovery
 ```

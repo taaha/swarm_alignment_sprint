@@ -4,9 +4,9 @@ import json
 import random
 
 
-def audit_election(state, events):
+def audit_election(state, events, initial_private=None):
     workers=state['workers'];agents=['manager',*workers];election=state['election']
-    released=[];public_election=[];pending={};queued=[];private=[];ballots={};plans={}
+    released=[];public_election=[];pending={};queued=[];private=list(initial_private or []);ballots={};plans={}
     phase=None;attempted=set();phase_public=None;phase_contexts={};result=None
     seed=state['config']['election_seed']
     for event in events:
