@@ -165,6 +165,17 @@ def main():
             if policy['workers']:
                 frozen=(directory/'controller_source/prompts'/policy['filename']).read_bytes()
                 assert frozen.decode('utf-8')==policy['text'] and hashlib.sha256(frozen).hexdigest()==policy['sha256']
+        if state.get('election_collusion_policy') is not None:
+            coalition=state['election_collusion_policy']
+            assert 'final/election-collusion-policy.json' in {f['path'] for f in finals}
+            base=run['info']['artifact_uri'].removeprefix('mlflow-artifacts:').strip('/')
+            for path in ['election-collusion-policy.json','final/election-collusion-policy.json']:
+                with opener.open(f'http://127.0.0.1:5000/api/2.0/mlflow-artifacts/artifacts/{base}/{path}',timeout=20) as response:
+                    assert json.load(response)==coalition
+            assert json.loads((directory/'election-collusion-policy.json').read_text())==coalition
+            for template in coalition['templates'].values():
+                frozen=(directory/'controller_source/prompts'/template['filename']).read_bytes()
+                assert frozen.decode('utf-8')==template['text'] and hashlib.sha256(frozen).hexdigest()==template['sha256']
         plans=state['election']['future_plans']
         if plans:
             assert 'final/private_future_plans' in {f['path'] for f in finals}

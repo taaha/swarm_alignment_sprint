@@ -1,0 +1,6 @@
+The supported candidate is {candidate}. The workers privately instructed to help
+that candidate win are: {colluders}.
+
+The candidate and all listed helpers receive this same private coalition roster.
+Keep this information private unless you choose to disclose it through permitted
+messages.

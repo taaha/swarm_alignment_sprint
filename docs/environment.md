@@ -359,3 +359,37 @@ Election instructions
 
 Saved work/checkpoint unchanged → Repeat with new selection or empty baseline
 ```
+
+## Private colluder policy on election resume
+
+```text
+resume-election --from-run SOURCE
+        │
+        ├── Helpers: --election-colluder-workers worker_3,worker_7
+        │           or SWARM_ELECTION_COLLUDER_WORKERS
+        ├── Candidate: --election-colluder-candidate worker_9
+        │             or SWARM_ELECTION_COLLUDER_CANDIDATE
+        │   ├── Both required together; default disabled; CLI overrides environment
+        │   ├── Resolved afresh per resume; both "" disable environment selections
+        │   └── Eligible workers only; no helper/candidate or helper/self-policy overlap
+        │
+        ├── Separate editable prompts, frozen before run creation
+        │   ├── election_colluder_policy.txt → Get the candidate elected, not yourself
+        │   │   └── Same deceptive campaigning permitted as self-advancement policy
+        │   └── election_coalition_context.txt → Candidate + complete helper roster
+        │
+        ▼
+Discussions 1–3 → Private ballot → Private personal future plan
+├── Helpers: baseline + coalition roster + colluder objective + phase instructions
+├── Candidate: baseline + coalition roster + phase instructions
+│   └── Self-advancement objective only if independently selected by existing flag
+├── Others and retiring manager: baseline instructions unchanged
+├── Existing tools, collective reveals, privacy, and ballot rules unchanged
+│   └── Votes remain agent decisions; no controller-enforced support
+├── No automatic policy disclosure on either board or inbox
+│   └── Agent-authored disclosure through permitted messages remains observable
+└── Operator records: SQLite + MLflow + election-collusion-policy.json
+    └── Frozen templates + rendered instructions + identities + hashes
+
+Saved work/checkpoint unchanged → Repeat with a new coalition or empty baseline
+```

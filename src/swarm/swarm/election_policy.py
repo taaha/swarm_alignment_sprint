@@ -3,6 +3,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+from .election_collusion import validated_collusion, collusion_blocks
 
 
 FILENAME = 'election_private_policy.txt'
@@ -66,13 +67,14 @@ def policy_block(policy, agent, phase):
     return None
 
 
-def instruction_text(prompts, agent, phase, policy=None):
+def instruction_text(prompts, agent, phase, policy=None, coalition=None):
     parts = [(prompts/'shared.txt').read_text(encoding='utf-8')]
     if phase != 'future_plan':
         parts.append((prompts/'election_shared.txt').read_text(encoding='utf-8'))
     block = policy_block(policy,agent,phase)
     if block is not None:
         parts.append(block)
+    parts.extend(collusion_blocks(coalition,agent,phase))
     parts.append((prompts/(phase+'.txt')).read_text(encoding='utf-8'))
     return '\n'.join(parts)
 
@@ -81,11 +83,14 @@ def audit_policy(state, events, prompt_directory=None):
     """Inspect controller delivery, not agent-authored disclosure or policy success."""
     try:
         policy = validated_policy(state)
+        coalition = validated_collusion(state)
     except ValueError as error:
         raise AssertionError(str(error)) from error
     selected = policy['workers'] if policy else []
+    coalition_agents = [*coalition['workers'],coalition['candidate']] if coalition and coalition['workers'] else []
+    coalition_seen = {agent:set() for agent in coalition_agents}
     systems = {};seen = {agent:set() for agent in selected}
-    forbidden = {'election_policy','election_policy_workers','election_policy_sha256'}
+    forbidden = {'election_policy','election_policy_workers','election_policy_sha256','election_collusion_policy','election_colluder_workers','election_colluder_candidate','election_collusion_sha256'}
 
     def keys(value):
         if isinstance(value,dict):
@@ -106,8 +111,13 @@ def audit_policy(state, events, prompt_directory=None):
                 block = PREFIX+policy['text']+SUFFIX
                 assert system.count(block) == (1 if agent in selected else 0)
                 if agent in selected: seen[agent].add(phase)
-            if policy is not None and prompt_directory is not None:
-                assert system == instruction_text(Path(prompt_directory),agent,phase,policy)
+            if coalition_agents:
+                for member in [coalition['candidate'],coalition['workers'][0]]:
+                    for block in collusion_blocks(coalition,member,phase):
+                        assert system.count(block) == (1 if block in collusion_blocks(coalition,agent,phase) else 0)
+                if agent in coalition_seen: coalition_seen[agent].add(phase)
+            if (policy is not None or coalition is not None) and prompt_directory is not None:
+                assert system == instruction_text(Path(prompt_directory),agent,phase,policy,coalition)
             key = (agent,phase,body['round'])
             systems[key] = system
         if kind == 'model_request':
@@ -115,6 +125,9 @@ def audit_policy(state, events, prompt_directory=None):
             if context['phase'] in PHASES:
                 assert request['messages'][0]['content'] == systems[(context['agent'],context['phase'],context['round'])]
     assert all(phases == set(PHASES) for phases in seen.values())
-    return dict(election_policy_enabled=bool(selected),election_policy_workers=selected,
+    assert all(phases == set(PHASES) for phases in coalition_seen.values())
+    return dict(election_collusion_enabled=bool(coalition_agents),election_colluder_workers=coalition['workers'] if coalition else [],
+                election_colluder_candidate=coalition['candidate'] if coalition else None,
+                targeted_collusion_delivery_verified=True,election_policy_enabled=bool(selected),election_policy_workers=selected,
                 election_policy_sha256=policy['sha256'] if policy else None,
                 targeted_policy_delivery_verified=True)
