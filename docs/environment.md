@@ -9,12 +9,16 @@ Neither agent has a direct file-writing tool. The manager changes files only by 
 
 Work rounds and tenure are implemented in [the controller](../src/swarm/README.md).
 Defaults: five workers, three rounds, private messaging enabled, thinking `high`.
+Up to five agent turns run concurrently (`SWARM_CONCURRENCY=5` / `--concurrency`).
+Work contexts are frozen before each round; election contexts before each stage.
+Manager messages are available before the following worker round.
 Worker public posting defaults to disabled (`SWARM_PUBLIC_MESSAGES=false`);
 `--public-messages true/false` overrides the environment setting.
 Each run starts one shared working container from the **Neutral Looking Buggy Image**.
 Messages and scratchpads use controller-owned SQLite state; MLflow logs the run.
 When public posting is enabled, workers can post updates during their work turns. The controller stamps
-sender and round; every agent sees new posts at the start of its next turn.
+sender and round; worker messages are delivered after all workers finish, before
+manager review. Workers see them in the next round.
 Public posting and private messaging are configured independently.
 When disabled, its tool is omitted and calls are rejected. Everyone still reads
 the public board, and manager assignments, feedback, and leaderboards remain public.
@@ -85,16 +89,16 @@ MANAGER — initial assignment
   │
   ▼
 WORKER PHASE
-  ├── Worker A investigates, optionally posts updates, and submits its patch privately
-  ├── Worker B reads the board, investigates, and posts/submits as permitted
-  └── Continue until every worker has taken its turn
+  ├── Freeze all assigned workers’ round-start contexts
+  ├── Run worker turns concurrently, up to the configured limit
+  └── Wait for every worker, then deliver buffered public/private messages
   │
   │   Patches go privately to the manager.
   │   No manager review between workers.
   ▼
 MANAGER — collective review
   ├── Review all submissions
-  ├── Accept/apply or reject each patch
+  ├── Accept or reject; apply accepted patches sequentially in configured worker order
   ├── Rate each submission
   ├── Publish decisions and feedback
   ├── Publish updated rating board:
@@ -239,13 +243,15 @@ Worker election context
 ├── Own scratchpad
 │   └── Retained notes from the work phase
 │
-├── Public work history
+├── Public work board — unchanged during elections
 │   ├── Task assignments
 │   ├── Acceptance/rejection decisions and feedback
 │   └── Final rating board
 │
-├── Election discussion
-│   └── All statements from completed discussion rounds
+├── Separate election board
+│   ├── All statements from completed discussion rounds — revealed together
+│   ├── Aggregate tally and result — after voting closes
+│   └── Shown once; never copied to the public work board
 │
 ├── Own private inbox
 │   └── Private messages — configurable; delivered between discussion rounds
@@ -260,8 +266,8 @@ Worker election context
 
 ```text
 Every agent — all workers and the retiring manager
-├── Public work history and released election discussion
-├── Final aggregate tally and election result
+├── Public work board — assignments, feedback, and leaderboards
+├── Separate election board — released discussions, final tally, and result
 ├── Own scratchpad, inbox, sent messages, and own ballot if any
 ├── Tools: none
 └── Private output: own open future plan
@@ -292,4 +298,34 @@ resume-election --from-run SOURCE --run-id NEW_ID
 ├── Current prompts remain in separate files and are snapshotted per run
 ├── No previous election content carried over
 └── No mid-turn or interrupted-election recovery
+```
+
+## Parallel stage barriers
+
+```text
+Manager assignment
+        │
+        ▼
+Work round — frozen contexts → concurrent turns → wait for all
+        │
+        ▼
+Deliver worker messages → Manager review → Sequential patch application
+        │
+        ├── Tenure remaining → Next work round
+        └── Retirement
+                │
+                ▼
+Discussion 1 — frozen contexts → concurrent turns → collective reveal
+                │
+                ▼
+Discussion 2 — frozen contexts → concurrent turns → collective reveal
+                │
+                ▼
+Discussion 3 — frozen contexts → concurrent turns → collective reveal
+                │
+                ▼
+Private ballots — concurrent turns → wait for all → Result on election board
+                │
+                ▼
+Private future plans — concurrent turns → wait for all → Finish
 ```

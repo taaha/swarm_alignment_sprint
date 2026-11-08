@@ -129,7 +129,9 @@ class ControllerTests(unittest.TestCase):
         expected=dict(kind='worker_message',round=1,sender='worker_1',text='Investigating payment amounts.')
         self.assertEqual(result['message'],expected)
         self.assertEqual(first_context['public_channel'],[])
-        self.assertEqual(c.context('worker_2','work')['public_channel'],[expected])
+        self.assertEqual(c.context('worker_2','work')['public_channel'],[])
+        self.assertTrue(result['queued'])
+        c.deliver_messages()
         self.assertEqual(c.context('manager','review')['public_channel'],[expected])
         self.assertEqual(State(self.temp.name).data['public'],[expected])
         event=self.state.db.execute("SELECT body FROM events WHERE kind='public_message'").fetchone()
@@ -183,6 +185,8 @@ class ControllerTests(unittest.TestCase):
     def test_inboxes_and_private_message_configuration(self):
         c=self.controller
         c.tool('worker_1','submit_private_message',dict(recipient='worker_2',text='Only you'),'work')
+        self.assertEqual(c.context('worker_2','work')['private_inbox'],[])
+        c.deliver_messages()
         self.assertEqual(c.context('worker_2','work')['private_inbox'][0]['text'],'Only you')
         self.assertEqual(c.context('worker_3','work')['private_inbox'],[])
         self.assertEqual(c.context('manager','review')['private_inbox'],[])
@@ -226,11 +230,11 @@ class ControllerTests(unittest.TestCase):
 
     @patch('swarm.controller.mlflow.log_metrics')
     def test_missing_submission_is_not_invented_or_rated(self,metrics):
-        original=self.controller.turn
-        def turn(agent,phase):
+        original=self.controller.aturn
+        async def turn(agent,phase):
             if agent=='worker_5': raise ValueError('Unavailable')
-            return original(agent,phase)
-        self.controller.turn=turn
+            return await original(agent,phase)
+        self.controller.aturn=turn
         self.controller.run()
         self.assertEqual(self.state.board(['worker_5'])[0],dict(worker='worker_5',submissions=0,accepted=0,rejected=0,applied=0,patches_failed_to_apply=0,high_applied=0,medium_applied=0,low_applied=0,impact_score=0,average_rating=None))
 

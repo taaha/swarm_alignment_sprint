@@ -1,4 +1,5 @@
 """Collective discussion barriers, private voting, and isolated future plans."""
+import asyncio
 import copy
 from collections import Counter
 import json
@@ -8,7 +9,8 @@ import random
 import mlflow
 
 from .models import StatementArgs, BallotArgs, FuturePlanEnd, WorkerEnd, MessageArgs, definition
-from .turns import run_turn, is_agent_failure
+from .parallel import run_stage
+from .turns import run_turn, arun_turn, is_agent_failure
 
 PROMPTS = Path(__file__).resolve().parent.parent/'prompts'
 
@@ -40,7 +42,7 @@ class Election:
         candidates = list(self.workers)
         random.Random(f'{self.seed}:candidates').shuffle(candidates)
         self.e = dict(phase='not_started',discussion_round=0,eligible_candidates=candidates,
-                      pending_statements={},discussion_rounds=[],pending_private_messages=[],
+                      pending_statements={},discussion_rounds=[],board=[],pending_private_messages=[],
                       ballots={},abstentions=[],result=None,future_plans={},future_plan_failures={})
         state.data['election']=self.e
         state.data['status']='running'
@@ -62,11 +64,10 @@ class Election:
             private_messaging_enabled=private,
             scratchpad=s['scratchpads'].get(agent,''),public_channel=copy.deepcopy(s['public']),
             final_rating_board=self.state.board(self.workers),
-            election_discussion=copy.deepcopy(self.e['discussion_rounds']),
+            election_board=copy.deepcopy(self.e['board']),
             private_inbox=copy.deepcopy([m for m in s['private'] if m['recipient']==agent]),
             sent_private_messages=copy.deepcopy([m for m in s['private'] if m['sender']==agent]))
         if phase=='future_plan':
-            context['election_result']=copy.deepcopy(self.e['result'])
             context['own_ballot']=copy.deepcopy(self.e['ballots'].get(agent))
             context['selected_as_successor']=self.e['result']['winner']==agent
         return context
@@ -154,9 +155,15 @@ class Election:
     def turn(self, agent, phase):
         return run_turn(self,agent,phase)
 
+    async def aturn(self, agent, phase):
+        return await arun_turn(self,agent,phase)
+
     def attempt(self, agent, phase):
+        return asyncio.run(self.aattempt(agent,phase))
+
+    async def aattempt(self, agent, phase):
         try:
-            self.turn(agent,phase)
+            await self.aturn(agent,phase)
         except Exception as error:
             if not is_agent_failure(error,self.state): raise
             failure=dict(agent=agent,phase=phase,error=str(error))
@@ -171,8 +178,9 @@ class Election:
         missing=[w for w in self.workers if w not in self.e['pending_statements']]
         record=dict(discussion_round=round,statements=statements,missing_statements=missing)
         self.e['discussion_rounds'].append(record)
-        self.state.public('election_round_revealed',dict(sender='controller',**copy.deepcopy(record)))
-        delivered=copy.deepcopy(self.e['pending_private_messages'])
+        self.e['board'].append(dict(kind='election_round_revealed',round=self.state.data['round'],
+                                    sender='controller',**copy.deepcopy(record)))
+        delivered=copy.deepcopy(sorted(self.e['pending_private_messages'],key=lambda m:self.workers.index(m['sender'])))
         self.state.data['private'].extend(delivered)
         self.e['pending_private_messages']=[]
         self.e['pending_statements']={}
@@ -182,21 +190,25 @@ class Election:
         ballots=self.e['ballots']
         self.e['abstentions']=[dict(voter=w,reason='No valid ballot submitted within the allowed turn') for w in self.workers if w not in ballots]
         self.e['result']=tally_votes(self.workers,ballots,self.seed)
-        self.state.public('election_result',dict(sender='controller',**copy.deepcopy(self.e['result'])))
+        self.e['board'].append(dict(kind='election_result',round=self.state.data['round'],
+                                    sender='controller',**copy.deepcopy(self.e['result'])))
         self.emit('election_result_announced',dict(result=self.e['result'],abstentions=self.e['abstentions'],seed=self.seed))
 
     def run(self):
+        return asyncio.run(self.arun())
+
+    async def arun(self):
         self.emit('election_started',dict(eligible_candidates=self.e['eligible_candidates'],seed=self.seed))
         for round in range(1,4):
             phase=f'discussion_{round}'
             self.prepare_phase(phase,self.workers,round)
-            for worker in self.workers: self.attempt(worker,phase)
+            await run_stage(self,phase,self.workers,self.aattempt)
             self.reveal_round()
         self.prepare_phase('ballot',self.workers)
-        for worker in self.workers: self.attempt(worker,'ballot')
+        await run_stage(self,'ballot',self.workers,self.aattempt)
         self.announce()
         self.prepare_phase('future_plan',self.agents)
-        for agent in self.agents: self.attempt(agent,'future_plan')
+        await run_stage(self,'future_plan',self.agents,self.aattempt)
         self.e['phase']='finished'
         self.e['future_planning_complete']=len(self.e['future_plans'])==len(self.agents)
         self.state.data['status']='completed' if self.e['result']['winner'] is not None else 'election_incomplete'

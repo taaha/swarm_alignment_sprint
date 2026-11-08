@@ -107,8 +107,8 @@ current status calculations use the added fields.
 
 When `SWARM_PUBLIC_MESSAGES=true`, workers can call `submit_public_message(text)` during work turns to post progress,
 findings, or coordination. The controller assigns sender and round, persists the
-post, and logs it to MLflow. All agents see new posts when their next turn starts;
-later workers can see earlier workers' posts in the same round. Public posting
+post, and logs it to MLflow. Worker messages are buffered until every worker
+finishes, then delivered before manager review. Workers see them next round. Public posting
 does not depend on private messaging being enabled. Blank messages, spoofed
 metadata, and standard unified diffs are rejected; patches belong in submit_patch.
 The manager continues publishing assignments, decisions, and the cumulative
@@ -122,8 +122,8 @@ Each agent sees its own scratchpad, public assignments/decisions/board/worker po
 own inbox and sent private messages. Workers do not receive other workers' diffs,
 private messages, or notes. Manager context additionally contains the 100
 symptom-only issues and submitted patches. Private messages arrive at the
-recipient's next turn during work; later workers in a work round may see messages sent by earlier
-workers. There are no extra turns just to receive messages. Scratchpads are
+round boundary during work: the manager sees them at review and workers in their
+next round. Manager messages are visible before the following work round. There are no extra turns just to receive messages. Scratchpads are
 returned as structured notes and persisted by the controller, not direct file edits.
 
 The manager's completed-round tenure is visible to all agents. After its final
@@ -135,7 +135,7 @@ work-only `election_pending` checkpoint; old run data is never replayed or chang
 
 All workers are candidates and voters, including workers with poor work records.
 Self-votes are allowed. The retired manager has no discussion or ballot turns.
-Each of three discussion rounds runs workers sequentially with frozen context:
+Each of three discussion rounds runs workers concurrently with frozen context:
 current-round statements remain private until every worker has attempted the
 round. The controller then reveals a batch in reproducibly shuffled order.
 Each worker can submit one statement of up to 6,000 characters. Failed statements
@@ -155,8 +155,12 @@ the election seed and the sorted tied candidate list; statement display shuffles
 use separate random streams. The seed is operator-only. Missing votes count as
 abstentions; at least one valid ballot is needed to select a successor. A valid
 submitted statement/vote is kept even if the agent later fails to finish its notes.
-The controller publishes the aggregate tally and winner, keeping attributed
-ballots private to operators.
+The controller publishes released discussion rounds and the aggregate tally and
+winner on a separate `election_board`, keeping attributed ballots private to
+operators. The public work board stays unchanged throughout elections. Agent
+contexts contain each released election entry once, without duplicate discussion
+or result fields. Exports include `election.md` alongside the work board in
+`public.md`; existing saved runs retain their original format.
 
 After the result, all agents (retired manager plus every worker) receive a frozen
 private planning context containing public history/result and only their own
@@ -363,3 +367,42 @@ per-run usage totals. The election audit verified that all 45 captured source
 files stayed unchanged. Frozen images, existing shops, prior run databases,
 local and sibling settings, and Git HEAD were unchanged. The work container and
 all private artifacts are retained. No second live election was run.
+
+## Parallel execution
+
+`--concurrency N` overrides `SWARM_CONCURRENCY` (default **5**, positive integer).
+The limit applies to worker turns, each election discussion, ballots, and private
+future plans; it can also be overridden for `resume-election`. Older checkpoints
+without this setting default to five. Concurrency one still uses frozen contexts
+and boundary-based message delivery.
+
+All participants receive snapshots made before their stage starts, including
+those waiting for a slot. Free slots start the next participant in configured
+order. Manager assignments/reviews and each agent's own tool/model sequence stay
+sequential. Accepted patches apply in configured worker order, independent of
+completion order. Tools and SQLite writes stay on the controller thread; only
+model HTTP waits overlap. No patched code is executed.
+
+`parallel_stage_started/finished` and `parallel_turn_started/finished` events
+record stage duration and active turn counts. Model events include agent and
+phase identity. A failed agent releases its slot; logging/infrastructure failures
+cancel outstanding requests and stop scheduling without advancing the barrier.
+
+### Verified five-worker parallel Gemma experiment
+
+`pipeline-20261108-gemma4-31b-parallel-5x3` completed all 45 turns with
+`gemma4:31b`, thinking enabled, and concurrency five. All eight parallel stages
+reached five overlapping model requests. Work took 260.0 seconds; the complete
+election took 46.6 seconds. All 55 scripted tests and the live audit passed.
+
+The manager accepted 15 patches: four applied and eleven failed to apply. There
+were no failed turns; three final-response repairs and one read-argument error
+were recovered. Worker 1 received all five votes; all six future plans were saved.
+Thinking was requested for every call, but Gemma returned no thinking text for
+four turns. No fix correctness tests or matching sequential speed comparison ran.
+
+See the local [timing and leaderboard report](data/controller/runs/pipeline-20261108-gemma4-31b-parallel-5x3/parallel-validation.md)
+and [MLflow run](http://localhost:5000/#/experiments/1/runs/64122ea072204ecda4cac0ccd3ed2142).
+Existing runs, application containers, saved images, environment files, and Git
+HEAD were verified unchanged. The new working container and full records remain
+available for inspection.

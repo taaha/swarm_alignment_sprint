@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import json
 import os
 import sys
@@ -27,7 +28,11 @@ def boolean(value):
 
 
 def thinking(value):
-    return False if value in ['off','false','none'] else value
+    if isinstance(value,bool):
+        return value
+    if value.lower() in ['on','true']:
+        return True
+    return False if value.lower() in ['off','false','none'] else value
 
 
 def parser():
@@ -36,6 +41,7 @@ def parser():
     p.add_argument('--run-id')
     p.add_argument('--from-run')
     p.add_argument('--workers',type=int,default=int(os.getenv('SWARM_WORKERS','5')))
+    p.add_argument('--concurrency',type=int,default=int(os.getenv('SWARM_CONCURRENCY','5')))
     p.add_argument('--rounds',type=int,default=int(os.getenv('SWARM_ROUNDS','3')))
     p.add_argument('--private-messages',type=boolean,default=boolean(os.getenv('SWARM_PRIVATE_MESSAGES','true')))
     p.add_argument('--public-messages',type=boolean,default=boolean(os.getenv('SWARM_PUBLIC_MESSAGES','false')))
@@ -102,16 +108,17 @@ def main():
         if forbidden:
             raise ValueError('Cannot override inherited work settings: '+', '.join(sorted(forbidden)))
         for name in ['private_messages','election_seed','manager_model','worker_model','manager_thinking',
-                     'worker_thinking','max_tokens','worker_call_limit','manager_call_limit','temperature']:
+                     'worker_thinking','concurrency','max_tokens','worker_call_limit','manager_call_limit','temperature']:
             if '--'+name.replace('_','-') in explicit:
                 config[name] = getattr(args,name)
+        config.setdefault('concurrency',5)
         config['election'] = True
         config['workflow'] = 'election_only'
     else:
         if args.from_run:
             raise ValueError('--from-run is only valid with resume-election')
         config={k:v for k,v in vars(args).items() if k not in ['command','run_id','from_run']}
-    if not 1<=config['workers']<=100 or config['rounds']<1 or min(config['max_tokens'],config['worker_call_limit'],config['manager_call_limit'])<1:
+    if not 1<=config['workers']<=100 or config['rounds']<1 or min(config['max_tokens'],config['worker_call_limit'],config['manager_call_limit'],config['concurrency'])<1:
         raise ValueError('Worker count must be 1–100; rounds and limits must be positive')
     if not os.getenv('OLLAMA_API_KEY'):
         raise ValueError('OLLAMA_API_KEY is missing')
@@ -135,21 +142,23 @@ def main():
         provider=Ollama(os.getenv('OLLAMA_BASE_URL','https://ollama.com/v1'),os.environ['OLLAMA_API_KEY'],telemetry)
         for model,effort in set([(config['manager_model'],config['manager_thinking']),(config['worker_model'],config['worker_thinking'])]):
             provider.check(model,effort)
-        if resumed:
-            telemetry.event('election_resumed',state.data['lineage'])
-            Election(state,config,provider,telemetry).run()
-        else:
-            workspace=Workspace(run_id)
-            state.data['container_id']=workspace.container.id
-            state.save()
-            controller=Controller(state,config,workspace,provider,telemetry,json.loads(Path('/opt/controller/issues.json').read_text()))
-            controller.run()
-            if state.data['status']=='election_pending':
-                path, checkpoint_hash = save_checkpoint(state)
-                telemetry.event('work_checkpoint_saved',dict(path=path.name,sha256=checkpoint_hash))
-                telemetry.checkpoint(path)
-                if config['election']:
-                    Election(state,config,provider,telemetry).run()
+        async def execute():
+            if resumed:
+                telemetry.event('election_resumed',state.data['lineage'])
+                await Election(state,config,provider,telemetry).arun()
+            else:
+                workspace=Workspace(run_id)
+                state.data['container_id']=workspace.container.id
+                state.save()
+                controller=Controller(state,config,workspace,provider,telemetry,json.loads(Path('/opt/controller/issues.json').read_text()))
+                await controller.arun()
+                if state.data['status']=='election_pending':
+                    path, checkpoint_hash = save_checkpoint(state)
+                    telemetry.event('work_checkpoint_saved',dict(path=path.name,sha256=checkpoint_hash))
+                    telemetry.checkpoint(path)
+                    if config['election']:
+                        await Election(state,config,provider,telemetry).arun()
+        asyncio.run(execute())
         telemetry.finish()
         print(json.dumps(dict(run_id=run_id,mlflow_run_id=telemetry.run_id,status=state.data['status'],board=state.board(state.data['workers']),
             election_result=state.data.get('election',{}).get('result'),private_plans_collected=len(state.data.get('election',{}).get('future_plans',{}))),indent=2))

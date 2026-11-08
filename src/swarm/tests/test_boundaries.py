@@ -100,6 +100,29 @@ class LoggingTests(unittest.TestCase):
 
 
 class ProviderTests(unittest.TestCase):
+    def test_boolean_thinking_is_sent_as_json_boolean(self):
+        from swarm.cli import thinking
+        for value in ['on','true','TRUE',True]:
+            self.assertIs(thinking(value),True)
+        for value in ['off','false','none',False]:
+            self.assertIs(thinking(value),False)
+        for value in ['low','medium','high']:
+            self.assertEqual(thinking(value),value)
+        with tempfile.TemporaryDirectory() as directory:
+            provider=Ollama('https://example.test','test-key',Journal(State(directory)))
+            calls=[]
+            def request(req):
+                body=json.loads(req.content)
+                calls.append(body)
+                if req.url.path=='/api/show':
+                    return httpx.Response(200,json=dict(capabilities=['thinking','tools'],thinking=dict(values=[False,True])))
+                return httpx.Response(200,json=dict(message=dict(role='assistant',thinking='Reasoning',content='{}')))
+            provider.http=httpx.Client(base_url='https://example.test',transport=httpx.MockTransport(request))
+            provider.async_transport=provider.http._transport
+            provider.check('gemma',thinking('on'))
+            provider.chat('gemma',thinking('on'),[],[],dict(temperature=.7,max_tokens=100))
+            self.assertIs(calls[-1]['think'],True)
+
     def test_thinking_tools_and_transient_retry(self):
         with tempfile.TemporaryDirectory() as directory:
             journal=Journal(State(directory))
@@ -113,8 +136,9 @@ class ProviderTests(unittest.TestCase):
                 if len(calls)==2: return httpx.Response(503,text='Unavailable')
                 return httpx.Response(200,json=dict(message=dict(role='assistant',thinking='Reasoning returned by provider',content='{}')))
             provider.http=httpx.Client(base_url='https://example.test',transport=httpx.MockTransport(request))
+            provider.async_transport=provider.http._transport
             provider.check('model','high')
-            with patch('swarm.provider.time.sleep'):
+            with patch('swarm.provider.asyncio.sleep'):
                 response=provider.chat('model','high',[],[],dict(temperature=.7,max_tokens=100))
             self.assertTrue(response['message']['thinking'])
             self.assertEqual(calls[-1]['think'],'high')

@@ -9,6 +9,8 @@ def audit_election(state, events, initial_private=None):
     released=[];public_election=[];pending={};queued=[];private=list(initial_private or []);ballots={};plans={}
     phase=None;attempted=set();phase_public=None;phase_contexts={};result=None
     seed=state['config']['election_seed']
+    separate_board='board' in election
+    work_public=None
     for event in events:
         kind,body=event['kind'],event['body']
         if kind=='private_message': private.append(body)
@@ -24,12 +26,19 @@ def audit_election(state, events, initial_private=None):
                 assert forbidden not in ctx,forbidden
             assert ctx['private_inbox']==[m for m in private if m['recipient']==agent]
             assert ctx['sent_private_messages']==[m for m in private if m['sender']==agent]
-            assert ctx['election_discussion']==released
-            assert [m for m in ctx['public_channel'] if m['kind'].startswith('election_')]==public_election
+            if separate_board:
+                assert ctx['election_board']==public_election
+                assert 'election_discussion' not in ctx and 'election_result' not in ctx
+                assert not any(m['kind'].startswith('election_') for m in ctx['public_channel'])
+                if work_public is None: work_public=ctx['public_channel']
+                assert ctx['public_channel']==work_public
+            else:  # Historical runs used the work board and a duplicate context field.
+                assert ctx['election_discussion']==released
+                assert [m for m in ctx['public_channel'] if m['kind'].startswith('election_')]==public_election
             if phase_public is None: phase_public=ctx['public_channel']
             assert ctx['public_channel']==phase_public
             if phase=='future_plan':
-                assert ctx['election_result']==result
+                if not separate_board: assert ctx['election_result']==result
                 assert ctx['own_ballot']==ballots.get(agent)
                 assert ctx['selected_as_successor']==(result['winner']==agent)
             else: assert 'own_ballot' not in ctx and 'election_result' not in ctx
@@ -67,8 +76,9 @@ def audit_election(state, events, initial_private=None):
             ordered=[pending[w] for w in workers if w in pending]
             random.Random(f'{seed}:discussion:{body["discussion_round"]}').shuffle(ordered)
             assert statements==ordered
-            assert body['private_messages_delivered']==queued
-            private.extend(queued);queued=[];pending={}
+            delivered=sorted(queued,key=lambda m:workers.index(m['sender'])) if 'concurrency' in state['config'] else queued
+            assert body['private_messages_delivered']==delivered
+            private.extend(delivered);queued=[];pending={}
             record={k:body[k] for k in ['discussion_round','statements','missing_statements']}
             released.append(record)
             public_election.append(dict(kind='election_round_revealed',round=state['round'],sender='controller',**record))
@@ -102,8 +112,13 @@ def audit_election(state, events, initial_private=None):
     assert election['phase']=='finished' and election['future_planning_complete']==(len(plans)==len(agents))
     assert election['pending_private_messages']==[] and election['pending_statements']=={}
     assert state['status']==('completed' if result['winner'] is not None else 'election_incomplete')
-    assert [m for m in state['public'] if m['kind'].startswith('election_')]==public_election
-    assert state['public'][-1]['kind']=='election_result'
+    if separate_board:
+        assert election['board']==public_election
+        assert state['public']==work_public
+        assert not any(m['kind'].startswith('election_') for m in state['public'])
+    else:
+        assert [m for m in state['public'] if m['kind'].startswith('election_')]==public_election
+        assert state['public'][-1]['kind']=='election_result'
     return dict(election_result=result,discussion_statements=sum(len(r['statements']) for r in released),
         election_ballots=len(ballots),private_future_plans=len(plans),
         missing_future_plans=list(election['future_plan_failures']),

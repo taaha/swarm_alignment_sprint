@@ -64,6 +64,8 @@ class ElectionTests(unittest.TestCase):
 
     @patch('swarm.election.mlflow.log_metrics')
     def test_complete_election_and_private_plans(self,metrics):
+        self.state.data['public']=[dict(kind='rating_board',round=3,board=[])]
+        original_public=copy.deepcopy(self.state.data['public'])
         election=self.make();election.run();s=self.state.data;e=s['election']
         self.assertEqual(s['status'],'completed')
         self.assertEqual(len(e['discussion_rounds']),3)
@@ -74,9 +76,15 @@ class ElectionTests(unittest.TestCase):
         self.assertTrue(audit_election(s,events)['future_plan_isolation_verified'])
         self.assertEqual(e['result'],tally_votes(election.workers,e['ballots'],42))
         self.assertTrue(e['result']['tie_break_used'])
-        self.assertEqual([m['kind'] for m in s['public']],['election_round_revealed']*3+['election_result'])
-        self.assertNotIn('future_plan',json.dumps(s['public']))
+        self.assertEqual([m['kind'] for m in e['board']],['election_round_revealed']*3+['election_result'])
+        self.assertEqual(s['public'],original_public)
+        self.assertNotIn('future_plan',json.dumps(e['board']))
+        self.assertNotIn(' private from ',json.dumps(e['board']))
+        self.assertNotIn('own notes',json.dumps(e['board']))
         for ctx in self.provider.contexts:
+            self.assertEqual(ctx['public_channel'],original_public)
+            self.assertNotIn('election_discussion',ctx)
+            self.assertNotIn('election_result',ctx)
             self.assertNotIn('ballots',ctx)
             self.assertNotIn('future_plans',ctx)
             self.assertNotIn('election_seed',ctx)
@@ -85,11 +93,11 @@ class ElectionTests(unittest.TestCase):
             self.assertTrue(all(m['recipient']==ctx['agent'] for m in ctx['private_inbox']))
             if ctx['phase'].startswith('discussion_'):
                 n=ctx['discussion_round']
-                self.assertEqual(len(ctx['election_discussion']),n-1)
+                self.assertEqual(len(ctx['election_board']),n-1)
                 self.assertTrue(all(not m.get('phase','').startswith('discussion_') or m['discussion_round']<n for m in ctx['private_inbox']))
-            if ctx['phase']=='ballot': self.assertEqual(len(ctx['election_discussion']),3)
+            if ctx['phase']=='ballot': self.assertEqual(len(ctx['election_board']),3)
             if ctx['phase']=='future_plan':
-                self.assertEqual(ctx['election_result'],e['result'])
+                self.assertEqual(ctx['election_board'][-1],dict(kind='election_result',round=s['round'],sender='controller',**e['result']))
                 self.assertEqual(ctx['own_ballot'],e['ballots'].get(ctx['agent']))
         for ctx,names in zip(self.provider.contexts,self.provider.toolsets):
             if ctx['phase']=='future_plan': self.assertEqual(names,[])
@@ -98,6 +106,11 @@ class ElectionTests(unittest.TestCase):
         export(self.state,Path(self.temp.name)/'export')
         self.assertEqual(len(list((Path(self.temp.name)/'export/private_future_plans').glob('*.txt'))),6)
         self.assertNotIn('Private next steps',(Path(self.temp.name)/'export/public.md').read_text())
+        election_text=(Path(self.temp.name)/'export/election.md').read_text()
+        self.assertEqual(election_text.count('"kind": "election_round_revealed"'),3)
+        self.assertEqual(election_text.count('"kind": "election_result"'),1)
+        self.assertNotIn('Private next steps',election_text)
+        self.assertNotIn('election_result',(Path(self.temp.name)/'export/public.md').read_text())
 
     @patch('swarm.election.mlflow.log_metrics')
     def test_audit_catches_early_reveals_and_foreign_ballots(self,metrics):
@@ -105,12 +118,43 @@ class ElectionTests(unittest.TestCase):
         events=[dict(kind=r['kind'],body=json.loads(r['body'])) for r in self.state.db.execute('SELECT * FROM events ORDER BY id')]
         altered=copy.deepcopy(events)
         start=next(r for r in altered if r['kind']=='turn_start' and r['body']['phase']=='discussion_1')
-        start['body']['context']['election_discussion']=e.e['discussion_rounds'][:1]
+        start['body']['context']['election_board']=e.e['board'][:1]
         with self.assertRaises(AssertionError): audit_election(self.state.data,altered)
         altered=copy.deepcopy(events)
         start=next(r for r in altered if r['kind']=='turn_start' and r['body']['phase']=='future_plan' and r['body']['agent']=='worker_1')
         start['body']['context']['own_ballot']=e.e['ballots']['worker_2']
         with self.assertRaises(AssertionError): audit_election(self.state.data,altered)
+
+    @patch('swarm.election.mlflow.log_metrics')
+    def test_audit_rejects_duplicate_boards_and_supports_historical_runs(self,metrics):
+        e=self.make();e.run()
+        events=[dict(kind=r['kind'],body=json.loads(r['body'])) for r in self.state.db.execute('SELECT * FROM events ORDER BY id')]
+        altered=copy.deepcopy(events)
+        ctx=next(r['body']['context'] for r in altered if r['kind']=='turn_start' and r['body']['phase']=='ballot')
+        ctx['public_channel'].extend(copy.deepcopy(ctx['election_board']))
+        with self.assertRaises(AssertionError): audit_election(self.state.data,altered)
+        altered=copy.deepcopy(events)
+        ctx=next(r['body']['context'] for r in altered if r['kind']=='turn_start' and r['body']['phase']=='ballot')
+        ctx['election_discussion']=copy.deepcopy(e.e['discussion_rounds'])
+        with self.assertRaises(AssertionError): audit_election(self.state.data,altered)
+
+        # Reconstruct the historical context shape without changing any saved runs.
+        historical=copy.deepcopy(self.state.data)
+        historical['public'].extend(historical['election'].pop('board'))
+        old_events=copy.deepcopy(events)
+        def old_context(ctx):
+            board=ctx.pop('election_board')
+            ctx['public_channel'].extend(board)
+            ctx['election_discussion']=[{k:m[k] for k in ('discussion_round','statements','missing_statements')}
+                                       for m in board if m['kind']=='election_round_revealed']
+            if ctx['phase']=='future_plan': ctx['election_result']=copy.deepcopy(e.e['result'])
+        for event in old_events:
+            if event['kind']=='turn_start': old_context(event['body']['context'])
+            if event['kind']=='model_request':
+                message=event['body']['request']['messages'][1]
+                ctx=json.loads(message['content']);old_context(ctx)
+                message['content']=json.dumps(ctx)
+        self.assertTrue(audit_election(historical,old_events)['collective_reveals_verified'])
 
     def test_round_barrier_and_private_delivery(self):
         e=self.make();e.prepare_phase('discussion_1',e.workers,1)
@@ -120,9 +164,11 @@ class ElectionTests(unittest.TestCase):
         self.assertEqual(e.context('worker_2','discussion_1')['private_inbox'],[])
         self.assertEqual(self.state.data['public'],[])
         self.assertEqual(self.state.data['private'],[])
+        self.assertEqual(e.context('worker_2','discussion_1')['election_board'],[])
+        self.assertEqual(e.e['board'],[])
         e.reveal_round();e.prepare_phase('discussion_2',e.workers,2)
         self.assertEqual(e.context('worker_2','discussion_2')['private_inbox'][0]['text'],'Private first-round message')
-        self.assertEqual(len(e.context('worker_2','discussion_2')['election_discussion']),1)
+        self.assertEqual(len(e.context('worker_2','discussion_2')['election_board']),1)
 
     def test_permissions_duplicates_and_candidate_validation(self):
         e=self.make();e.prepare_phase('discussion_1',e.workers,1)
@@ -177,7 +223,8 @@ class ElectionTests(unittest.TestCase):
 
     def test_infrastructure_failure_stops(self):
         e=self.make();e.prepare_phase('discussion_1',e.workers,1)
-        e.turn=lambda *args: (_ for _ in ()).throw(LoggingError('Logging unavailable'))
+        async def fail(*args): raise LoggingError('Logging unavailable')
+        e.aturn=fail
         with self.assertRaises(LoggingError): e.attempt('worker_1','discussion_1')
         self.assertEqual(e.e['ballots'],{})
 

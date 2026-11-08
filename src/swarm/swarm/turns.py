@@ -1,4 +1,6 @@
 """Shared, logged execution for work, election, and private planning turns."""
+import asyncio
+import inspect
 import json
 import time
 
@@ -15,6 +17,10 @@ def is_agent_failure(error, state):
 
 
 def run_turn(owner, agent, phase):
+    return asyncio.run(arun_turn(owner, agent, phase))
+
+
+async def arun_turn(owner, agent, phase):
     manager = agent == 'manager'
     instructions = owner.instructions(agent, phase)
     context = owner.context(agent, phase)
@@ -34,7 +40,10 @@ def run_turn(owner, agent, phase):
         span.set_inputs(owner.telemetry.clean(context))
         try:
             for call_index in range(limit):
-                response = owner.provider.chat(model, thinking, messages, available_tools, owner.config)
+                chat = getattr(owner.provider, 'achat', owner.provider.chat)
+                response = chat(model, thinking, messages, available_tools, owner.config)
+                if inspect.isawaitable(response):
+                    response = await response
                 message = response['message']
                 thinking_chars += len(message.get('thinking', ''))
                 messages.append(message)
@@ -77,8 +86,8 @@ def run_turn(owner, agent, phase):
                 span.set_outputs(owner.telemetry.clean(result.model_dump()))
                 return result
             raise TurnLimitError('Per-turn model-call limit exhausted')
-        except Exception as error:
-            record.update(status='failed', error=owner.telemetry.clean(str(error)), thinking_characters=thinking_chars, seconds=round(time.monotonic() - started, 3))
+        except (Exception, asyncio.CancelledError) as error:
+            record.update(status='cancelled' if isinstance(error,asyncio.CancelledError) else 'failed', error=owner.telemetry.clean(str(error)), thinking_characters=thinking_chars, seconds=round(time.monotonic() - started, 3))
             owner.state.data['turns'].append(record)
             owner.emit('turn_failed', record)
             raise

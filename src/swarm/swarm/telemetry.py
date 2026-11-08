@@ -106,6 +106,9 @@ def export(state, destination):
     if 'election' in state.data:
         election=state.data['election']
         (destination/'election.json').write_text(json.dumps(election,indent=2)+'\n')
+        if 'board' in election:
+            (destination/'election.md').write_text('# Election board\n\n'+'\n\n'.join(
+                '```json\n'+json.dumps(m,indent=2)+'\n```' for m in election['board'])+'\n')
         plans=destination/'private_future_plans'
         plans.mkdir(exist_ok=True)
         for agent,plan in election['future_plans'].items():

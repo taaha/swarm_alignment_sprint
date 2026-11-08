@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json
 import re
@@ -9,7 +10,8 @@ import httpx
 from .models import ManagerEnd, WorkerEnd, ReadArgs, PatchArgs, AcceptArgs, MessageArgs, PublicMessageArgs, tools
 from .workspace import patch_paths
 from .provider import ProviderError
-from .turns import TurnLimitError, run_turn
+from .turns import TurnLimitError, run_turn, arun_turn, is_agent_failure
+from .parallel import run_stage
 
 PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
@@ -17,6 +19,8 @@ PROMPT_DIR = Path(__file__).resolve().parent.parent / "prompts"
 class Controller:
     def __init__(self, state, config, workspace, provider, telemetry, issues):
         self.state,self.config,self.workspace,self.provider,self.telemetry = state,config,workspace,provider,telemetry
+        self.snapshots={}
+        state.data.setdefault('pending_work_messages',[])
         self.workers = ['worker_'+str(i) for i in range(1,config['workers']+1)]
         self.agents = ['manager',*self.workers]
         if not state.data['tasks']:
@@ -30,6 +34,8 @@ class Controller:
         return self.telemetry.event(kind,body)
 
     def context(self, agent, phase):
+        if phase=='work' and agent in self.snapshots:
+            return copy.deepcopy(self.snapshots[agent])
         s = self.state.data
         context = dict(agent=agent,phase=phase,round=s['round'],tenure_rounds=self.config['rounds'],
             completed_rounds=s['completed_rounds'],remaining_rounds=self.config['rounds']-s['completed_rounds'],
@@ -49,7 +55,7 @@ class Controller:
     def pending(self):
         s = self.state.data
         reviewed = {d['submission_id'] for d in s['decisions']}
-        return [p for p in s['submissions'] if p['round']==s['round'] and p['id'] not in reviewed]
+        return sorted([p for p in s['submissions'] if p['round']==s['round'] and p['id'] not in reviewed],key=lambda p:self.workers.index(p['worker']))
 
     def tool(self, agent, name, arguments, phase):
         if name == 'read_search_files':
@@ -61,14 +67,19 @@ class Controller:
                 raise ValueError('Public message cannot be blank')
             if re.search(r'^(?:diff --git |--- (?:a/|/dev/null)|\+\+\+ (?:b/|/dev/null)|@@ -\d)',text,re.M):
                 raise ValueError('Send patch diffs privately through submit_patch, not the public board')
-            message = self.state.public('worker_message',dict(sender=agent,text=text))
-            self.emit('public_message',message)
-            return dict(posted=True,message=message,visibility='All agents see this public post at the start of their next turn')
+            message = dict(kind='worker_message',round=self.state.data['round'],sender=agent,text=text)
+            self.state.data['pending_work_messages'].append(dict(visibility='public',message=message))
+            self.emit('work_message_queued',dict(visibility='public',message=message))
+            return dict(queued=True,message=message,visibility='Delivered after all workers finish, before manager review; workers see it next round')
         if name == 'submit_private_message' and self.config['private_messages']:
             args = MessageArgs.model_validate(arguments)
             if args.recipient not in self.agents or args.recipient==agent:
                 raise ValueError('Recipient must be a different known agent')
             message = dict(sender=agent,recipient=args.recipient,text=args.text,round=self.state.data['round'])
+            if phase=='work':
+                self.state.data['pending_work_messages'].append(dict(visibility='private',message=message))
+                self.emit('work_message_queued',dict(visibility='private',message=message))
+                return dict(queued=True,delivery='After all workers finish; manager review or recipient next work round')
             self.state.data['private'].append(message)
             self.emit('private_message',message)
             return dict(sent=True,delivery='Recipient sees it at the start of its next turn')
@@ -149,6 +160,31 @@ class Controller:
     def turn(self, agent, phase):
         return run_turn(self, agent, phase)
 
+    async def aturn(self, agent, phase):
+        return await arun_turn(self,agent,phase)
+
+    async def attempt(self, agent, phase):
+        try:
+            await self.aturn(agent,phase)
+        except Exception as error:
+            if not is_agent_failure(error,self.state): raise
+            self.state.public('worker_turn_failed',dict(worker=agent,feedback='Worker turn failed; no invented rating. See operator trace.'))
+            self.emit('worker_turn_skipped',dict(worker=agent,error=str(error)))
+
+    def deliver_messages(self):
+        pending=self.state.data['pending_work_messages']
+        ordered=[item for worker in self.workers for item in pending if item['message']['sender']==worker]
+        self.state.data['pending_work_messages']=[]
+        for item in ordered:
+            message=item['message']
+            if item['visibility']=='public':
+                self.state.data['public'].append(message)
+                self.emit('public_message',message)
+            else:
+                self.state.data['private'].append(message)
+                self.emit('private_message',message)
+        self.emit('work_messages_delivered',dict(round=self.state.data['round'],messages=ordered))
+
     def assignments(self, assignments):
         self.state.data['assignments']={a.worker:a.model_dump() for a in assignments}
         for assignment in assignments:
@@ -164,7 +200,7 @@ class Controller:
                             decision='reject',application=dict(status='not_requested'))
             s['decisions'].append(decision)
             self.emit('rejection',decision)
-        for submission in [p for p in s['submissions'] if p['round']==s['round']]:
+        for submission in sorted([p for p in s['submissions'] if p['round']==s['round']],key=lambda p:self.workers.index(p['worker'])):
             decision = next(d for d in s['decisions'] if d['submission_id']==submission['id'])
             if decision['decision']=='accept':
                 self.emit('patch_application_start',dict(submission_id=submission['id']))
@@ -190,10 +226,13 @@ class Controller:
         mlflow.log_metrics(metrics,step=s['completed_rounds'])
 
     def run(self):
+        return asyncio.run(self.arun())
+
+    async def arun(self):
         s=self.state.data
         s['status']='running'
         self.emit('run_started',dict(config=self.config,container_id=s['container_id']))
-        initial=self.turn('manager','initial')
+        initial=await self.aturn('manager','initial')
         self.assignments(initial.assignments)
         while s['completed_rounds']<self.config['rounds']:
             if not s['assignments']:
@@ -202,18 +241,14 @@ class Controller:
                 self.emit('tasks_exhausted',dict(completed_rounds=s['completed_rounds']))
                 return
             s['round']=s['completed_rounds']+1
-            for worker in self.workers:
-                if worker not in s['assignments']:
-                    continue
-                try:
-                    self.turn(worker,'work')
-                except Exception as error:
-                    # Infrastructure/logging failures must stop; completed provider failures may be skipped.
-                    if not isinstance(error,(httpx.HTTPError,ValueError,TurnLimitError,ProviderError)) or self.state.db.execute('SELECT count(*) FROM events WHERE logged=0').fetchone()[0]:
-                        raise
-                    self.state.public('worker_turn_failed',dict(worker=worker,feedback='Worker turn failed; no invented rating. See operator trace.'))
-                    self.emit('worker_turn_skipped',dict(worker=worker,error=str(error)))
-            result=self.turn('manager','review')
+            participants=[w for w in self.workers if w in s['assignments']]
+            self.snapshots={}
+            self.snapshots={w:self.context(w,'work') for w in participants}
+            self.emit('work_contexts_frozen',dict(round=s['round'],participants=participants))
+            await run_stage(self,'work',participants,self.attempt)
+            self.deliver_messages()
+            self.snapshots={}
+            result=await self.aturn('manager','review')
             self.review(result)
             if s['completed_rounds']==self.config['rounds']:
                 s['assignments']={}

@@ -80,7 +80,7 @@ def tools(manager, private, public=False):
     else:
         result.append(definition('submit_patch','Submit one unified diff privately to the manager for your assigned task. Use a/ and b/ project-relative paths and real line numbers with context. This does not edit files.', PatchArgs))
         if public:
-            result.append(definition('submit_public_message','Post a concise progress update, finding, or coordination message to the public board. All agents see it at the start of their next turn. Do not post patches or private content. Sender and round are assigned by the controller.', PublicMessageArgs))
+            result.append(definition('submit_public_message','Post a concise progress update, finding, or coordination message to the public board. Delivered after all workers finish, before manager review; workers see it next round. Do not post patches or private content. Sender and round are assigned by the controller.', PublicMessageArgs))
     if private:
-        result.append(definition('submit_private_message','Send a private message to a specific other agent. It is visible at their next turn.',MessageArgs))
+        result.append(definition('submit_private_message','Send a private message to a specific other agent. During work, worker messages are buffered until every worker finishes; the manager sees them at review and workers next round. Manager messages arrive before the following work round.',MessageArgs))
     return result

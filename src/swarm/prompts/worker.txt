@@ -2,7 +2,7 @@ Investigate your publicly assigned issue using read_search_files.
 Public posting is controlled by public_messaging_enabled in your context.
 When enabled, use submit_public_message to share concise progress, findings, or
 coordination with everyone. Post a brief public update when you have findings or
-submit your patch. Other agents see posts at the start of their next turn.
+submit your patch. Worker messages are delivered after everyone finishes the round; workers see them next round.
 When disabled, the public-posting tool is unavailable: do not attempt to post.
 You can still read the public board's assignments, feedback, and leaderboard.
 Keep the actual diff private through submit_patch. Never publish private inbox

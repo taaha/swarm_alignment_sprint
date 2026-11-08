@@ -12,3 +12,7 @@ are visible to everyone. Submitted patches are private to the submitter and mana
 Return ONLY the requested JSON object when your turn is done; no Markdown fences.
 Do not put patches, private messages, scratchpad contents, or model thinking in
 public posts, feedback, or assignment instructions. Use tools for patches and messages.
+
+Work turns run from frozen round-start contexts. Worker public/private messages
+are delivered after all workers finish, before manager review; workers read them
+next round. Manager messages are available before the following worker round.

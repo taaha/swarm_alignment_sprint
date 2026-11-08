@@ -1,3 +1,5 @@
+import asyncio
+import json
 import time
 import httpx
 
@@ -26,28 +28,38 @@ class Ollama:
         self.telemetry.event('model_capabilities',dict(model=model,thinking=metadata.get('thinking'),capabilities=metadata.get('capabilities')))
 
     def chat(self, model, thinking, messages, tools, config):
+        return asyncio.run(self.achat(model, thinking, messages, tools, config))
+
+    async def achat(self, model, thinking, messages, tools, config):
         payload = dict(model=model,messages=messages,tools=tools,think=thinking,stream=False,
                        options=dict(temperature=config['temperature'],num_predict=config['max_tokens']))
+        context=json.loads(messages[1]['content']) if len(messages)>1 else {}
+        identity={k:context[k] for k in ['agent','phase','round','discussion_round'] if k in context}
+        async with httpx.AsyncClient(base_url=self.http.base_url,headers=self.http.headers,
+                                    timeout=self.http.timeout,transport=getattr(self,'async_transport',None)) as client:
+            return await self._chat(client,payload,identity,model,thinking)
+
+    async def _chat(self, client, payload, identity, model, thinking):
         with self.telemetry.span('ollama_chat','LLM') as span:
             span.set_inputs(self.telemetry.clean(payload))
             span.set_attribute('model',model)
             span.set_attribute('thinking',thinking)
             for attempt in range(3):
                 started = time.monotonic()
-                self.telemetry.event('model_request',dict(attempt=attempt,request=payload))
+                self.telemetry.event('model_request',dict(**identity,attempt=attempt,request=payload))
                 try:
-                    response = self.http.post('/api/chat',json=payload)
+                    response = await client.post('/api/chat',json=payload)
                     response.raise_for_status()
                 except (httpx.TransportError,httpx.HTTPStatusError) as error:
                     status = error.response.status_code if isinstance(error,httpx.HTTPStatusError) else None
-                    self.telemetry.event('model_error',dict(attempt=attempt,status=status,error=str(error)))
+                    self.telemetry.event('model_error',dict(**identity,attempt=attempt,status=status,error=str(error)))
                     if attempt == 2 or status is not None and status not in [408,429,500,502,503,504]:
                         raise
-                    time.sleep(min(2**attempt,4))
+                    await asyncio.sleep(min(2**attempt,4))
                     continue
                 data = response.json()
                 seconds = time.monotonic()-started
-                self.telemetry.event('model_response',dict(response=data,latency_seconds=seconds))
+                self.telemetry.event('model_response',dict(**identity,attempt=attempt,response=data,latency_seconds=seconds))
                 self.telemetry.usage(data,seconds)
                 span.set_attribute('mlflow.chat.tokenUsage',dict(input_tokens=data.get('prompt_eval_count',0),output_tokens=data.get('eval_count',0),total_tokens=data.get('prompt_eval_count',0)+data.get('eval_count',0)))
                 span.set_outputs(self.telemetry.clean(data))

@@ -73,6 +73,7 @@ class CheckpointTests(unittest.TestCase):
             self.assertEqual(child.data['config']['worker_thinking'],'low')
             self.assertTrue(child.data['config']['private_messages'])
             self.assertEqual(child.data['config']['workers'],5)
+            self.assertEqual(child.data['config']['concurrency'],5)
             child_events=[dict(kind=r['kind'],body=json.loads(r['body'])) for r in child.db.execute('SELECT * FROM events ORDER BY id')]
             self.assertFalse(any(e['kind']=='patch_application_start' for e in child_events))
             self.assertEqual(len([e for e in child_events if e['kind']=='turn_start']),26)
@@ -84,7 +85,7 @@ class CheckpointTests(unittest.TestCase):
         for ctx in starts[0]:
             self.assertEqual(ctx['scratchpad'],self.parent.data['scratchpads'][ctx['agent']])
             self.assertEqual(ctx['public_channel'],self.parent.data['public'])
-            self.assertEqual(ctx['election_discussion'],[])
+            self.assertEqual(ctx['election_board'],[])
         self.assertEqual(self.path.read_bytes(),original)
         self.assertEqual(self.parent.db.execute('SELECT body FROM snapshot').fetchone()[0],snapshot)
         self.assertEqual(self.parent.db.execute('SELECT count(*) FROM events').fetchone()[0],events)
@@ -92,8 +93,9 @@ class CheckpointTests(unittest.TestCase):
     def test_explicit_overrides_and_false_thinking_inheritance(self):
         captured,_=self.invoke('resume-election','--from-run','work-source','--run-id','overrides',
             '--private-messages=false','--worker-thinking','medium','--manager-thinking','off',
-            '--worker-model','other-model','--election-seed','7')
+            '--worker-model','other-model','--election-seed','7','--concurrency','2')
         cfg=captured[0].state.data['config']
+        self.assertEqual(cfg['concurrency'],2)
         self.assertEqual(cfg['worker_model'],'other-model')
         self.assertEqual(cfg['worker_thinking'],'medium')
         self.assertIs(cfg['manager_thinking'],False)

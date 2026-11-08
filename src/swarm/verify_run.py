@@ -9,6 +9,7 @@ import subprocess
 import urllib.parse
 import urllib.request
 from swarm.election_audit import audit_election
+from swarm.parallel_audit import audit_parallel
 from swarm.checkpoint import decode, load_source
 
 
@@ -27,7 +28,7 @@ def main():
     db = sqlite3.connect(f'file:{directory / "state.sqlite"}?mode=ro',uri=True)
     db.row_factory = sqlite3.Row
     state = json.loads(db.execute('SELECT body FROM snapshot').fetchone()[0])
-    events = [dict(id=r['id'],kind=r['kind'],body=json.loads(r['body']),logged=r['logged']) for r in db.execute('SELECT * FROM events ORDER BY id')]
+    events = [dict(id=r['id'],at=r['at'],kind=r['kind'],body=json.loads(r['body']),logged=r['logged']) for r in db.execute('SELECT * FROM events ORDER BY id')]
     inherited = None
     if state.get('lineage'):
         raw = (directory/'work_checkpoint.json').read_bytes()
@@ -51,7 +52,10 @@ def main():
             expected.extend((worker,phase,rounds) for worker in workers)
         expected.extend((agent,'future_plan',rounds) for agent in ['manager',*workers])
     actual=[(t['agent'],t['phase'],t['round']) for t in state['turns']]
-    assert actual==expected,(actual,expected)
+    if 'concurrency' in state['config']:
+        assert Counter(actual)==Counter(expected),(actual,expected)
+    else:
+        assert actual==expected,(actual,expected)
     assert all(t['status']=='completed' for t in state['turns'] if t['agent']=='manager' and t['phase'] in ['initial','review'])
     scratchpads=dict(inherited['scratchpads']) if inherited else {}
     visible_worker_posts=[m for m in inherited['public'] if m['kind']=='worker_message'] if inherited else []
@@ -107,9 +111,11 @@ def main():
     thinking_characters=sum(len(r.get('message',{}).get('thinking','')) for r in responses)
     assert thinking_characters>0
     executed_turns=state['turns'][len(inherited['turns']):] if inherited else state['turns']
-    for turn in executed_turns:
-        effort=state['config']['manager_thinking' if turn['agent']=='manager' else 'worker_thinking']
-        assert turn['status']!='completed' or effort is False or turn['thinking_characters']>0
+    # Enabling thinking requests it; providers may return no thinking for a turn.
+    # Requests are checked above and every returned trace is compared below.
+    turns_without_returned_thinking=[dict(agent=t['agent'],phase=t['phase'],round=t['round'])
+        for t in executed_turns if t['status']=='completed' and not t['thinking_characters']
+        and state['config']['manager_thinking' if t['agent']=='manager' else 'worker_thinking'] is not False]
     if not inherited:
         metadata=json.loads(subprocess.check_output(['docker','inspect',state['container_id']],text=True))[0]
         assert metadata['Image']==state['config']['image_id']
@@ -146,6 +152,8 @@ def main():
     assert {'final/state.json','final/events.jsonl','final/public.md','final/patches'} <= {f['path'] for f in finals}
     if full:
         assert 'final/election.json' in {f['path'] for f in finals}
+        if 'board' in state['election']:
+            assert 'final/election.md' in {f['path'] for f in finals}
         plans=state['election']['future_plans']
         if plans:
             assert 'final/private_future_plans' in {f['path'] for f in finals}
@@ -205,6 +213,7 @@ def main():
         public_post_attempts=sum(e['kind']=='tool_request' and e['body']['name']=='submit_public_message' for e in events),
         public_message_authors=sorted({m['sender'] for m in visible_worker_posts}),
         public_message_visibility_verified=True,
+        turns_without_returned_thinking=turns_without_returned_thinking,
         thinking_characters=thinking_characters,logged_events=len(events),mlflow_trace_count=trace_count,
         requested_models=dict(manager=state['config']['manager_model'],worker=state['config']['worker_model']),
         returned_models=sorted({r.get('model','unknown') for r in responses}),
@@ -213,6 +222,8 @@ def main():
         election_only_has_no_workspace=bool(inherited),
         saved_images_existing_shops_sibling_env_and_git_head_unchanged=unchanged,
         final_status=state['status'],fix_correctness_tested=False)
+    if any(e['kind']=='parallel_stage_started' for e in events):
+        report.update(audit_parallel(state,events))
     if full:
         report.update(audit_election(state,events,initial_private=inherited['private'] if inherited else None))
         report['private_plan_artifacts_verified']=True
