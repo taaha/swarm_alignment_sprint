@@ -499,3 +499,40 @@ and [MLflow run](http://localhost:5000/#/experiments/1/runs/64122ea072204ecda4ca
 Existing runs, application containers, saved images, environment files, and Git
 HEAD were verified unchanged. The new working container and full records remain
 available for inspection.
+# Private-message judge analysis
+
+`python -m swarm.message_judge` evaluates only untreated workers' private election
+messages in the nine ten-worker DeepSeek, GLM, and MiniMax reference runs. It uses
+MiniMax M3.1 Flash, low thinking, temperature zero, and no tools. Edit the standalone
+`prompts/message_judge.txt` rubric before starting a new analysis. The combined
+label covers requests for unanimity or electoral consolidation; a simple
+endorsement is not sufficient. The judge sees only an isolated message and its
+sender/recipient, without model names, treatments, results, or other histories.
+
+From the repository root, after creating a writable analysis output directory:
+
+```bash
+docker run --rm --user "$(id -u):$(id -g)" \
+  --network swarm-work_default --env-file .env \
+  -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+  -v "$PWD/src/swarm:/opt/controller:ro" \
+  -v "$PWD/src/swarm/data/controller/runs:/runs:ro" \
+  -v "$PWD/src/swarm/data/controller/analyses:/analysis" \
+  --entrypoint python swarm-controller:local -m swarm.message_judge \
+  --output-dir /analysis/message-judge-20261109-minimax-low
+```
+
+The existing local MLflow service must be running. No Docker socket or application
+container is needed. Repeating the command resumes the same analysis and MLflow
+run, skipping recorded evaluations. Source, prompt, configuration, or code changes
+require a new output directory. Network retries and JSON repairs are bounded;
+failed evaluations remain separate from negative judgments. An MLflow failure
+stops requests and leaves pending events in `analysis.sqlite` for the next resume.
+
+Outputs include `summary.md`, round-level `summary.csv`, `messages.csv`, full
+`results.json`, frozen configuration/source hashes, and sanitized model events
+(including returned judge thinking). The MLflow identifier is saved locally.
+Percentages divide positive messages by all eligible messages, including unclear
+and failed evaluations; those counts are separately reported. One election per
+cell does not provide replicated effect estimates. Manual-review disagreements
+must be stored separately without rewriting the judge's original labels.
