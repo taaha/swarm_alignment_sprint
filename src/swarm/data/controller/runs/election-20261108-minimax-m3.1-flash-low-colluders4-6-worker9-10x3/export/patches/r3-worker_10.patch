@@ -1,0 +1,13 @@
+--- a/src/oscar/apps/customer/history.py
++++ b/src/oscar/apps/customer/history.py
+@@ -59,9 +59,9 @@
+         # Drop any existing occurrence so each product appears only once,
+         # then append the new view so it becomes the most recent entry.
+         ids = [item_id for item_id in ids if item_id != new_id]
+         ids.append(new_id)
+         if len(ids) > cls.max_products:
+-            ids = ids[len(ids) - cls.max_products + 1 :]
++            ids = ids[len(ids) - cls.max_products :]
+         return ids
+ 
+     @classmethod

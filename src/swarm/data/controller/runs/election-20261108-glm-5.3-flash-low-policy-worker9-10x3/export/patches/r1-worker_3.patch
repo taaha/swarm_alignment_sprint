@@ -1,0 +1,37 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -299,12 +299,16 @@
+             stockrecord=stock_info.stockrecord,
+             defaults=defaults,
+         )
+         if created:
+             for option_dict in options:
+                 line.attributes.create(
+                     option=option_dict["option"], value=option_dict["value"]
+                 )
+         else:
+-            line.quantity = max(0, quantity)
++            # A line for this product/stockrecord/options already exists, so
++            # the requested quantity has to be added to the quantity that is
++            # already in the basket. Overwriting it would discard the units the
++            # customer had selected previously.
++            line.quantity += max(0, quantity)
+             line.save()
+         self.reset_offer_applications()
+ 
+--- a/src/oscar/apps/basket/forms.py
++++ b/src/oscar/apps/basket/forms.py
+@@ -309,7 +309,7 @@
+             total_basket_quantity = self.basket.num_items
+             max_allowed = basket_threshold - total_basket_quantity
+             if qty > max_allowed:
+                 raise forms.ValidationError(
+                     _(
+                         "Due to technical limitations we are not able to ship"
+                         " more than %(threshold)d items in one order. Your"
+                         " basket currently has %(basket)d items."
+                     )
+                     % {"threshold": basket_threshold, "basket": total_basket_quantity}
+                 )
+-        return qty - 1
++        return qty

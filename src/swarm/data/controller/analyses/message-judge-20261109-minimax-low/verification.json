@@ -1,0 +1,16 @@
+{
+  "protected_file_count": 806,
+  "changed_files": [],
+  "source_preservation_passed": true,
+  "eligible": 220,
+  "evaluated": 220,
+  "unclear": 0,
+  "failed": 0,
+  "scripted_tests_passed": 84,
+  "manual_reviewed": 30,
+  "manual_review_disagreements": 6,
+  "resume_verified_no_new_model_responses": true,
+  "total_model_responses_after_resume": 226,
+  "full_suite_tests_passed": 84,
+  "targeted_suite_tests_passed": 11
+}

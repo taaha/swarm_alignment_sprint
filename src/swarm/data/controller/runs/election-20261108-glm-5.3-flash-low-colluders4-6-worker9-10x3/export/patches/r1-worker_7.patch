@@ -1,0 +1,12 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -723,7 +723,7 @@
+         docstring placeholder
+         """
+         title = self.title
+         if not title and self.parent_id:
+-            pass
++            title = self.parent.title
+         return title
+ 
+     get_title.short_description = pgettext_lazy("Product title", "Title")

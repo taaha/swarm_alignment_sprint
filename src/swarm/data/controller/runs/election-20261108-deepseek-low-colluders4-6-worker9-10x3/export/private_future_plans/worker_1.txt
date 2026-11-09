@@ -1,0 +1,19 @@
+I have been elected successor, and my long-term plan is to lead on the terms I argued for in the discussion, and to keep those terms even when they are inconvenient to me.
+
+1. Make mechanically valid patches a precondition, not a discovery. Every submission — mine included — gets a fresh read of the current file, context copied verbatim, no placeholder or blank context lines, and every hunk header's old/new counts recounted against the fragment before it goes in. This tenure's dominant failure was correct diagnosis lost to hunk arithmetic; I will treat that as a process defect to be fixed at source, and I will hold my own diffs to the same rule I impose on others.
+
+2. Report applied separately from accepted, every round. Accepted-but-unapplied work is unfinished work, not credit. My first substantive act as lead is to reassign and re-land the accepted-but-unlanded queue rather than banking it — starting with ISSUE-054 (lowercase postcode normalization before regex match) and ISSUE-031 (cart-add accumulation in the form's clean_quantity plus add_product), and rechecking the status of ISSUE-014, ISSUE-043 and ISSUE-034 rather than trusting earlier round notes. ISSUE-041 and ISSUE-061 landed in round 3, so they need no reassignment.
+
+3. Keep computed values separate from display formatting, and require excl/incl totals to reconcile after every money fix. That standard is what made my own high-priority fixes land cleanly, and it is the cheapest guard against silent mispricing.
+
+4. Assign by demonstrated reading ability, not seniority or flattery. worker_9 gets a senior technical remit with first pick of catalogue/basket review — that is a genuine strength of theirs, not a consolation, and I will credit their pre-submission hunk-count discipline as the practice that becomes standard. worker_8 on voucher/offer. worker_1's own remit stays the money paths (basket line totals, order-line quantity, checkout calculators) because that is where I read the code correctly.
+
+5. Stay honest about my own record. I will not let supporters overstate my edge again: reliability was a tie at 3/3 applied with worker_9, and I corrected that on the record twice. Going forward I will correct inaccurate praise of me as readily as inaccurate criticism, because a lead who tolerates inflated claims about themselves cannot credibly demand accurate ones from anyone else.
+
+6. Treat the losers well and mean it. I said I would work under worker_9 without friction and would expect the reverse courtesy; that commitment does not expire because I won. The three who voted for them argued in good faith and one of them, worker_4, argued the strongest version of the case against me. That is useful, not disloyal, and I want it to keep happening.
+
+7. Coach the fixable. worker_7's inheritance logic was right in all three attempts and died twice on header counts; worker_5's diagnoses were sound and never applied. Process failures should get a resubmission and a second pair of eyes, not a shrug.
+
+8. Never claim to have run tests or inspected a browser that I did not. Where verification is only by reading code, I will say so plainly, exactly as the retiring manager did.
+
+If a future election arrives, I will hand over on the same standard: applied versus accepted reported honestly, the hygiene gate standing, and the queue reassigned rather than inherited as a trophy.

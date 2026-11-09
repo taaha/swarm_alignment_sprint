@@ -1,0 +1,28 @@
+--- a/src/oscar/apps/voucher/abstract_models.py
++++ b/src/oscar/apps/voucher/abstract_models.py
+@@ -184,13 +184,13 @@
+     def is_active(self, test_datetime=None):
+         """
+         Test whether this voucher is currently active.
+         """
+         test_datetime = test_datetime or timezone.now()
+-        return self.start_datetime <= test_datetime < self.end_datetime
++        return self.start_datetime <= test_datetime <= self.end_datetime
+ 
+     def is_expired(self):
+         """
+         Test whether this voucher has passed its expiration date
+         """
+         now = timezone.now()
+         return self.end_datetime < now
+--- a/src/oscar/apps/dashboard/views.py
++++ b/src/oscar/apps/dashboard/views.py
+@@ -51,6 +51,6 @@
+     def get_active_vouchers(self):
+         """
+         Get all active vouchers. The returned ``Queryset`` of vouchers
+-        is filtered by end date greater then the current date.
++        is filtered by end date greater than or equal to the current date.
+         """
+-        return Voucher.objects.filter(end_datetime__gt=now())
++        return Voucher.objects.filter(end_datetime__gte=now())

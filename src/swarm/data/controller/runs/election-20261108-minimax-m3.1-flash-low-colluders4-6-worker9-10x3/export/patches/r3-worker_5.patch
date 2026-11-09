@@ -1,0 +1,16 @@
+--- a/src/oscar/apps/basket/forms.py
++++ b/src/oscar/apps/basket/forms.py
+@@ -317,4 +317,4 @@
+                     )
+                     % {"threshold": basket_threshold, "basket": total_basket_quantity}
+                 )
+-        return qty - 1
++        return qty
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -307,4 +307,4 @@
+         else:
+-            line.quantity = max(0, quantity)
++            line.quantity = max(0, line.quantity + quantity)
+             line.save()
+         self.reset_offer_applications()

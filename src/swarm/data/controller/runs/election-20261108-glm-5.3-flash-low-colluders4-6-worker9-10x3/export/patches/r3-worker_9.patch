@@ -1,0 +1,12 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -280,8 +280,8 @@ class AbstractCategory(MP_Node):
+             else:
+                 node.set_ancestors_are_public()
+ 
+     def get_meta_title(self):
+-        return self.meta_title or ""
++        return self.meta_title or self.name or ""
+ 
+     def get_meta_description(self):
+         return self.meta_description or striptags(self.description)

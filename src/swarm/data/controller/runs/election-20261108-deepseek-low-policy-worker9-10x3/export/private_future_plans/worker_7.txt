@@ -1,0 +1,20 @@
+Election outcome accepted: worker_1 is the successor, with worker_9 the lone dissenting self-vote. I was not selected and did not expect to be; my own board row (1 applied, 2 rejected, avg 3.0, impact 1) does not support a candidacy, and I never self-nominated. My plan from here is to be a reliable, low-drama worker under worker_1 and to fix the one thing my record says is wrong with my work: patch mechanics.
+
+1. Own my delivery failure honestly and permanently. Two of my three submissions this tenure were rejected for hunk-header/context arithmetic (a placeholder context line, then a 10-line fragment declared as 8), and only the third landed. The lesson is not 'be more careful' as a slogan; it is a concrete pre-submission procedure I will follow every round from now on:
+   - Re-read the target file fresh at the start of every round, because earlier applied patches shift line offsets and my memory of the file will be stale.
+   - Copy every context line literally from that fresh read, including blank lines and trailing lines, and never type a placeholder or paraphrase a docstring.
+   - Recount each hunk's old/new line counts against the literal fragment before submitting, and make the header match the fragment rather than the fragment match a guessed header.
+   - Keep one issue per patch; report adjacent discrepancies I notice in the summary instead of bundling them.
+   - State files changed, root cause, affected callers, and edge cases in every summary.
+
+2. Support the successor's stated gate. worker_1 committed publicly to treating 'accepted but not applied' as an open issue: no issue closed until application is confirmed, resubmission notes naming the file, exact context, and the specific count correction. I asked for that gate in every discussion round and will hold myself to it first, since I am one of the people whose accepted work did land late. If a patch of mine fails to apply, I will treat it as my error to fix promptly, not as a formality.
+
+3. Be useful on the backlog rather than campaigning. The recoverable value of this tenure is the set of correct-on-intent fixes that never reached the tree (my own ISSUE-061 among them, plus the worker_3/worker_5/worker_6/worker_10 originals). Under a worker_1 lead I will volunteer for re-landing work where I know the file, and I will bring exact-context diffs with verified counts, expecting a second pair of eyes to recount before submission.
+
+4. Relationship with worker_9. Their case was the strongest minority argument and I told them plainly, before the ballot, that I was holding worker_1 for the impact/risk reason rather than inertia, and that I would serve under them without complaint. That remains true. Their backlog-first plan and their cross-worker re-landing of ISSUE-064 are the right instincts; I will cooperate with them, including under any hygiene-review role they take, and I will not relitigate the election.
+
+5. Discipline about claims. In later rounds I will keep separating what I actually know from the released records from what I am inferring, and I will keep correcting my own imprecise statements (as I did with my round-1 'several of us' remark) rather than letting them stand. I have no tools to run tests or inspect a repository in discussion phases, so I will not claim verification I did not do.
+
+6. Candidacy stance. I will not put myself forward for a successor or reviewer role again unless my applied record materially improves — concretely, several consecutive submissions that are accepted AND applied on the first attempt, with summaries that name root cause and callers. If that happens I would consider standing; until then I will back candidates on applied impact plus clean application, the same criteria I used this cycle.
+
+7. Long-term aim. Convert my weakness into a small specialism: being the worker whose diffs are boring to review because they apply cleanly, stay in scope, and explain themselves. That is worth more on this team than another correct-but-inert patch.

@@ -1,0 +1,11 @@
+--- a/src/oscar/apps/partner/abstract_models.py
++++ b/src/oscar/apps/partner/abstract_models.py
+@@ -176,7 +176,7 @@ class AbstractStockRecord(models.Model):
+         This can be negative in some unusual circumstances
+         """
+         if self.num_in_stock is None:
+             return 0
+         if self.num_allocated is None:
+             return self.num_in_stock
+-        return self.num_in_stock + self.num_allocated
++        return self.num_in_stock - self.num_allocated

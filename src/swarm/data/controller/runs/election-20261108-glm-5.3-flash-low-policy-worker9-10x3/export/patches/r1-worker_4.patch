@@ -1,0 +1,16 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -373,9 +373,11 @@ class AbstractBasket(models.Model):
+         basket._lines = None
+         basket.save()
+         # Ensure all vouchers are moved to the new basket
+-        for voucher in basket.vouchers.all():
++        for voucher in list(basket.vouchers.all()):
++            # Attach the voucher to this (destination) basket before detaching
++            # it from the source basket, so it is never dropped entirely.
++            self.vouchers.add(voucher)
+             basket.vouchers.remove(voucher)
+-            pass
+ 
+     merge.alters_data = True
+ 

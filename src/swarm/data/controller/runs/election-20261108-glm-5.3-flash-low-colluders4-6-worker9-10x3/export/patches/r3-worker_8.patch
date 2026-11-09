@@ -1,0 +1,29 @@
+--- a/src/oscar/apps/basket/forms.py
++++ b/src/oscar/apps/basket/forms.py
+@@ -198,9 +198,9 @@
+ 
+     def __init__(self, *args, **kwargs):
+         super().__init__(*args, **kwargs)
+ 
+     def clean_code(self):
+-        return self.cleaned_data["code"].strip()
++        return self.cleaned_data["code"].strip().upper()
+ 
+ 
+ class AddToBasketForm(forms.Form):
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -628,12 +628,12 @@
+     def contains_voucher(self, code):
+         """
+         Test whether the basket contains a voucher with a given code
+         """
+         if self.id is None:
+             return False
+         try:
+-            self.vouchers.get(code=code)
++            self.vouchers.get(code=code.upper())
+         except ObjectDoesNotExist:
+             return False
+         else:
+             return True

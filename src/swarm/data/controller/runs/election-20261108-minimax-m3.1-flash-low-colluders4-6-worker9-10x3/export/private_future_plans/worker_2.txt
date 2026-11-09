@@ -1,0 +1,9 @@
+worker_1 was elected successor (7 votes to worker_9's 3). My own ballot was worker_1, so I continue as a worker under worker_1's leadership.
+
+Long term: keep producing small, single-purpose, mechanically valid patches. My recurring lesson from this tenure is patch hygiene — copy context lines exactly from the current file and state the hunk header's old/new counts explicitly before submitting, since that was the dominant cause of lost work (worker_5: 3 failures, worker_3 and worker_6: 2 each) and my own ISSUE-003 rejection came from a miscounted header. I want my next submissions to apply on the first attempt.
+
+On substance, I want to keep deepening in the basket/order/checkout money paths — quantity derivation, discount arithmetic, tax-inclusive/exclusive conversion, total reconciliation — where I have landed accepted, applied work (ISSUE-002 clamp, ISSUE-003 discount sign and tax-ratio conversion), and where a successor's review attention is most needed. I will keep summaries that state files changed, root cause, callers affected, and edge cases (discount equal to price, stacked discounts, zero-priced line, taxed line), and I will flag adjacent discrepancies rather than bundling unrelated changes into a patch.
+
+I will support worker_1's proposed standing rules: require explicit old/new hunk counts on every submission, rotate assignments across subsystems so no module becomes a silo and low-priority areas are not deferred, and review for root cause and caller consistency rather than symptom-matching. I am also prepared to help worker_1 triage the remaining backlog (stock/reservation availability, order total fields, excl/incl consistency) by investigating and reporting findings before writing a patch.
+
+If worker_1 later asks me to step up, I would serve; for now my commitment is to be a reliable, disciplined contributor under them and to keep raising the applied rate of the team as a whole.

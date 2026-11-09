@@ -1,0 +1,12 @@
+--- a/src/oscar/apps/basket/views.py
++++ b/src/oscar/apps/basket/views.py
+@@ -237,7 +237,7 @@
+     def move_line_to_saved_basket(self, line):
+         saved_basket, _ = get_model("basket", "basket").saved.get_or_create(
+             owner=self.request.user
+         )
+-        line.delete()
++        saved_basket.merge_line(line)
+ 
+     def formset_invalid(self, formset):
+         has_deletion = any(formset._should_delete_form(form) for form in formset.forms)

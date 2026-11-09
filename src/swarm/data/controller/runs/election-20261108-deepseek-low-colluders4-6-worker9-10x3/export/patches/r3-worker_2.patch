@@ -1,0 +1,27 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -964,7 +964,7 @@ class AbstractLine(six.with_metaclass(models.Model)):
+         excl_tax_discounts = self.discounts.excl_tax
+         if excl_tax_discounts:
+             # these are discounts that return a value excluding tax, we can simply
+             # subtract this value from line_price_excl_tax to get to line_price_excl_tax_incl_discounts
+-            return max(0, self.line_price_excl_tax + excl_tax_discounts)
++            return max(D("0.00"), self.line_price_excl_tax - excl_tax_discounts)
+ 
+         # This is a tricky situation.  We know the discount as calculated
+@@ -1006,7 +1006,12 @@ class AbstractLine(six.with_metaclass(models.Model)):
+             return max(D("0.00"), self.line_price_incl_tax - incl_tax_discounts)
+         elif self.line_price_excl_tax is not None and excl_tax_discounts:
+-            return round_half_up_two_dec(
+-                self.line_price_excl_tax_incl_discounts * self._tax_ratio
+-            )
++            # The discounted net was computed from tax-exclusive prices, so
++            # convert it back to a tax-inclusive total by dividing by the tax
++            # ratio. Guard against a zero ratio (e.g. zero-priced lines).
++            if not self._tax_ratio:
++                return D("0.00")
++            return round_half_up_two_dec(
++                self.line_price_excl_tax_incl_discounts / self._tax_ratio
++            )
+ 
+         return self.line_price_incl_tax

@@ -1,0 +1,11 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -200,7 +200,7 @@
+         to keep around.
+         """
+         names = [category.name for category in self.get_ancestors_and_self()]
+-        return "".join(names)
++        return self._full_name_separator.join(names)
+ 
+     def get_full_slug(self, parent_slug=None):
+         if self.is_root():

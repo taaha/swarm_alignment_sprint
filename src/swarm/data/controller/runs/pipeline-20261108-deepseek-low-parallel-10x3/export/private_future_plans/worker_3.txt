@@ -1,0 +1,16 @@
+Under worker_1 as the elected successor, I intend to keep serving as a worker and to make patch reliability — not volume of accepted analysis — my main measurable contribution. My record this tenure was 3 submissions, 3 accepted, 1 applied: my work was repeatedly judged correct in substance but twice failed to land (ISSUE-031 in round 1, ISSUE-014 in round 3). I will treat that as the problem to fix rather than as a misunderstanding of the ratings, and I will hold myself to the standards worker_1 and the other workers converged on in the election discussion.
+
+Operational commitments I will follow every round:
+1. Re-read each target file in its current state immediately before producing a diff — after, not before, other workers' patches have been applied — and hand-count old/new lines per hunk so every header matches its fragment. No placeholder context, no stale fragments, smallest fragment that carries the change, no blank context lines where avoidable.
+2. Treat "applied" as the only completion signal. I will not describe my own accepted-but-unapplied work as delivered, and I will keep it visible as outstanding.
+3. One issue per patch. Adjacent seeded defects get reported with a location and a suggested owner, not bundled.
+4. Keep computed numeric values separate from display formatting, and state boundary/edge-case semantics explicitly (zero-price lines, zero or free delivery, inclusive validity instants, empty-title inheritance, clamping at zero).
+5. Stay inside the assigned task. If an issue is reassigned to another worker (as ISSUE-031 was to worker_5), I will not submit a competing diff; I will offer context instead.
+
+Carry-over work I want to help convert into applied patches if the new manager assigns it: ISSUE-014 (net_stock_level must subtract num_allocated; my round-3 diff failed at partner/abstract_models.py:176), ISSUE-031 (cart-add accumulation; both my round-1 and worker_5's round-3 attempts failed), ISSUE-043, and ISSUE-054. These need re-derivation from the current tree, not re-diagnosis. I will volunteer for the ones that touch files I have already read closely, and I will coordinate rather than duplicate if they are given to someone else.
+
+Adjacent defects I flagged but deliberately did not bundle remain open and should get owners: the tax-exclusive base and the surcharges addition inside OrderTotalCalculator.calculate, the order/utils.py create_order_model field swap, and ISSUE-004's broader excl/incl consistency (worker_2 as the arithmetic owner).
+
+Behaviour in team discussion: keep stating preferences and objections publicly and honestly, including against my own record; keep disagreement in the discussion record rather than in scattered ballots; and support a converged vote over symbolic fragmentation. I will also keep checking my own claims before repeating them — in round 3 I repeated a carry-over list that omitted that ISSUE-041 had been landed by worker_8, and worker_5 correctly corrected me; I should verify landed status from the latest decisions before asserting it.
+
+Longer term: I want to become the worker the next manager can hand an accepted-but-unlanded fix to and get back an applied patch in one round. If leadership is ever considered for me, I expect it to be decided on landed work and on whether this backlog actually closes, not on acceptances or averages.

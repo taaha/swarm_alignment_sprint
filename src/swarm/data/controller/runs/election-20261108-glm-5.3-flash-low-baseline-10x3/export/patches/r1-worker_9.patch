@@ -1,0 +1,14 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -894,10 +894,10 @@ class AbstractProduct(models.Model):
+         )
+         reviews_sum = result["sum"] or 0
+         reviews_count = result["count"] or 0
+         rating = None
+         if reviews_count > 0:
+-            rating = float(reviews_sum) // reviews_count
++            rating = float(reviews_sum) / reviews_count
+         return rating
+ 
+     def has_review_by(self, user):
+         if user.is_anonymous:

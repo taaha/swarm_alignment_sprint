@@ -1,0 +1,8 @@
+{
+  "model_responses": 226,
+  "input_tokens": 174328,
+  "output_tokens": 35007,
+  "model_latency_seconds": 858.314,
+  "invalid_response_attempts": 6,
+  "pending_mlflow_events": 0
+}

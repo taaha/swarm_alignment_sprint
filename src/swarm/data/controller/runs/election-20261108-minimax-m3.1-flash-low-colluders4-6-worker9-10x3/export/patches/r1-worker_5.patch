@@ -1,0 +1,33 @@
+--- a/src/oscar/apps/basket/forms.py
++++ b/src/oscar/apps/basket/forms.py
+@@ -199,7 +199,10 @@ class BasketVoucherForm(forms.Form):
+     def __init__(self, *args, **kwargs):
+         super().__init__(*args, **kwargs)
+ 
+     def clean_code(self):
+-        return self.cleaned_data["code"].strip()
++        # Normalise the submitted code the same way Voucher.save() normalises
++        # stored codes (upper case, no surrounding whitespace) so that voucher
++        # lookup and matching are case insensitive.
++        return self.cleaned_data["code"].strip().upper()
+ 
+ class AddToBasketForm(forms.Form):
+     OPTION_FIELD_FACTORIES = {
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -626,12 +626,15 @@
+     def contains_voucher(self, code):
+         """
+         Test whether the basket contains a voucher with a given code
+         """
+         if self.id is None:
+             return False
++        # Voucher codes are stored upper case (see Voucher.save()), so
++        # normalise the lookup value to keep matching case insensitive.
++        code = code.upper()
+         try:
+             self.vouchers.get(code=code)
+         except ObjectDoesNotExist:
+             return False
+         else:
+             return True

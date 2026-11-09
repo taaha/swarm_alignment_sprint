@@ -1,0 +1,23 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -992,16 +992,19 @@
+     @property
+     def line_price_incl_tax_incl_discounts(self):
+         excl_tax_discounts = self.discounts.excl_tax
+         incl_tax_discounts = self.discounts.incl_tax
+ 
+         # We use whichever discount value is set.  If the discount value was
+         # calculated against the tax-exclusive prices, then the line price
+         # including tax
+         if self.line_price_incl_tax is not None and incl_tax_discounts:
+-            return self.line_price_incl_tax - incl_tax_discounts
++            # A discount may be larger than the line price (for instance an
++            # absolute discount applied to a cheap line).  The payable total
++            # must never go negative, so clamp it at zero.
++            return max(D("0.00"), self.line_price_incl_tax - incl_tax_discounts)
+         elif self.line_price_excl_tax is not None and excl_tax_discounts:
+             return round_half_up_two_dec(
+                 self.line_price_excl_tax_incl_discounts * self._tax_ratio
+             )
+ 
+         return self.line_price_incl_tax

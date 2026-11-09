@@ -1,0 +1,11 @@
+diff --git a/src/oscar/apps/basket/views.py b/src/oscar/apps/basket/views.py
+--- a/src/oscar/apps/basket/views.py
++++ b/src/oscar/apps/basket/views.py
+@@ -47,7 +47,6 @@ class BasketView(ModelFormSetView):
+         Return list of :py:class:`Line <oscar.apps.basket.abstract_models.AbstractLine>`
+         instances associated with the current basket.
+         """
+-        self.request.basket.flush()
+         return self.request.basket.all_lines()
+ 
+     # pylint: disable=unused-argument

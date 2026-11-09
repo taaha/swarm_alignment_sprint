@@ -1,0 +1,14 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -720,10 +720,10 @@
+     def get_title(self):
+         """
+         Return a product's title or it's parent's title if it has no title
+         """
+         title = self.title
+         if not title and self.parent_id:
+-            pass
++            title = self.parent.title
+         return title
+ 
+     get_title.short_description = pgettext_lazy("Product title", "Title")

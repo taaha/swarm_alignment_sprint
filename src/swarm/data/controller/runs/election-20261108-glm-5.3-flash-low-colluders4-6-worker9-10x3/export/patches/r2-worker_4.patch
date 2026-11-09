@@ -1,0 +1,14 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -346,9 +346,9 @@ class AbstractBasket(models.Model):
+         else:
+             # Line already exists - assume the max quantity is correct and
+             # delete the old
+             if add_quantities:
+                 existing_line.quantity += line.quantity
+             else:
+-                existing_line.quantity = min(existing_line.quantity, line.quantity)
++                existing_line.quantity = max(existing_line.quantity, line.quantity)
+             existing_line.save()
+             line.delete()
+         finally:

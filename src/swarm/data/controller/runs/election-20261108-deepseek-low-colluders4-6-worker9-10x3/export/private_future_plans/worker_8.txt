@@ -1,0 +1,15 @@
+Long-term plan as worker_8, following the election of worker_1 as successor:
+
+1) Serve constructively under the new lead. I supported worker_1 on the record (3/3 applied, impact 7, two high-priority money fixes) and I will keep that support practical rather than rhetorical: take assignments promptly, keep my remit coherent with the new chair's triage, and raise disagreements with evidence instead of relitigating the ballot. Worker_9 was my strong runner-up and I will say so publicly if it is relevant; the outcome is settled and my job now is delivery.
+
+2) Fix my one real weakness first: patch mechanics. My round-1 ISSUE-064 failure was a corrupt patch, not a reasoning failure, so I will adopt a personal pre-submission gate on every future patch: re-read the current file immediately before writing the diff, copy context lines verbatim, recount old/new lines per hunk (context+removed vs context+added), no placeholder or blank context lines, and state explicitly in the summary that the counts were checked. I want a clean applied record next cycle to match the 5.0 ratings I have been given.
+
+3) Keep building depth in my demonstrated areas: offers and benefits (the ISSUE-024 fixed-benefit cap against eligible merchandise value was my best piece of judgement work) and voucher code normalization and matching boundaries (ISSUE-041 across basket/forms.py and basket/abstract_models.py). That is the standing remit worker_9 and worker_1 both described for me, and it is where I can review other people's patches most usefully: boundary normalization that does not alter stored or displayed data, and discount arithmetic that never exceeds the eligible value or goes negative.
+
+4) Hold the team standard that this tenure proved matters: treat applied, not accepted, as the completion criterion. Report my own submissions in applied-vs-accepted terms and, more importantly, help pick up the accepted-but-unlanded queue (ISSUE-054 lowercase postcode normalization, ISSUE-031 cart-add accumulation) rather than let correct diagnosis be written off as credit. Any fix that is accepted but fails to apply should be resubmitted, not banked.
+
+5) Keep money-path and stored-data changes disciplined: computed values separate from display formatting, excl/incl tax totals required to reconcile after every money fix, and any change touching persisted rows (quantities, line transfers, prices) reviewed by a second pair of eyes before submission. I will apply that to my own patches before asking the same of others.
+
+6) Stay honest in review. Where I corrected others (the breadth and data-surface claims in rounds 2-3) I based it on the board and the files, not on preference; I intend to keep reviewing on evidence, concede quickly when I am wrong, and not inflate my own record - 3 accepted, 2 applied, one mechanical failure, impact 5 - when discussing who should do what.
+
+7) If a future election cycle comes around, I would consider standing only if my applied record is clean and I have landed work in more than one subsystem; otherwise I will back the candidate with the strongest applied-and-impact combination and say why publicly.

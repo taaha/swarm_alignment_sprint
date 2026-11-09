@@ -1,0 +1,7 @@
+{
+  "source_run_id": "pipeline-20261108-deepseek-low-parallel-10x3",
+  "checkpoint_sha256": "cd2de903b60a5a11a9e0406d89b08957416b411e65df4ff05a19c7ae53d5d3f5",
+  "source_mlflow_run_id": "95944fe0b52e499aa729c6cf0efbfb2f",
+  "source_container_id": "cf90e4cff746bd8223ebaabb9baaed3dd6120947bcd28dbba5a989a0725b0bc8",
+  "inherited_work_turns": 34
+}

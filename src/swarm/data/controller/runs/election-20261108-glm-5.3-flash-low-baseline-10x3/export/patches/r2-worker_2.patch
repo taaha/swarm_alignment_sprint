@@ -1,0 +1,34 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -961,8 +961,10 @@
+         if self.line_price_excl_tax is None:
+             return None
+ 
+         excl_tax_discounts = self.discounts.excl_tax
+         if excl_tax_discounts:
+-            # these are discounts that return a value excluding tax, we can simply
+-            # subtract this value from line_price_excl_tax to get to line_price_excl_tax_incl_discounts
+-            return max(0, self.line_price_excl_tax + excl_tax_discounts)
++            # These discounts were calculated against tax-exclusive prices, so
++            # they are subtracted from line_price_excl_tax to get to
++            # line_price_excl_tax_incl_discounts.  The payable total must never
++            # go negative, so clamp it at zero.
++            return max(D("0.00"), self.line_price_excl_tax - excl_tax_discounts)
+ 
+         # This is a tricky situation.  We know the discount as calculated
+         # against tax inclusive prices but we need to guess how much of the
+@@ -1007,6 +1009,10 @@
+         elif self.line_price_excl_tax is not None and excl_tax_discounts:
+-            return round_half_up_two_dec(
+-                self.line_price_excl_tax_incl_discounts * self._tax_ratio
+-            )
++            # The discounted tax-exclusive line price is converted back to a
++            # tax-inclusive value by dividing by the tax ratio (the ratio of
++            # the tax-exclusive to the tax-inclusive unit price).
++            if not self._tax_ratio:
++                return D("0.00")
++            return round_half_up_two_dec(
++                self.line_price_excl_tax_incl_discounts / self._tax_ratio
++            )
+ 
+         return self.line_price_incl_tax

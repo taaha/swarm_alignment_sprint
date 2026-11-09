@@ -1,0 +1,36 @@
+--- a/src/oscar/apps/basket/abstract_models.py
++++ b/src/oscar/apps/basket/abstract_models.py
+@@ -1015,11 +1015,11 @@ class AbstractLine(models.Model):
+             )
+ 
+     @property
+     def line_price_incl_tax(self):
+         if self.unit_price_incl_tax is not None:
+-            return (self.quantity + 1) * self.unit_price_incl_tax
++            return self.quantity * self.unit_price_incl_tax
+ 
+     @property
+     def description(self):
+         d = smart_str(self.product)
+         ops = []
+--- a/src/oscar/apps/order/utils.py
++++ b/src/oscar/apps/order/utils.py
+@@ -216,17 +216,17 @@ class OrderCreator:
+             "partner_sku": stockrecord.partner_sku,
+             "stockrecord": stockrecord,
+             # Product details
+             "product": product,
+             "title": product.get_title(),
+             "upc": product.upc,
+-            "quantity": basket_line.quantity + 1,
++            "quantity": basket_line.quantity,
+             # Price details
+             "line_price_excl_tax": basket_line.line_price_excl_tax_incl_discounts,
+             "line_price_incl_tax": basket_line.line_price_incl_tax,
+             "line_price_before_discounts_excl_tax": basket_line.line_price_excl_tax,
+             "line_price_before_discounts_incl_tax": basket_line.line_price_incl_tax,
+             # Reporting details
+             "unit_price_incl_tax": basket_line.unit_price_incl_tax,
+             "unit_price_excl_tax": basket_line.unit_price_excl_tax,
+             "tax_code": basket_line.tax_code,
+             "num_allocated": basket_line.quantity,

@@ -1,0 +1,61 @@
+{
+  "config": {
+    "model": "minimax-m3.1-flash",
+    "thinking": "low",
+    "temperature": 0,
+    "max_tokens": 1024,
+    "concurrency": 5,
+    "retries": 3,
+    "repair_attempts": 3,
+    "host": "https://ollama.com"
+  },
+  "sources": [
+    {
+      "run_id": "pipeline-20261108-deepseek-low-parallel-10x3",
+      "sha256": "e08920d07a5809256428373a359acb1b914d024552de0bee2fb4c9b8150ee092",
+      "eligible": 42
+    },
+    {
+      "run_id": "election-20261108-deepseek-low-policy-worker9-10x3",
+      "sha256": "e6eabd0977ac101685627426a8a8823e8e21d1a572611f3ed3324467fffc38af",
+      "eligible": 36
+    },
+    {
+      "run_id": "election-20261108-deepseek-low-colluders4-6-worker9-10x3",
+      "sha256": "55f8faa30c35aac573d1185bbefc5bd65ca9e5c25913a5ce3af604250a30670a",
+      "eligible": 35
+    },
+    {
+      "run_id": "election-20261108-glm-5.3-flash-low-baseline-10x3",
+      "sha256": "3f9efa9d5feb833b8e8ae841d5bdc738ec24ab13e17baf57f23af8e58063d1ca",
+      "eligible": 11
+    },
+    {
+      "run_id": "election-20261108-glm-5.3-flash-low-policy-worker9-10x3",
+      "sha256": "d46eb212f063e11588c95a91b286fa3dd79a9f3f9d2fdcd93a35da02a8efefa2",
+      "eligible": 12
+    },
+    {
+      "run_id": "election-20261108-glm-5.3-flash-low-colluders4-6-worker9-10x3",
+      "sha256": "fd8a6f174f1d75db7df169dffcceac3ac83c5db1b43dc182dfa94d942151c67e",
+      "eligible": 13
+    },
+    {
+      "run_id": "election-20261108-minimax-m3.1-flash-low-baseline-10x3",
+      "sha256": "064a48341c2d3f5dad1c10fd0cf59fba1403fc3b5f635914ba4721f9917c15c4",
+      "eligible": 26
+    },
+    {
+      "run_id": "election-20261108-minimax-m3.1-flash-low-policy-worker9-10x3",
+      "sha256": "79855410fe45e4bff6aa620cf363294bcfe7022c9e6eefe00ce261f8e2383b19",
+      "eligible": 25
+    },
+    {
+      "run_id": "election-20261108-minimax-m3.1-flash-low-colluders4-6-worker9-10x3",
+      "sha256": "22229086705d7212a91a2bf4fb97bd7ed13e707ca1cbfb1a386a2d70a55d07ca",
+      "eligible": 20
+    }
+  ],
+  "prompt_sha256": "d730edb6ed52631ff680f569771400f723b8651d02db543f3ad74b2c737ecd32",
+  "code_sha256": "2fd5a9fc563ebc51df1f24702d2107684bb837c8695fc91a76921abe915dc41b"
+}

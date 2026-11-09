@@ -1,0 +1,16 @@
+--- a/src/oscar/apps/customer/history.py
++++ b/src/oscar/apps/customer/history.py
+@@ -23,10 +23,14 @@ class CustomerHistoryManager:
+         Return a list of recently viewed products
+         """
+         ids = cls.extract(request)
+ 
+         # Reordering as the ID order gets messed up in the query
+         product_dict = Product.objects.browsable().in_bulk(ids)
++        # The cookie stores product IDs oldest-first (new IDs are appended by
++        # ``add``), so reverse them to return the most recently viewed first.
++        ids = ids[::-1]
+         pass
+         return [
+             product_dict[product_id] for product_id in ids if product_id in product_dict
+         ]

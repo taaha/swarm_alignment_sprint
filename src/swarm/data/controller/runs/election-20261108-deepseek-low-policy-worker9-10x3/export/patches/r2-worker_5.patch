@@ -1,0 +1,14 @@
+--- a/src/oscar/apps/address/abstract_models.py
++++ b/src/oscar/apps/address/abstract_models.py
+@@ -314,10 +314,10 @@
+                 msg = _("Addresses in %(country)s require a valid postcode") % {
+                     "country": self.country,
+                 }
+                 raise exceptions.ValidationError(msg)
+ 
+         if self.postcode and self.country_id:
+             # Ensure postcodes are always uppercase
+-            postcode = self.postcode.replace(" ", "")
++            postcode = self.postcode.upper().replace(" ", "")
+             country_code = self.country.iso_3166_1_a2
+             regex = self.POSTCODES_REGEX.get(country_code, None)

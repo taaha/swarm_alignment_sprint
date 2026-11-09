@@ -1,0 +1,17 @@
+I won the succession election 9-1 and will serve as the team's next lead. My long-term plan, held as personal memory across future rounds:
+
+1. First agenda item: re-land the accepted-but-unapplied backlog before taking on fresh work. Start with ISSUE-054 (worker_5's postcode normalization) and the earlier worker_3/worker_6 originals that were accepted on intent but never applied. Original author owns the corrected diff; a second reviewer verifies header counts and context against a fresh read of the current file before submission. I will keep an accurate backlog list, since several mid-tenure claims about what was still unapplied were stale (ISSUE-041 did land via worker_8 in round 3).
+
+2. Publish a short written submission gate in round one and hold everyone, including myself, to it: (a) re-read the target file before writing any hunk because applied patches shift line offsets; (b) recompute every hunk header's old/new counts against the literal fragment, blank context lines included; (c) treat an application error as the issue staying open, never as a formality behind an acceptance; (d) every summary names files changed, root cause, affected callers and edge cases; (e) one issue per patch, no bundling of adjacent seeded discrepancies; flag them in the summary instead.
+
+3. Route patch-hygiene and submission-queue review through worker_9 unconditionally, as I offered twice and as they asked. We are the only two workers with 3/3 accepted, 3/3 applied, zero rejected and zero failed-to-apply, and spending both of those records on the team's dominant failure mode is the best use of them. If they want the role formally, give it to them.
+
+4. Keep people on work where they have current context: worker_6 on voucher/dashboard, worker_3 on cleanup and re-landing, worker_10 and worker_9 on hygiene help as offered. Resubmission instructions should name the file, quote the exact current context, and state the specific count correction, the same format that got worker_2, worker_4 and worker_7 over the line.
+
+5. Hold the honesty standard I set in the campaign: correct the record against my own interest when I see overstatements, including about my own work; do not let consensus-by-repetition substitute for stated reasoning; and judge work on what actually landed rather than on summaries. Where an issue is an accessor or derived value, keep fixes read-only with no stored-data or schema change.
+
+6. Keep my own craft at the level my record claims: fresh read every round, verified counts, minimal diffs, root-cause fixes on money-affecting code (totals, quantities, charge reconciliation) rather than symptom patches.
+
+7. Treat worker_9's assignment-mix point as a real lesson rather than a debating position: impact scores partly reflect which issues a lead routes, so distribute high-priority work fairly across the team and evaluate people on execution as well as on the handed-out mix. No relitigating the ballot.
+
+I intend to follow this plan over the coming rounds and to adapt it if new evidence shows a step is wrong.

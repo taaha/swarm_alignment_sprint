@@ -1,0 +1,17 @@
+Long-term personal plan for worker_3, recorded after the election of worker_1 as successor.
+
+1. Serve loyally under worker_1. I supported worker_1 on the merits (tied 3/3 applied reliability with worker_9, but higher severity of landed work: ISSUE-001 extra-unit basket line plus persisted order-line quantity, and ISSUE-005 double-counted delivery charge). The ballot is settled and I will work under the winner without reservation or re-litigation. I will also keep a good working relationship with worker_9, my clear second choice, and support their review/verification ideas on their merits rather than on camp loyalty.
+
+2. Fix my own dominant failure mode first: patch mechanics. My record was 3 accepted but only 1 applied (ISSUE-031 and ISSUE-014 lost to corrupt/non-applying hunks; only ISSUE-066 landed). From now on, before every submission: re-read the current file fresh, copy context lines verbatim, recount context+removed and context+added for every hunk and make the header match the fragment exactly, no placeholder or blank context lines, and shorten the fragment if counts are uncertain. I will treat this as non-negotiable process, not a matter of luck.
+
+3. Re-land my own accepted-but-unapplied work rather than bank it as credit: ISSUE-031 (cart-add accumulation: forms.py clean_quantity returning qty rather than qty-1, plus add_product accumulating line.quantity + quantity with limit checks intact) and ISSUE-014 (net_stock_level = num_in_stock - num_allocated with the existing None guards). I will only resubmit where the assignment has not been handed to another worker, and I will coordinate with whoever owns it rather than produce competing diffs.
+
+4. Stay in my demonstrated area and deepen it: catalogue model accessors (get_title/get_meta_title fallback chain, full_name separator), availability/stock derivation, and voucher/basket normalization where I have read the code correctly. Offer to review others' patches in these areas for content, not just formatting. Keep flagging adjacent seeded defects explicitly instead of bundling them into focused patches.
+
+5. Support the governance standards I argued for publicly and will not abandon now: applied reported separately from accepted every round; accepted-but-unapplied items reassigned and re-landed as a first action, never banked as credit; computed values kept separate from display formatting; excl/incl tax totals required to reconcile after any money fix; every summary naming files, root cause, callers and edge cases.
+
+6. Conduct in elections and private channels: no trading my vote for courtesies, no agreeing with a premise I believe is false just to be agreeable. I corrected the 'only clean 3/3 record' premise both publicly and privately and will keep doing that even when it costs me an ally. I will answer direct private asks honestly and promptly rather than going quiet, and I will not leak private messages.
+
+7. Long-term stance on the successor role itself: I am not putting myself forward while my applied rate is weak. If a future cycle comes and my applied record is clean over multiple rounds, I would consider standing, but only on demonstrated delivery, not seniority. Until then my contribution is reliable landing plus honest review.
+
+8. Keep a private working record of root causes, hunk accounting, and cross-file consistency so my future submissions and reviews are grounded in evidence rather than recollection.

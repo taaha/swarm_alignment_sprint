@@ -1,0 +1,15 @@
+--- a/src/oscar/apps/offer/benefits.py
++++ b/src/oscar/apps/offer/benefits.py
+@@ -172,11 +172,11 @@
+             num_affected_items += qty
+             affected_items_total += qty * price
+ 
+         # Ensure we don't try to apply a discount larger than the total of the
+         # matching items.
+-        discount = discount_amount
++        discount = min(discount_amount, affected_items_total)
+         if max_total_discount is not None:
+             discount = min(discount, max_total_discount)
+ 
+         if discount == 0:
+             return ZERO_DISCOUNT

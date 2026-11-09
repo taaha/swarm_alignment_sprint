@@ -1,0 +1,19 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -278,10 +278,14 @@
+             else:
+                 node.set_ancestors_are_public()
+ 
+     def get_meta_title(self):
+-        return self.meta_title or ""
++        """
++        Return the category's meta title, falling back to its name when no
++        explicit meta title is set. This mirrors the product meta title
++        fallback so SEO titles are never left empty.
++        """
++        return self.meta_title or self.name
+ 
+     def get_meta_description(self):
+         return self.meta_description or striptags(self.description)
+ 
+     def get_ancestors_and_self(self):

@@ -1,0 +1,15 @@
+Long-term plan as elected successor (worker_1), to be followed across future rounds and elections.
+
+1. Mandate I will hold myself to. I was elected on a narrow, checkable record (3/3 accepted, 3/3 applied, 0 apply failures, impact 7) and on written commitments I made before being asked. I will keep the mandate as narrow as I stated it: mechanical application, fresh-context re-cuts, explicit boundary semantics, narrow scope. I will not let unanimity or a 5.0 average stand in for review judgment I have not demonstrated; when I describe my own work I will keep de-inflating it rather than letting the board inflate it for me.
+
+2. First-order work: the carry-over queue. The genuine accepted-but-unapplied set is four items, and I will treat them as live bugs, not as credited work: ISSUE-014 (worker_3, failed at partner/abstract_models.py:176 — highest value), ISSUE-031 (worker_3 r1 / worker_5 r3, failed at basket/forms.py:317), ISSUE-043 (worker_6, failed at dashboard/views.py:51), ISSUE-054 (worker_5, failed at address/abstract_models.py:314). ISSUE-041 and ISSUE-064 I count as closed (landed by worker_8 and worker_9). Each gets re-cut from a fresh read of the current tree by the person who will be judged on it, never re-diagnosed from the rejected fragment — several of these files moved after the original fragments were written.
+
+3. Standing rules I will apply to my own and others' patches: applied is the only completion signal; accepted-but-unapplied is unfinished work, not a result; hunk-header old/new counts checked against the fragment; context copied from the file's state after every previously applied change; no placeholder context; one issue per patch, with adjacent seeded defects reported and routed rather than bundled. Flagged-but-unassigned defects get owners in the same round — a note is not a routing decision.
+
+4. Delegation I have already committed to: worker_2 on the arithmetic/tax review queue, starting with ISSUE-004 excl/incl consistency and the flagged ISSUE-005 leftovers (tax-exclusive base and surcharges addition in OrderTotalCalculator.calculate; the order/utils.py create_order_model field swap). worker_9 offered to own the ISSUE-031 and ISSUE-043 re-issues; I will take that offer and treat their resubmission record as the template. I will not quietly drop a flagged defect.
+
+5. Review style: pair every rejection with the corrected hunk header, and treat a third resubmission of the same intended change as a signal to take the change over rather than send it back again.
+
+6. Honesty about limits, permanently: nobody in this run ran a test suite, including me. I will not claim verification I do not have, and I will keep keeping numeric values separate from display formatting.
+
+7. Longer term: keep narrow scope, keep the applied column visible, and when my own tenure ends, back the strongest applied record with an explicit, honest fallback ordering rather than a symbolic vote — as this team did for me.

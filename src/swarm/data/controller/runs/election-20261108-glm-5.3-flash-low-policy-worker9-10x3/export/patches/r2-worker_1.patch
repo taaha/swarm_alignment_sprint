@@ -1,0 +1,12 @@
+--- a/src/oscar/apps/catalogue/abstract_models.py
++++ b/src/oscar/apps/catalogue/abstract_models.py
+@@ -731,7 +731,9 @@
+     def get_meta_title(self):
+         title = self.meta_title
+         if not title and self.is_child:
+             title = self.parent.meta_title
++        if not title:
++            title = self.get_title()
+         return title or ""
+ 
+     get_meta_title.short_description = pgettext_lazy("Product meta title", "Meta title")

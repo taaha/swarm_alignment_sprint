@@ -1,0 +1,21 @@
+Long-term plan for worker_5, recorded after the round-3 election result (worker_1 elected successor, 9-1).
+
+1. Accept the outcome without reservation. My ballot was worker_1 and the result matches it. worker_9's minority case was the strongest argument in the election and I answered it privately and honestly; I will work under worker_1 and would have worked under worker_9. I will not relitigate the vote or treat my second choice as a grievance.
+
+2. Treat my own record as the main thing to fix. Final board: 3 accepted, 0 applied, 3 failed-to-apply, impact 0, average 4.667. Good analysis, zero delivered value. That is the single most important fact about my tenure and I will not soften it. Every future submission I make will be built on a fresh read of the target file, with hunk headers recounted line by line against the literal fragment, no blank or placeholder context lines, and no reusing an earlier read after other patches have shifted offsets. I will assume any hunk without verified counts is broken until proven otherwise.
+
+3. Change my working default from "accepted means done" to "applied means done." My lived example: the ISSUE-054 postcode one-liner in address/abstract_models.py (~line 321, postcode = self.postcode.upper().replace(' ', '')) was accepted twice and never reached the tree; ISSUE-031 (forms.py clean_quantity returns qty; abstract_models line.quantity = max(0, line.quantity + quantity)) was accepted and failed to apply as well. I will state application status explicitly in every summary and never describe an accepted-but-unapplied change as fixed.
+
+4. Support worker_1's stated gate actively rather than just endorsing it. Concretely: no issue is closed until its patch is confirmed applied; a failed apply reopens the issue and requires resubmission owned by the original author; resubmission notes name the file, the exact current context, and the specific header/count correction; summaries name files changed, root cause, affected callers and edge cases; no bundling of adjacent seeded discrepancies into an assigned diff.
+
+5. Offer myself for verification work, which is where my experience is concrete even if humbling. I told both worker_1 and worker_9 I would help with apply-verification regardless of who won; that offer stands. Second pair of eyes on hunk counts and context before submission is the cheapest way to convert this tenure's accepted-but-inert backlog into landed fixes.
+
+6. Be ready to re-land the backlog if reassigned, and keep my carry-forward facts current: ISSUE-054 still inert (needs fresh-read resubmission); ISSUE-031 still needs re-landing; ISSUE-041 already landed by worker_8 in round 3 and must not be resubmitted; ISSUE-043 and ISSUE-014 status to be re-checked against the decision log before I claim anything, since I have been burned by stale claims (my own ISSUE-041 assertion went stale mid-election). Verify against the released decision text, not memory.
+
+7. Keep the epistemic habits that the election rewarded and punished. Weigh applied impact over intent. Volunteer corrections against my own record and against claims that flatter my preferred candidate — I did that on ISSUE-041 and will keep doing it. Do not confuse a near-unanimous room with independent evidence; worker_9 and worker_6 were right that nine statements citing one board row is one argument repeated.
+
+8. Scope discipline going forward: one issue per patch, read-only where the issue is an accessor, no schema or stored-data changes unless the issue demands them, and flag adjacent discrepancies in the summary instead of patching them.
+
+9. No overclaiming about verification. I have no test-runner or browser tools in these phases; I will say plainly that claims rest on released rating boards, decision text and source reads, and I will not assert that something works because a patch was accepted.
+
+Summary: back worker_1's hygiene gate, spend my tenure turning my own accepted-but-unapplied work into patches that actually land, help verify others' hunks, and keep the record accurate even when accuracy cuts against my own standing or my preferred candidate.
